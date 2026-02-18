@@ -25,15 +25,20 @@ tab1, tab2, tab3 = st.tabs(["💧 Soluzione", "⚙️ Pompa Dosatrice", "🏊 Po
 # --- TAB 1: PREPARAZIONE SOLUZIONE ---
 with tab1:
     st.header("1. Preparazione Soluzione")
+    st.write("Calcola il valore di concentrazione da impostare sulla pompa.")
+    
     col_a, col_b = st.columns(2)
     with col_a:
         vol_vasca = st.number_input("Volume Vasca Soluzione (L)", min_value=0.0, value=100.0)
         litri_inseriti = st.number_input("Litri di prodotto versati (L)", min_value=0.0, value=10.0)
     with col_b:
-        perc_prodotto = st.number_input("% Prodotto Commerciale", min_value=0.0, max_value=100.0, value=15.0)
+        perc_prodotto = st.number_input("% Prodotto Commerciale (es. 15%)", min_value=0.0, max_value=100.0, value=15.0)
     
+    # Calcolo concentrazione per programmazione
     risultato_perc = (litri_inseriti / vol_vasca) * perc_prodotto if vol_vasca > 0 else 0
-    st.success(f"Concentrazione Reale nella vasca: **{risultato_perc:.2f} %**")
+    
+    # Messaggio corretto per il tecnico
+    st.success(f"**Valore da inserire in programmazione: {risultato_perc:.2f} %**")
 
 # --- TAB 2: CALCOLO PORTATA POMPA ---
 with tab2:
@@ -44,7 +49,8 @@ with tab2:
         pressione = st.number_input("Pressione impianto (bar)", min_value=0.0, value=2.0)
     with col2:
         dosaggio_des = st.number_input("Dosaggio desiderato (g/mc o ppm)", min_value=0.0, value=2.0)
-        conc_sol = st.number_input("% Conc. soluzione nel bidone", min_value=0.01, value=risultato_perc if risultato_perc > 0 else 10.0)
+        # Prende il valore dal Tab 1
+        conc_sol = st.number_input("% Conc. soluzione impostata", min_value=0.01, value=risultato_perc if risultato_perc > 0 else 10.0)
 
     principio_attivo = portata_imp * dosaggio_des
     portata_pompa = principio_attivo / (conc_sol * 10) if conc_sol > 0 else 0
@@ -54,7 +60,7 @@ with tab2:
     res_c1.metric("Principio Attivo", f"{principio_attivo:.2f} g/h")
     res_c2.metric("Portata Pompa", f"{portata_pompa:.2f} l/h")
 
-# --- TAB 3: POOL ASSISTANT (Completo) ---
+# --- TAB 3: POOL ASSISTANT (Completo di Power Clor e Cianurico) ---
 with tab3:
     st.header("3. 💧 Pool Assistant")
     
@@ -68,11 +74,10 @@ with tab3:
 
     if st.button("CALCOLA INTERVENTI", type="primary", use_container_width=True):
         st.divider()
-        cya_reale = cya_ril / 2  # Logica dal tuo file HTML
+        cya_reale = cya_ril / 2 
         st.info(f"**Dato Cianurico Reale:** {cya_reale:.1f} ppm")
         
-        # pH (Target 7.2)
-        st.subheader("Gestione pH")
+        # pH
         if ph_ril > 7.2:
             diff = (ph_ril - 7.2) / 0.1
             st.warning(f"**pH ALTO.** Inserire:\n"
@@ -85,8 +90,7 @@ with tab3:
         else:
             st.success("pH ottimale.")
 
-        # Cloro (Target 1.5)
-        st.subheader("Integrazione Cloro")
+        # Cloro
         if cl_ril < 1.5:
             diff_cl = 1.5 - cl_ril
             st.error(f"**Cloro BASSO.** Inserire:\n"
@@ -96,13 +100,12 @@ with tab3:
         else:
             st.success("Cloro a norma.")
             
-        # Acido Cianurico (Target 30)
-        st.subheader("Acido Cianurico (Stabi)")
+        # Acido Cianurico
+        st.subheader("Integrazione Stabilizzante")
         if cya_reale < 30:
             mancante = 30 - cya_reale
-            st.warning(f"Dose Acido Cianurico: **{(v_piscina*mancante)/1000:.2f} kg**")
+            st.warning(f"Dose Acido Cianurico per raggiungere 30ppm: **{(v_piscina*mancante)/1000:.2f} kg**")
         else:
-            st.success("Stabilizzante a norma.")
+            st.success("Acido Cianurico a norma.")
         
-        # Alghicida
-        st.write(f"**Alghicida (Mantenimento):** {(v_piscina*5)/1000:.2f} L/settimana")
+        st.write(f"**Alghicida (Mantenimento settimanale):** {(v_piscina*5)/1000:.2f} L")
