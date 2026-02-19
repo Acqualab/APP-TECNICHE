@@ -32,22 +32,12 @@ except:
 
 st.title("🧪 Suite Calcoli Light")
 
-tab1, tab2 = st.tabs(["💧 Soluzione", "🏊 Pool Assistant"])
+# SCAMBIO TAB: Pool Assistant ora è il primo
+tab1, tab2 = st.tabs(["🏊 Pool Assistant", "💧 Soluzione"])
 
+# --- TAB 1: POOL ASSISTANT (ORA PRINCIPALE) ---
 with tab1:
-    st.header("1. Preparazione Soluzione")
-    col_a, col_b = st.columns(2)
-    with col_a:
-        vol_vasca = st.number_input("Volume Vasca Soluzione (L)", min_value=0.0, value=100.0)
-        litri_inseriti = st.number_input("Litri prodotto versati (L)", min_value=0.0, value=10.0)
-    with col_b:
-        perc_prodotto = st.number_input("% Prodotto Commerciale", min_value=0.0, max_value=100.0, value=15.0)
-    
-    ris_perc = (litri_inseriti / vol_vasca) * perc_prodotto if vol_vasca > 0 else 0
-    st.success(f"### ✅ Valore in programmazione: {ris_perc:.2f} %")
-
-with tab2:
-    st.header("2. 💧 Pool Assistant")
+    st.header("1. 💧 Pool Assistant")
     c1, c2 = st.columns(2)
     with c1:
         v_piscina = st.number_input("Volume Piscina (m³)", min_value=0.0, value=100.0)
@@ -58,13 +48,13 @@ with tab2:
 
     st.markdown("---")
     st.subheader("🧂 Sezione Sale")
-    # CORREZIONE: Inserimento in g/L (che equivale a kg/mc)
-    sale_ril_gl = st.number_input("Sale rilevato (g/L)", min_value=0.0, value=0.0, step=0.1, help="Grammi per litro equivalgono a kg al metro cubo")
+    # Inserimento in g/L (equivalente a kg/mc)
+    sale_ril_gl = st.number_input("Sale rilevato (g/L)", min_value=0.0, value=0.0, step=0.1)
 
     if st.button("🚀 CALCOLA INTERVENTI", type="primary", use_container_width=True):
         st.divider()
         
-        # LOGICA SALE (Target 4.5 g/L e 1.5 g/L)
+        # LOGICA SALE
         m_std = max(0.0, 4.5 - sale_ril_gl)
         m_ls = max(0.0, 1.5 - sale_ril_gl)
         
@@ -103,3 +93,16 @@ with tab2:
             st.markdown(f'<p class="nome-prodotto">👉 Dose Acido Cianurico: <span class="misura-grande">{(v_piscina*(30-cya_reale))/1000:.2f}</span> <span class="unita-misura">kg</span></p>', unsafe_allow_html=True)
         
         st.markdown(f'<p class="nome-prodotto">👉 Alghicida (Settimana): <span class="misura-grande">{(v_piscina*5)/1000:.2f}</span> <span class="unita-misura">L</span></p>', unsafe_allow_html=True)
+
+# --- TAB 2: PREPARAZIONE SOLUZIONE ---
+with tab2:
+    st.header("2. Preparazione Soluzione")
+    col_a, col_b = st.columns(2)
+    with col_a:
+        vol_vasca = st.number_input("Volume Vasca Soluzione (L)", min_value=0.0, value=100.0)
+        litri_inseriti = st.number_input("Litri prodotto versati (L)", min_value=0.0, value=10.0)
+    with col_b:
+        perc_prodotto = st.number_input("% Prodotto Commerciale", min_value=0.0, max_value=100.0, value=15.0)
+    
+    ris_perc = (litri_inseriti / vol_vasca) * perc_prodotto if vol_vasca > 0 else 0
+    st.success(f"### ✅ Valore in programmazione: {ris_perc:.2f} %")
