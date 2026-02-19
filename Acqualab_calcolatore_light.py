@@ -33,7 +33,7 @@ except:
 
 st.title("🧪 Suite Calcoli Light")
 
-# Pool Assistant come prima schermata
+# Pool Assistant è la Tab principale
 tab1, tab2 = st.tabs(["🏊 Pool Assistant", "💧 Soluzione"])
 
 # --- TAB 1: POOL ASSISTANT ---
@@ -48,18 +48,19 @@ with tab1:
         cya_ril = st.number_input("Acido Cianurico (ppm)", min_value=0.0, value=0.0)
 
     st.markdown("---")
-    st.subheader("🧂 Sezione Sale")
+    st.subheader("🧂 Inserimento Sale")
     sale_ril_gl = st.number_input("Sale rilevato (g/L)", min_value=0.0, value=0.0, step=0.1)
 
     if st.button("🚀 CALCOLA DOSAGGI", type="primary", use_container_width=True):
         st.divider()
         
-        # SALE
+        # NUOVA SEZIONE: SALE
+        st.subheader("🧂 Sezione Sale")
         m_std = max(0.0, 4.5 - sale_ril_gl)
         m_ls = max(0.0, 1.5 - sale_ril_gl)
-        cs1, cs2 = st.columns(2)
-        cs1.metric("Clorinatore Standard", f"{(v_piscina * m_std):.2f} kg")
-        cs2.metric("Bassa Salinità", f"{(v_piscina * m_ls):.2f} kg")
+        
+        st.markdown(f'<p class="nome-prodotto">🧂 Clorinatore Standard: <span class="misura-grande">{(v_piscina * m_std):.2f}</span> <span class="unita-misura">kg</span></p>', unsafe_allow_html=True)
+        st.markdown(f'<p class="nome-prodotto">🧂 Bassa Salinità: <span class="misura-grande">{(v_piscina * m_ls):.2f}</span> <span class="unita-misura">kg</span></p>', unsafe_allow_html=True)
 
         # pH
         st.subheader("📊 Correzione pH")
@@ -80,32 +81,3 @@ with tab1:
             d_cl = 1.5 - cl_ril
             st.markdown(f'<p class="nome-prodotto">👉 Chemacal 70: <span class="misura-grande">{(v_piscina*1.5*d_cl)/1000:.2f}</span> <span class="unita-misura">kg</span></p>', unsafe_allow_html=True)
             st.markdown(f'<p class="nome-prodotto">👉 Power Clor 56: <span class="misura-grande">{(v_piscina*1.8*d_cl)/1000:.2f}</span> <span class="unita-misura">kg</span></p>', unsafe_allow_html=True)
-            st.markdown(f'<p class="nome-prodotto">👉 Chemaclor L: <span class="misura-grande">{(v_piscina*7*d_cl)/1000:.2f}</span> <span class="unita-misura">L</span></p>', unsafe_allow_html=True)
-        else:
-            st.success("✅ Cloro a norma.")
-            
-        # STABILIZZANTE
-        st.subheader("📊 Stabilizzante")
-        cya_reale = cya_ril / 2
-        st.info(f"**Dato Cianurico Reale:** {cya_reale:.1f} ppm")
-        if cya_reale < 30:
-            st.markdown(f'<p class="nome-prodotto">👉 Dose Acido Cianurico: <span class="misura-grande">{(v_piscina*(30-cya_reale))/1000:.2f}</span> <span class="unita-misura">kg</span></p>', unsafe_allow_html=True)
-        
-        # SEZIONE ALGHICIDA
-        st.subheader("🌿 Alghicida")
-        st.markdown(f'<p class="nome-prodotto">✨ Algiprevent Inizio stagione: <span class="misura-grande">{(v_piscina*2)/100:.2f}</span> <span class="unita-misura">L</span></p>', unsafe_allow_html=True)
-        st.markdown(f'<p class="nome-prodotto">✨ Algiprevent Urto: <span class="misura-grande">{(v_piscina*5)/100:.2f}</span> <span class="unita-misura">L</span></p>', unsafe_allow_html=True)
-        st.markdown(f'<p class="nome-prodotto">✨ Algiprevent Mantenimento: <span class="misura-grande">{(v_piscina*1)/100:.2f}</span> <span class="unita-misura">L</span></p>', unsafe_allow_html=True)
-
-# --- TAB 2: SOLUZIONE ---
-with tab2:
-    st.header("Preparazione Soluzione Vasca")
-    col_a, col_b = st.columns(2)
-    with col_a:
-        vol_vasca = st.number_input("Volume Vasca Soluzione (L)", min_value=0.0, value=100.0)
-        litri_ins = st.number_input("Litri prodotto versati (L)", min_value=0.0, value=10.0)
-    with col_b:
-        perc_prod = st.number_input("% Prodotto Commerciale", min_value=0.0, max_value=100.0, value=15.0)
-    
-    ris_p = (litri_ins / vol_vasca) * perc_prod if vol_vasca > 0 else 0
-    st.success(f"### ✅ Valore in programmazione: {ris_p:.2f} %")
