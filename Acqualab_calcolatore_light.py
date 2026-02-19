@@ -25,7 +25,7 @@ st.markdown("""
     </style>
     """, unsafe_allow_html=True)
 
-# --- SIDEBAR E TITOLO ---
+# --- SIDEBAR ---
 try:
     st.sidebar.image("Color con payoff - senza sfondo.png", use_container_width=True)
 except:
@@ -33,14 +33,14 @@ except:
 
 st.title("🧪 Suite Calcoli Light")
 
-# Tab: Pool Assistant è la principale
+# Tab principali
 tab1, tab2 = st.tabs(["🏊 Pool Assistant", "💧 Soluzione"])
 
 # --- TAB 1: POOL ASSISTANT ---
 with tab1:
     st.header("Analisi e Interventi")
     
-    # INPUT DATI PRINCIPALI
+    # Input Dati
     c1, c2 = st.columns(2)
     with c1:
         v_piscina = st.number_input("Volume Piscina (m³)", min_value=0.0, value=100.0)
@@ -50,19 +50,22 @@ with tab1:
         cya_ril = st.number_input("Acido Cianurico (ppm)", min_value=0.0, value=0.0)
 
     st.markdown("---")
-    # INPUT SALE IN MG/L (PPM) COME DA STRISCE REATTIVE
-    sale_ril_mgl = st.number_input("Sale rilevato (mg/L - ppm)", min_value=0.0, value=0.0, step=100.0)
+    # SALE: Input in mg/L (ppm) dalle strisce reattive
+    sale_ril_mgl = st.number_input("Sale rilevato (mg/L o ppm)", min_value=0.0, value=0.0, step=100.0)
 
     if st.button("🚀 CALCOLA TUTTI I DOSAGGI", type="primary", use_container_width=True):
         st.divider()
         
         # 1. SEZIONE SALE (Conversione mg/L -> g/L)
         st.subheader("🧂 Sezione Sale")
+        # 1000 mg/L = 1 g/L. Se la striscia dà 2000, abbiamo 2 g/L.
         sale_attuale_gl = sale_ril_mgl / 1000
+        
         # Target: Standard 4.5 g/L | Bassa Salinità 1.5 g/L
         m_std = max(0.0, 4.5 - sale_attuale_gl)
         m_ls = max(0.0, 1.5 - sale_attuale_gl)
         
+        # Calcolo: (Target - Rilevato) * Volume m3 = kg di sale da aggiungere
         st.markdown(f'<p class="nome-prodotto">🧂 Clorinatore Standard (Target 4.5): <span class="misura-grande">{(v_piscina * m_std):.2f}</span> <span class="unita-misura">kg</span></p>', unsafe_allow_html=True)
         st.markdown(f'<p class="nome-prodotto">🧂 Bassa Salinità (Target 1.5): <span class="misura-grande">{(v_piscina * m_ls):.2f}</span> <span class="unita-misura">kg</span></p>', unsafe_allow_html=True)
         st.divider()
@@ -102,15 +105,21 @@ with tab1:
             st.success("✅ Livello stabilizzante adeguato.")
         st.divider()
         
-        # 5. SEZIONE ALGHICIDA (Algiprevent)
+        # 5. SEZIONE ALGHICIDA (Dati esatti immagine: 2L, 5L, 1L per 100mc)
         st.subheader("🌿 Alghicida")
         st.markdown(f'<p class="nome-prodotto">✨ Algiprevent Inizio stagione: <span class="misura-grande">{(v_piscina*2)/100:.2f}</span> <span class="unita-misura">L</span></p>', unsafe_allow_html=True)
         st.markdown(f'<p class="nome-prodotto">✨ Algiprevent Urto: <span class="misura-grande">{(v_piscina*5)/100:.2f}</span> <span class="unita-misura">L</span></p>', unsafe_allow_html=True)
         st.markdown(f'<p class="nome-prodotto">✨ Algiprevent Mantenimento: <span class="misura-grande">{(v_piscina*1)/100:.2f}</span> <span class="unita-misura">L</span></p>', unsafe_allow_html=True)
 
-# --- TAB 2: PREPARAZIONE SOLUZIONE ---
+# --- TAB 2: SOLUZIONE ---
 with tab2:
     st.header("Preparazione Soluzione Vasca")
     col_a, col_b = st.columns(2)
     with col_a:
-        vol_vasca = st.number_input("
+        vol_vasca = st.number_input("Volume Vasca Soluzione (L)", min_value=0.0, value=100.0)
+        litri_ins = st.number_input("Litri prodotto versati (L)", min_value=0.0, value=10.0)
+    with col_b:
+        perc_prod = st.number_input("% Prodotto Commerciale", min_value=0.0, max_value=100.0, value=15.0)
+    
+    ris_p = (litri_ins / vol_vasca) * perc_prod if vol_vasca > 0 else 0
+    st.success(f"### ✅ Valore in programmazione: {ris_p:.2f} %")
