@@ -3,24 +3,34 @@ import streamlit as st
 # --- CONFIGURAZIONE PAGINA ---
 st.set_page_config(page_title="Acqualab Light", page_icon="💧", layout="centered")
 
-# --- STILE CSS PER LEGGIBILITÀ MASSIMA ---
+# --- STILE CSS AGGIORNATO PER DARK E LIGHT MODE ---
 st.markdown("""
     <style>
+    /* Numero gigante in rosso */
     .misura-grande {
         font-size: 40px !important;
         font-weight: bold;
-        color: #E63946;
-        margin-left: 15px;
+        color: #FF4B4B; /* Rosso acceso più visibile */
+        margin-left: 10px;
     }
+    /* Nome prodotto - Grigio chiarissimo per contrasto su nero e bianco */
     .nome-prodotto {
-        font-size: 20px;
+        font-size: 18px;
         font-weight: 500;
-        color: #1D3557;
+        color: #E0E0E0; 
     }
+    /* Unità di misura - Azzurro chiaro */
     .unita-misura {
-        font-size: 24px;
-        color: #457B9D;
+        font-size: 22px;
+        color: #00D1FF;
         font-weight: bold;
+    }
+    /* Divider più visibile */
+    hr {
+        margin-top: 1rem;
+        margin-bottom: 1rem;
+        border: 0;
+        border-top: 1px solid #555;
     }
     </style>
     """, unsafe_allow_html=True)
@@ -33,14 +43,12 @@ except:
 
 st.title("🧪 Suite Calcoli Light")
 
-# Tab principali
 tab1, tab2 = st.tabs(["🏊 Pool Assistant", "💧 Soluzione"])
 
 # --- TAB 1: POOL ASSISTANT ---
 with tab1:
     st.header("Analisi e Interventi")
     
-    # Input Dati
     c1, c2 = st.columns(2)
     with c1:
         v_piscina = st.number_input("Volume Piscina (m³)", min_value=0.0, value=100.0)
@@ -56,16 +64,12 @@ with tab1:
     if st.button("🚀 CALCOLA TUTTI I DOSAGGI", type="primary", use_container_width=True):
         st.divider()
         
-        # 1. SEZIONE SALE (Conversione mg/L -> g/L)
+        # 1. SEZIONE SALE
         st.subheader("🧂 Sezione Sale")
-        # 1000 mg/L = 1 g/L. Se la striscia dà 2000, abbiamo 2 g/L.
         sale_attuale_gl = sale_ril_mgl / 1000
-        
-        # Target: Standard 4.5 g/L | Bassa Salinità 1.5 g/L
         m_std = max(0.0, 4.5 - sale_attuale_gl)
         m_ls = max(0.0, 1.5 - sale_attuale_gl)
         
-        # Calcolo: (Target - Rilevato) * Volume m3 = kg di sale da aggiungere
         st.markdown(f'<p class="nome-prodotto">🧂 Clorinatore Standard (Target 4.5): <span class="misura-grande">{(v_piscina * m_std):.2f}</span> <span class="unita-misura">kg</span></p>', unsafe_allow_html=True)
         st.markdown(f'<p class="nome-prodotto">🧂 Bassa Salinità (Target 1.5): <span class="misura-grande">{(v_piscina * m_ls):.2f}</span> <span class="unita-misura">kg</span></p>', unsafe_allow_html=True)
         st.divider()
@@ -98,14 +102,14 @@ with tab1:
         # 4. SEZIONE STABILIZZANTE
         st.subheader("📊 Stabilizzante")
         cya_reale = cya_ril / 2
-        st.info(f"**Dato Cianurico Reale:** {cya_reale:.1f} ppm")
+        st.info(f"Dato Cianurico Reale: {cya_reale:.1f} ppm")
         if cya_reale < 30:
             st.markdown(f'<p class="nome-prodotto">👉 Dose Acido Cianurico: <span class="misura-grande">{(v_piscina*(30-cya_reale))/1000:.2f}</span> <span class="unita-misura">kg</span></p>', unsafe_allow_html=True)
         else:
             st.success("✅ Livello stabilizzante adeguato.")
         st.divider()
         
-        # 5. SEZIONE ALGHICIDA (Dati esatti immagine: 2L, 5L, 1L per 100mc)
+        # 5. SEZIONE ALGHICIDA (Algiprevent)
         st.subheader("🌿 Alghicida")
         st.markdown(f'<p class="nome-prodotto">✨ Algiprevent Inizio stagione: <span class="misura-grande">{(v_piscina*2)/100:.2f}</span> <span class="unita-misura">L</span></p>', unsafe_allow_html=True)
         st.markdown(f'<p class="nome-prodotto">✨ Algiprevent Urto: <span class="misura-grande">{(v_piscina*5)/100:.2f}</span> <span class="unita-misura">L</span></p>', unsafe_allow_html=True)
@@ -116,10 +120,10 @@ with tab2:
     st.header("Preparazione Soluzione Vasca")
     col_a, col_b = st.columns(2)
     with col_a:
-        vol_vasca = st.number_input("Volume Vasca Soluzione (L)", min_value=0.0, value=100.0)
-        litri_ins = st.number_input("Litri prodotto versati (L)", min_value=0.0, value=10.0)
+        vol_vasca = st.number_input("Volume Vasca Soluzione (L)", min_value=0.0, value=100.0, key="vol_v")
+        litri_ins = st.number_input("Litri prodotto versati (L)", min_value=0.0, value=10.0, key="lit_i")
     with col_b:
-        perc_prod = st.number_input("% Prodotto Commerciale", min_value=0.0, max_value=100.0, value=15.0)
+        perc_prod = st.number_input("% Prodotto Commerciale", min_value=0.0, max_value=100.0, value=15.0, key="perc_p")
     
     ris_p = (litri_ins / vol_vasca) * perc_prod if vol_vasca > 0 else 0
     st.success(f"### ✅ Valore in programmazione: {ris_p:.2f} %")
