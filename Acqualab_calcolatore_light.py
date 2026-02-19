@@ -33,7 +33,7 @@ except:
 
 st.title("🧪 Suite Calcoli Light")
 
-# Pool Assistant è la Tab principale
+# Pool Assistant come prima schermata
 tab1, tab2 = st.tabs(["🏊 Pool Assistant", "💧 Soluzione"])
 
 # --- TAB 1: POOL ASSISTANT ---
@@ -91,7 +91,7 @@ with tab1:
         if cya_reale < 30:
             st.markdown(f'<p class="nome-prodotto">👉 Dose Acido Cianurico: <span class="misura-grande">{(v_piscina*(30-cya_reale))/1000:.2f}</span> <span class="unita-misura">kg</span></p>', unsafe_allow_html=True)
         
-        # NUOVA SEZIONE: ALGICIDA
+        # SEZIONE ALGHICIDA
         st.subheader("🌿 Alghicida")
         st.markdown(f'<p class="nome-prodotto">✨ Algiprevent Inizio stagione: <span class="misura-grande">{(v_piscina*2)/100:.2f}</span> <span class="unita-misura">L</span></p>', unsafe_allow_html=True)
         st.markdown(f'<p class="nome-prodotto">✨ Algiprevent Urto: <span class="misura-grande">{(v_piscina*5)/100:.2f}</span> <span class="unita-misura">L</span></p>', unsafe_allow_html=True)
