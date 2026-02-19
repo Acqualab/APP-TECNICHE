@@ -21,6 +21,13 @@ st.markdown("""
         font-size: 22px;
         color: #457B9D;
     }
+    .dosaggio-dettaglio {
+        font-size: 16px;
+        color: #1D3557;
+        margin-left: 40px;
+        margin-top: -10px;
+        margin-bottom: 10px;
+    }
     </style>
     """, unsafe_allow_html=True)
 
@@ -32,10 +39,10 @@ except:
 
 st.title("🧪 Suite Calcoli Light")
 
-# SCAMBIO TAB: Pool Assistant ora è il primo
+# Pool Assistant come prima schermata
 tab1, tab2 = st.tabs(["🏊 Pool Assistant", "💧 Soluzione"])
 
-# --- TAB 1: POOL ASSISTANT (ORA PRINCIPALE) ---
+# --- TAB 1: POOL ASSISTANT ---
 with tab1:
     st.header("1. 💧 Pool Assistant")
     c1, c2 = st.columns(2)
@@ -48,16 +55,14 @@ with tab1:
 
     st.markdown("---")
     st.subheader("🧂 Sezione Sale")
-    # Inserimento in g/L (equivalente a kg/mc)
     sale_ril_gl = st.number_input("Sale rilevato (g/L)", min_value=0.0, value=0.0, step=0.1)
 
     if st.button("🚀 CALCOLA INTERVENTI", type="primary", use_container_width=True):
         st.divider()
         
-        # LOGICA SALE
+        # SALE
         m_std = max(0.0, 4.5 - sale_ril_gl)
         m_ls = max(0.0, 1.5 - sale_ril_gl)
-        
         col_s1, col_s2 = st.columns(2)
         col_s1.metric("Clorinatore Standard", f"{(v_piscina * m_std):.2f} kg")
         col_s2.metric("Bassa Salinità", f"{(v_piscina * m_ls):.2f} kg")
@@ -85,14 +90,18 @@ with tab1:
         else:
             st.success("✅ Cloro a norma.")
             
-        # STABILIZZANTE
-        st.subheader("📊 Stabilizzante e Manutenzione")
+        # STABILIZZANTE E ALGIPREVENT
+        st.subheader("📊 Stabilizzante e Algiprevent")
         cya_reale = cya_ril / 2
         st.info(f"**Dato Cianurico Reale:** {cya_reale:.1f} ppm")
         if cya_reale < 30:
             st.markdown(f'<p class="nome-prodotto">👉 Dose Acido Cianurico: <span class="misura-grande">{(v_piscina*(30-cya_reale))/1000:.2f}</span> <span class="unita-misura">kg</span></p>', unsafe_allow_html=True)
         
-        st.markdown(f'<p class="nome-prodotto">👉 Alghicida (Settimana): <span class="misura-grande">{(v_piscina*5)/1000:.2f}</span> <span class="unita-misura">L</span></p>', unsafe_allow_html=True)
+        # Sezione Algiprevent con dosaggi specifici
+        st.markdown('<p class="nome-prodotto">✨ Algiprevent:</p>', unsafe_allow_html=True)
+        st.markdown(f'<p class="dosaggio-dettaglio">🔹 Inizio stagione: <b>{(v_piscina*2)/100:.2f} L</b></p>', unsafe_allow_html=True)
+        st.markdown(f'<p class="dosaggio-dettaglio">🔹 Trattamento d\'urto: <b>{(v_piscina*5)/100:.2f} L</b></p>', unsafe_allow_html=True)
+        st.markdown(f'<p class="dosaggio-dettaglio">🔹 Mantenimento (sett): <b>{(v_piscina*1)/100:.2f} L</b></p>', unsafe_allow_html=True)
 
 # --- TAB 2: PREPARAZIONE SOLUZIONE ---
 with tab2:
