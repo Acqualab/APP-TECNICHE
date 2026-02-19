@@ -7,14 +7,6 @@ st.set_page_config(
     layout="centered"
 )
 
-# --- LOGICA DI RESET CON RICARICAMENTO FORZATO ---
-def reset_all():
-    # 1. Cancella tutto lo stato della sessione
-    for key in st.session_state.keys():
-        del st.session_state[key]
-    # 2. Forza il ricaricamento totale dell'app (Infallibile)
-    st.rerun()
-
 # --- SIDEBAR: LOGO E INFO ---
 try:
     st.sidebar.image("Color con payoff - senza sfondo.png", use_container_width=True)
@@ -35,10 +27,10 @@ with tab1:
     st.header("1. Preparazione Soluzione")
     col_a, col_b = st.columns(2)
     with col_a:
-        vol_vasca = st.number_input("Volume Vasca Soluzione (L)", min_value=0.0, value=100.0, key="v_vasca")
-        litri_inseriti = st.number_input("Litri di prodotto versati (L)", min_value=0.0, value=10.0, key="l_ins")
+        vol_vasca = st.number_input("Volume Vasca (L)", min_value=0.0, value=100.0, key="v_vasca")
+        litri_inseriti = st.number_input("Litri prodotto versati (L)", min_value=0.0, value=10.0, key="l_ins")
     with col_b:
-        perc_prodotto = st.number_input("% Prodotto Commerciale (es. 15%)", min_value=0.0, max_value=100.0, value=15.0, key="p_prod")
+        perc_prodotto = st.number_input("% Prodotto Commerciale", min_value=0.0, max_value=100.0, value=15.0, key="p_prod")
     
     risultato_perc = (litri_inseriti / vol_vasca) * perc_prodotto if vol_vasca > 0 else 0
     st.success(f"**Valore da inserire in programmazione: {risultato_perc:.2f} %**")
@@ -49,10 +41,10 @@ with tab2:
     col1, col2 = st.columns(2)
     with col1:
         portata_imp = st.number_input("Portata impianto (mc/h)", min_value=0.0, value=10.0, key="p_imp")
-        pressione = st.number_input("Pressione impianto (bar)", min_value=0.0, value=2.0, key="press")
+        pressione = st.number_input("Pressione (bar)", min_value=0.0, value=2.0, key="press")
     with col2:
-        dosaggio_des = st.number_input("Dosaggio desiderato (g/mc o ppm)", min_value=0.0, value=2.0, key="dos_des")
-        conc_sol = st.number_input("% Conc. soluzione impostata", min_value=0.01, value=risultato_perc if risultato_perc > 0 else 10.0, key="c_sol")
+        dosaggio_des = st.number_input("Dosaggio desiderato (g/mc)", min_value=0.0, value=2.0, key="dos_des")
+        conc_sol = st.number_input("% Conc. impostata", min_value=0.01, value=risultato_perc if risultato_perc > 0 else 10.0, key="c_sol")
 
     principio_attivo = portata_imp * dosaggio_des
     portata_pompa = principio_attivo / (conc_sol * 10) if conc_sol > 0 else 0
@@ -66,14 +58,14 @@ with tab2:
 with tab3:
     st.header("3. 💧 Pool Assistant")
     
+    # Campi di input con chiavi per il reset
     c1, c2 = st.columns(2)
     with c1:
         v_piscina = st.number_input("Volume Piscina (m³)", min_value=0.0, value=0.0, key="v_pisc")
-        # Il pH torna sempre a 7.2 con il ricaricamento
         ph_ril = st.number_input("pH Rilevato", min_value=0.0, max_value=14.0, value=7.2, step=0.1, key="ph_r")
     with c2:
         cl_ril = st.number_input("Cloro Libero (ppm)", min_value=0.0, value=0.0, step=0.1, key="cl_r")
-        cya_ril = st.number_input("Acido Cianurico rilevato (ppm)", min_value=0.0, value=0.0, key="cya_r")
+        cya_ril = st.number_input("Acido Cianurico (ppm)", min_value=0.0, value=0.0, key="cya_r")
 
     st.markdown("---")
     st.subheader("🧂 Sezione Sale (Clorinatori)")
@@ -81,11 +73,16 @@ with tab3:
 
     # BOTTONI AZIONE
     col_btn1, col_btn2 = st.columns([3, 1])
+    
     with col_btn1:
         calcola = st.button("CALCOLA INTERVENTI", type="primary", use_container_width=True)
+    
     with col_btn2:
-        # Questo pulsante ora ricarica l'intera pagina
-        st.button("RESET", on_click=reset_all, use_container_width=True)
+        # Il reset ora svuota solo le chiavi specifiche di questo tab senza ricaricare tutto
+        if st.button("RESET", use_container_width=True):
+            for k in ["v_pisc", "ph_r", "cl_r", "cya_r", "s_ril"]:
+                st.session_state[k] = 0.0 if k != "ph_r" else 7.2
+            st.rerun()
 
     if calcola:
         if v_piscina <= 0:
@@ -93,7 +90,7 @@ with tab3:
         else:
             st.divider()
             
-            # LOGICA SALE (4.5 kg/mc Standard - 1.5 kg/mc LS)
+            # --- CALCOLO SALE ---
             sale_ril_kg = sale_ril_g / 1000
             m_std = max(0.0, 4.5 - sale_ril_kg)
             m_ls = max(0.0, 1.5 - sale_ril_kg)
@@ -105,11 +102,11 @@ with tab3:
 
             st.divider()
 
-            # PARAMETRI CHIMICI (Dal tuo file Pool Assistant.html)
+            # --- PARAMETRI CHIMICI (Target 7.2 pH / 1.5 Cloro) ---
             cya_reale = cya_ril / 2
             st.info(f"**Dato Cianurico Reale:** {cya_reale:.1f} ppm")
             
-            # pH (Target 7.2)
+            # pH
             st.subheader("Gestione pH")
             if ph_ril > 7.2:
                 diff = (ph_ril - 7.2) / 0.1
@@ -123,7 +120,7 @@ with tab3:
             else:
                 st.success("pH ottimale (7.2).")
 
-            # Cloro (Target 1.5)
+            # Cloro
             st.subheader("Integrazione Cloro")
             if cl_ril < 1.5:
                 d_cl = 1.5 - cl_ril
@@ -134,11 +131,10 @@ with tab3:
             else:
                 st.success("Cloro a norma.")
             
-            # Cianurico (Target 30)
+            # Acido Cianurico
             if cya_reale < 30:
                 st.subheader("Stabilizzante")
                 st.warning(f"Dose Acido Cianurico: **{(v_piscina*(30-cya_reale))/1000:.2f} kg**")
             
             st.divider()
-            # Dose alghicida 5ml/m3
             st.write(f"**Alghicida (Mantenimento):** {(v_piscina*5)/1000:.2f} L/settimana")
