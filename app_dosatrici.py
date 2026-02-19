@@ -7,22 +7,12 @@ st.set_page_config(
     layout="centered"
 )
 
-# --- FUNZIONE RESET ---
+# --- FUNZIONE RESET TOTALE ---
 def reset_all():
+    # Elimina tutte le chiavi dallo stato della sessione
     for key in st.session_state.keys():
-        st.session_state[key] = st.session_state.get(f"default_{key}", 0.0)
-    # Forza il reset specifico dei valori numerici ai default
-    st.session_state.v_vasca = 100.0
-    st.session_state.l_ins = 10.0
-    st.session_state.p_prod = 15.0
-    st.session_state.p_imp = 10.0
-    st.session_state.press = 2.0
-    st.session_state.dos_des = 2.0
-    st.session_state.v_pisc = 100.0
-    st.session_state.ph_r = 7.2
-    st.session_state.cl_r = 1.0
-    st.session_state.cya_r = 0.0
-    st.session_state.s_ril = 0.0
+        del st.session_state[key]
+    # Nota: Streamlit ricaricherà i widget con i valori di 'value' predefiniti
 
 # --- SIDEBAR: LOGO E INFO ---
 try:
@@ -61,6 +51,7 @@ with tab2:
         pressione = st.number_input("Pressione impianto (bar)", min_value=0.0, value=2.0, key="press")
     with col2:
         dosaggio_des = st.number_input("Dosaggio desiderato (g/mc o ppm)", min_value=0.0, value=2.0, key="dos_des")
+        # Prende il valore dinamico dal Tab 1
         conc_sol = st.number_input("% Conc. soluzione impostata", min_value=0.01, value=risultato_perc if risultato_perc > 0 else 10.0, key="c_sol")
 
     principio_attivo = portata_imp * dosaggio_des
@@ -77,80 +68,82 @@ with tab3:
     
     c1, c2 = st.columns(2)
     with c1:
-        v_piscina = st.number_input("Volume Piscina (m³)", min_value=0.0, value=100.0, key="v_pisc")
+        v_piscina = st.number_input("Volume Piscina (m³)", min_value=0.0, value=0.0, key="v_pisc")
         ph_ril = st.number_input("pH Rilevato", min_value=0.0, max_value=14.0, value=7.2, step=0.1, key="ph_r")
     with c2:
-        cl_ril = st.number_input("Cloro Libero (ppm)", min_value=0.0, value=1.0, step=0.1, key="cl_r")
+        cl_ril = st.number_input("Cloro Libero (ppm)", min_value=0.0, value=0.0, step=0.1, key="cl_r")
         cya_ril = st.number_input("Acido Cianurico rilevato (ppm)", min_value=0.0, value=0.0, key="cya_r")
 
     st.markdown("---")
     st.subheader("🧂 Sezione Sale (Clorinatori)")
-    # Cambiata etichetta in g/mc come richiesto
-    sale_ril_g = st.number_input("Sale rilevato (g/mc)", min_value=0.0, value=0.0, step=100.0, key="s_ril", help="Inserisci il valore rilevato in grammi per metro cubo")
+    sale_ril_g = st.number_input("Sale rilevato (g/mc)", min_value=0.0, value=0.0, step=100.0, key="s_ril")
 
     # BOTTONI AZIONE
     col_btn1, col_btn2 = st.columns([3, 1])
     with col_btn1:
+        # Il calcolo viene eseguito solo se il volume è maggiore di 0
         calcola = st.button("CALCOLA INTERVENTI", type="primary", use_container_width=True)
     with col_btn2:
+        # Il tasto reset ora svuota tutto lo stato della sessione
         st.button("RESET", on_click=reset_all, use_container_width=True)
 
     if calcola:
-        st.divider()
-        
-        # --- LOGICA SALE ---
-        # Conversione g/mc in kg/mc per il calcolo (es: 3500 g/mc = 3.5 kg/mc)
-        sale_ril_kg = sale_ril_g / 1000
-        
-        st.subheader("Integrazione Sale")
-        mancante_std = max(0.0, 4.5 - sale_ril_kg)
-        tot_sale_std = v_piscina * mancante_std
-        
-        mancante_ls = max(0.0, 1.5 - sale_ril_kg)
-        tot_sale_ls = v_piscina * mancante_ls
-        
-        s_col1, s_col2 = st.columns(2)
-        with s_col1:
-            st.metric("Clorinatore Standard", f"{tot_sale_std:.2f} kg")
-            st.caption("Target: 4.5 kg/mc")
-        with s_col2:
-            st.metric("Bassa Salinità", f"{tot_sale_ls:.2f} kg")
-            st.caption("Target: 1.5 kg/mc")
-
-        st.divider()
-
-        # --- LOGICA ALTRI PARAMETRI ---
-        cya_reale = cya_ril / 2
-        st.info(f"**Dato Cianurico Reale:** {cya_reale:.1f} ppm")
-        
-        # pH
-        st.subheader("Gestione pH")
-        if ph_ril > 7.2:
-            diff = (ph_ril - 7.2) / 0.1
-            st.warning(f"**pH ALTO.** Inserire:\n"
-                       f"- Carisan pH meno G: **{(v_piscina*10*diff)/1000:.2f} kg**\n"
-                       f"- Carisan pH meno L 15%: **{(v_piscina*27*diff)/1000:.2f} L**\n"
-                       f"- Carisan pH meno L 40%: **{(v_piscina*9*diff)/1000:.2f} L**")
-        elif ph_ril < 7.2 and ph_ril > 0:
-            diff = (7.2 - ph_ril) / 0.1
-            st.info(f"**pH BASSO.** Inserire: **{(v_piscina*10*diff)/1000:.2f} kg** di pH Plus")
+        if v_piscina <= 0:
+            st.error("Inserisci il volume della piscina per procedere.")
         else:
-            st.success("pH ottimale.")
-
-        # Cloro
-        st.subheader("Integrazione Cloro")
-        if cl_ril < 1.5:
-            d_cl = 1.5 - cl_ril
-            st.error(f"**Cloro BASSO.** Inserire:\n"
-                     f"- Chemacal 70: **{(v_piscina*1.5*d_cl)/1000:.2f} kg**\n"
-                     f"- Power Clor 56: **{(v_piscina*1.8*d_cl)/1000:.2f} kg**\n"
-                     f"- Chemaclor L: **{(v_piscina*7*d_cl)/1000:.2f} L**")
-        else:
-            st.success("Cloro a norma.")
+            st.divider()
             
-        # Cianurico e Alghicida
-        st.subheader("Stabilizzante e Altri")
-        if cya_reale < 30:
-            st.warning(f"Dose Acido Cianurico: **{(v_piscina*(30-cya_reale))/1000:.2f} kg**")
-        
-        st.write(f"**Alghicida (Mantenimento):** {(v_piscina*5)/1000:.2f} L/settimana")
+            # LOGICA SALE
+            sale_ril_kg = sale_ril_g / 1000
+            st.subheader("Integrazione Sale")
+            mancante_std = max(0.0, 4.5 - sale_ril_kg)
+            tot_sale_std = v_piscina * mancante_std
+            mancante_ls = max(0.0, 1.5 - sale_ril_kg)
+            tot_sale_ls = v_piscina * mancante_ls
+            
+            s_col1, s_col2 = st.columns(2)
+            with s_col1:
+                st.metric("Clorinatore Standard", f"{tot_sale_std:.2f} kg")
+                st.caption("Target: 4.5 kg/mc")
+            with s_col2:
+                st.metric("Bassa Salinità", f"{tot_sale_ls:.2f} kg")
+                st.caption("Target: 1.5 kg/mc")
+
+            st.divider()
+
+            # LOGICA PARAMETRI CHIMICI (Target 7.2 pH / 1.5 Cloro)
+            cya_reale = cya_ril / 2
+            st.info(f"**Dato Cianurico Reale:** {cya_reale:.1f} ppm")
+            
+            # pH
+            st.subheader("Gestione pH")
+            if ph_ril > 7.2:
+                diff = (ph_ril - 7.2) / 0.1
+                st.warning(f"**pH ALTO.** Inserire:\n"
+                           f"- Carisan pH meno G: **{(v_piscina*10*diff)/1000:.2f} kg**\n"
+                           f"- Carisan pH meno L 15%: **{(v_piscina*27*diff)/1000:.2f} L**\n"
+                           f"- Carisan pH meno L 40%: **{(v_piscina*9*diff)/1000:.2f} L**")
+            elif ph_ril < 7.2 and ph_ril > 0:
+                diff = (7.2 - ph_ril) / 0.1
+                st.info(f"**pH BASSO.** Inserire: **{(v_piscina*10*diff)/1000:.2f} kg** di pH Plus")
+            else:
+                st.success("pH ottimale.")
+
+            # Cloro
+            st.subheader("Integrazione Cloro")
+            if cl_ril < 1.5:
+                d_cl = 1.5 - cl_ril
+                st.error(f"**Cloro BASSO.** Inserire:\n"
+                         f"- Chemacal 70: **{(v_piscina*1.5*d_cl)/1000:.2f} kg**\n"
+                         f"- Power Clor 56: **{(v_piscina*1.8*d_cl)/1000:.2f} kg**\n"
+                         f"- Chemaclor L: **{(v_piscina*7*d_cl)/1000:.2f} L**")
+            else:
+                st.success("Cloro a norma.")
+                
+            # Acido Cianurico
+            if cya_reale < 30:
+                st.subheader("Stabilizzante")
+                st.warning(f"Dose Acido Cianurico: **{(v_piscina*(30-cya_reale))/1000:.2f} kg**")
+            
+            st.divider()
+            st.write(f"**Alghicida (Mantenimento):** {(v_piscina*5)/1000:.2f} L/settimana")
