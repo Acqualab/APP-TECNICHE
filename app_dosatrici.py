@@ -10,7 +10,19 @@ st.set_page_config(
 # --- FUNZIONE RESET ---
 def reset_all():
     for key in st.session_state.keys():
-        del st.session_state[key]
+        st.session_state[key] = st.session_state.get(f"default_{key}", 0.0)
+    # Forza il reset specifico dei valori numerici ai default
+    st.session_state.v_vasca = 100.0
+    st.session_state.l_ins = 10.0
+    st.session_state.p_prod = 15.0
+    st.session_state.p_imp = 10.0
+    st.session_state.press = 2.0
+    st.session_state.dos_des = 2.0
+    st.session_state.v_pisc = 100.0
+    st.session_state.ph_r = 7.2
+    st.session_state.cl_r = 1.0
+    st.session_state.cya_r = 0.0
+    st.session_state.s_ril = 0.0
 
 # --- SIDEBAR: LOGO E INFO ---
 try:
@@ -19,7 +31,6 @@ except:
     st.sidebar.title("ACQUALAB S.R.L.")
 
 st.sidebar.markdown("---")
-st.sidebar.button("🔄 RESET GENERALE", on_click=reset_all, use_container_width=True)
 st.sidebar.info("Strumenti di calcolo ad uso interno per i tecnici di ACQUALAB S.R.L.")
 
 # --- TITOLO PRINCIPALE ---
@@ -74,17 +85,28 @@ with tab3:
 
     st.markdown("---")
     st.subheader("🧂 Sezione Sale (Clorinatori)")
-    sale_ril = st.number_input("Sale rilevato (kg/mc)", min_value=0.0, value=0.0, step=0.1, key="s_ril", help="Inserisci il valore attuale in kg/mc")
+    # Cambiata etichetta in g/mc come richiesto
+    sale_ril_g = st.number_input("Sale rilevato (g/mc)", min_value=0.0, value=0.0, step=100.0, key="s_ril", help="Inserisci il valore rilevato in grammi per metro cubo")
 
-    if st.button("CALCOLA INTERVENTI", type="primary", use_container_width=True):
+    # BOTTONI AZIONE
+    col_btn1, col_btn2 = st.columns([3, 1])
+    with col_btn1:
+        calcola = st.button("CALCOLA INTERVENTI", type="primary", use_container_width=True)
+    with col_btn2:
+        st.button("RESET", on_click=reset_all, use_container_width=True)
+
+    if calcola:
         st.divider()
         
         # --- LOGICA SALE ---
+        # Conversione g/mc in kg/mc per il calcolo (es: 3500 g/mc = 3.5 kg/mc)
+        sale_ril_kg = sale_ril_g / 1000
+        
         st.subheader("Integrazione Sale")
-        mancante_std = max(0.0, 4.5 - sale_ril)
+        mancante_std = max(0.0, 4.5 - sale_ril_kg)
         tot_sale_std = v_piscina * mancante_std
         
-        mancante_ls = max(0.0, 1.5 - sale_ril)
+        mancante_ls = max(0.0, 1.5 - sale_ril_kg)
         tot_sale_ls = v_piscina * mancante_ls
         
         s_col1, s_col2 = st.columns(2)
@@ -97,10 +119,11 @@ with tab3:
 
         st.divider()
 
-        # --- LOGICA PH (Target 7.2) ---
+        # --- LOGICA ALTRI PARAMETRI ---
         cya_reale = cya_ril / 2
         st.info(f"**Dato Cianurico Reale:** {cya_reale:.1f} ppm")
         
+        # pH
         st.subheader("Gestione pH")
         if ph_ril > 7.2:
             diff = (ph_ril - 7.2) / 0.1
@@ -114,7 +137,7 @@ with tab3:
         else:
             st.success("pH ottimale.")
 
-        # --- LOGICA CLORO (Target 1.5) ---
+        # Cloro
         st.subheader("Integrazione Cloro")
         if cl_ril < 1.5:
             d_cl = 1.5 - cl_ril
@@ -125,7 +148,7 @@ with tab3:
         else:
             st.success("Cloro a norma.")
             
-        # --- ACIDO CIANURICO E ALGHICIDA ---
+        # Cianurico e Alghicida
         st.subheader("Stabilizzante e Altri")
         if cya_reale < 30:
             st.warning(f"Dose Acido Cianurico: **{(v_piscina*(30-cya_reale))/1000:.2f} kg**")
