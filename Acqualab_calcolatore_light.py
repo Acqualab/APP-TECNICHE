@@ -54,7 +54,7 @@ with tab1:
     if st.button("🚀 CALCOLA DOSAGGI", type="primary", use_container_width=True):
         st.divider()
         
-        # SALE (Target 4.5 e 1.5 g/L)
+        # SALE
         m_std = max(0.0, 4.5 - sale_ril_gl)
         m_ls = max(0.0, 1.5 - sale_ril_gl)
         cs1, cs2 = st.columns(2)
@@ -84,14 +84,15 @@ with tab1:
         else:
             st.success("✅ Cloro a norma.")
             
-        # STABILIZZANTE E ALGIPREVENT
-        st.subheader("📊 Stabilizzante e Algiprevent")
+        # STABILIZZANTE
+        st.subheader("📊 Stabilizzante")
         cya_reale = cya_ril / 2
         st.info(f"**Dato Cianurico Reale:** {cya_reale:.1f} ppm")
         if cya_reale < 30:
             st.markdown(f'<p class="nome-prodotto">👉 Dose Acido Cianurico: <span class="misura-grande">{(v_piscina*(30-cya_reale))/1000:.2f}</span> <span class="unita-misura">kg</span></p>', unsafe_allow_html=True)
         
-        # Algiprevent - Dosaggi da immagine
+        # NUOVA SEZIONE: ALGICIDA
+        st.subheader("🌿 Alghicida")
         st.markdown(f'<p class="nome-prodotto">✨ Algiprevent Inizio stagione: <span class="misura-grande">{(v_piscina*2)/100:.2f}</span> <span class="unita-misura">L</span></p>', unsafe_allow_html=True)
         st.markdown(f'<p class="nome-prodotto">✨ Algiprevent Urto: <span class="misura-grande">{(v_piscina*5)/100:.2f}</span> <span class="unita-misura">L</span></p>', unsafe_allow_html=True)
         st.markdown(f'<p class="nome-prodotto">✨ Algiprevent Mantenimento: <span class="misura-grande">{(v_piscina*1)/100:.2f}</span> <span class="unita-misura">L</span></p>', unsafe_allow_html=True)
