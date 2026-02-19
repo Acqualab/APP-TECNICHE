@@ -3,18 +3,23 @@ import streamlit as st
 # --- CONFIGURAZIONE PAGINA ---
 st.set_page_config(page_title="Acqualab Light", page_icon="💧", layout="centered")
 
-# --- STILE CSS PER GRANDEZZA FONT ---
+# --- STILE CSS PER GRANDEZZA FONT E COLORI ---
 st.markdown("""
     <style>
     .misura-grande {
-        font-size: 32px !important;
+        font-size: 36px !important;
         font-weight: bold;
         color: #E63946;
-        margin-left: 20px;
+        margin-left: 15px;
     }
     .nome-prodotto {
-        font-size: 18px;
+        font-size: 19px;
+        font-weight: 500;
         color: #1D3557;
+    }
+    .unita-misura {
+        font-size: 22px;
+        color: #457B9D;
     }
     </style>
     """, unsafe_allow_html=True)
@@ -53,15 +58,15 @@ with tab2:
 
     st.markdown("---")
     st.subheader("🧂 Sezione Sale")
-    sale_ril_g = st.number_input("Sale rilevato (g/mc)", min_value=0.0, value=0.0, step=100.0)
+    # CORREZIONE: Inserimento in g/L (che equivale a kg/mc)
+    sale_ril_gl = st.number_input("Sale rilevato (g/L)", min_value=0.0, value=0.0, step=0.1, help="Grammi per litro equivalgono a kg al metro cubo")
 
     if st.button("🚀 CALCOLA INTERVENTI", type="primary", use_container_width=True):
         st.divider()
         
-        # SALE
-        sale_ril_kg = sale_ril_g / 1000
-        m_std = max(0.0, 4.5 - sale_ril_kg)
-        m_ls = max(0.0, 1.5 - sale_ril_kg)
+        # LOGICA SALE (Target 4.5 g/L e 1.5 g/L)
+        m_std = max(0.0, 4.5 - sale_ril_gl)
+        m_ls = max(0.0, 1.5 - sale_ril_gl)
         
         col_s1, col_s2 = st.columns(2)
         col_s1.metric("Clorinatore Standard", f"{(v_piscina * m_std):.2f} kg")
@@ -71,12 +76,12 @@ with tab2:
         st.subheader("📊 Gestione pH")
         if ph_ril > 7.2:
             diff = (ph_ril - 7.2) / 0.1
-            st.markdown(f'<p class="nome-prodotto">👉 Carisan pH meno G: <span class="misura-grande">{(v_piscina*10*diff)/1000:.2f} kg</span></p>', unsafe_allow_html=True)
-            st.markdown(f'<p class="nome-prodotto">👉 Carisan pH meno L 15%: <span class="misura-grande">{(v_piscina*27*diff)/1000:.2f} L</span></p>', unsafe_allow_html=True)
-            st.markdown(f'<p class="nome-prodotto">👉 Carisan pH meno L 40%: <span class="misura-grande">{(v_piscina*9*diff)/1000:.2f} L</span></p>', unsafe_allow_html=True)
+            st.markdown(f'<p class="nome-prodotto">👉 Carisan pH meno G: <span class="misura-grande">{(v_piscina*10*diff)/1000:.2f}</span> <span class="unita-misura">kg</span></p>', unsafe_allow_html=True)
+            st.markdown(f'<p class="nome-prodotto">👉 Carisan pH meno L 15%: <span class="misura-grande">{(v_piscina*27*diff)/1000:.2f}</span> <span class="unita-misura">L</span></p>', unsafe_allow_html=True)
+            st.markdown(f'<p class="nome-prodotto">👉 Carisan pH meno L 40%: <span class="misura-grande">{(v_piscina*9*diff)/1000:.2f}</span> <span class="unita-misura">L</span></p>', unsafe_allow_html=True)
         elif ph_ril < 7.2 and ph_ril > 0:
             diff = (7.2 - ph_ril) / 0.1
-            st.markdown(f'<p class="nome-prodotto">👉 pH Plus: <span class="misura-grande">{(v_piscina*10*diff)/1000:.2f} kg</span></p>', unsafe_allow_html=True)
+            st.markdown(f'<p class="nome-prodotto">👉 pH Plus: <span class="misura-grande">{(v_piscina*10*diff)/1000:.2f}</span> <span class="unita-misura">kg</span></p>', unsafe_allow_html=True)
         else:
             st.success("✅ pH ottimale (7.2).")
 
@@ -84,9 +89,9 @@ with tab2:
         st.subheader("📊 Integrazione Cloro")
         if cl_ril < 1.5:
             d_cl = 1.5 - cl_ril
-            st.markdown(f'<p class="nome-prodotto">👉 Chemacal 70: <span class="misura-grande">{(v_piscina*1.5*d_cl)/1000:.2f} kg</span></p>', unsafe_allow_html=True)
-            st.markdown(f'<p class="nome-prodotto">👉 Power Clor 56: <span class="misura-grande">{(v_piscina*1.8*d_cl)/1000:.2f} kg</span></p>', unsafe_allow_html=True)
-            st.markdown(f'<p class="nome-prodotto">👉 Chemaclor L: <span class="misura-grande">{(v_piscina*7*d_cl)/1000:.2f} L</span></p>', unsafe_allow_html=True)
+            st.markdown(f'<p class="nome-prodotto">👉 Chemacal 70: <span class="misura-grande">{(v_piscina*1.5*d_cl)/1000:.2f}</span> <span class="unita-misura">kg</span></p>', unsafe_allow_html=True)
+            st.markdown(f'<p class="nome-prodotto">👉 Power Clor 56: <span class="misura-grande">{(v_piscina*1.8*d_cl)/1000:.2f}</span> <span class="unita-misura">kg</span></p>', unsafe_allow_html=True)
+            st.markdown(f'<p class="nome-prodotto">👉 Chemaclor L: <span class="misura-grande">{(v_piscina*7*d_cl)/1000:.2f}</span> <span class="unita-misura">L</span></p>', unsafe_allow_html=True)
         else:
             st.success("✅ Cloro a norma.")
             
@@ -95,6 +100,6 @@ with tab2:
         cya_reale = cya_ril / 2
         st.info(f"**Dato Cianurico Reale:** {cya_reale:.1f} ppm")
         if cya_reale < 30:
-            st.markdown(f'<p class="nome-prodotto">👉 Dose Acido Cianurico: <span class="misura-grande">{(v_piscina*(30-cya_reale))/1000:.2f} kg</span></p>', unsafe_allow_html=True)
+            st.markdown(f'<p class="nome-prodotto">👉 Dose Acido Cianurico: <span class="misura-grande">{(v_piscina*(30-cya_reale))/1000:.2f}</span> <span class="unita-misura">kg</span></p>', unsafe_allow_html=True)
         
-        st.markdown(f'<p class="nome-prodotto">👉 Alghicida (Settimana): <span class="misura-grande">{(v_piscina*5)/1000:.2f} L</span></p>', unsafe_allow_html=True)
+        st.markdown(f'<p class="nome-prodotto">👉 Alghicida (Settimana): <span class="misura-grande">{(v_piscina*5)/1000:.2f}</span> <span class="unita-misura">L</span></p>', unsafe_allow_html=True)
