@@ -59,6 +59,7 @@ with tab1:
         # 1. SEZIONE SALE (Conversione mg/L -> g/L)
         st.subheader("🧂 Sezione Sale")
         sale_attuale_gl = sale_ril_mgl / 1000
+        # Target: Standard 4.5 g/L | Bassa Salinità 1.5 g/L
         m_std = max(0.0, 4.5 - sale_attuale_gl)
         m_ls = max(0.0, 1.5 - sale_attuale_gl)
         
@@ -101,8 +102,15 @@ with tab1:
             st.success("✅ Livello stabilizzante adeguato.")
         st.divider()
         
-        # 5. SEZIONE ALGHICIDA
+        # 5. SEZIONE ALGHICIDA (Algiprevent)
         st.subheader("🌿 Alghicida")
         st.markdown(f'<p class="nome-prodotto">✨ Algiprevent Inizio stagione: <span class="misura-grande">{(v_piscina*2)/100:.2f}</span> <span class="unita-misura">L</span></p>', unsafe_allow_html=True)
         st.markdown(f'<p class="nome-prodotto">✨ Algiprevent Urto: <span class="misura-grande">{(v_piscina*5)/100:.2f}</span> <span class="unita-misura">L</span></p>', unsafe_allow_html=True)
-        st.markdown(f'<p class="nome-prodotto">✨ Algiprevent Manten
+        st.markdown(f'<p class="nome-prodotto">✨ Algiprevent Mantenimento: <span class="misura-grande">{(v_piscina*1)/100:.2f}</span> <span class="unita-misura">L</span></p>', unsafe_allow_html=True)
+
+# --- TAB 2: PREPARAZIONE SOLUZIONE ---
+with tab2:
+    st.header("Preparazione Soluzione Vasca")
+    col_a, col_b = st.columns(2)
+    with col_a:
+        vol_vasca = st.number_input("
