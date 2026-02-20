@@ -16,14 +16,15 @@ st.markdown("""
     </style>
     """, unsafe_allow_html=True)
 
-# --- SIDEBAR CON LOGO ---
+# --- SIDEBAR ---
 st.sidebar.title("ACQUALAB S.R.L.")
 
 st.title("🧪 Suite Calcoli PRO")
 
+# Definizione Tab
 tab1, tab2, tab3, tab4 = st.tabs(["🏊 Piscina", "💧 Soluzione", "🚰 Gestione", "📐 Progetto UNI 9182"])
 
-# --- TAB 1: ANALISI PISCINA (RIPRISTINATO INTEGRALMENTE) ---
+# --- TAB 1: ANALISI PISCINA ---
 with tab1:
     st.header("Analisi e Interventi Piscina")
     cp1, cp2 = st.columns(2)
@@ -54,10 +55,10 @@ with tab2:
     st.header("Preparazione Soluzione Vasca")
     v_v = st.number_input("Volume Vasca (L)", value=100.0)
     l_i = st.number_input("Litri prodotto (L)", value=10.0)
-    p_p = st.number_input("% Prodotto", value=15.0)
-    st.success(f"### ✅ Valore in programmazione: {(l_i/v_v)*p_p if v_v > 0 else 0:.2f} %")
+    p_p = st.number_input("% Prodotto Commerciale", value=15.0)
+    st.success(f"### ✅ Valore in programmazione: {(l_i / v_v) * p_p if v_v > 0 else 0:.2f} %")
 
-# --- TAB 3: GESTIONE (CON CONSUMI SINGOLI E INTERVALLO) ---
+# --- TAB 3: GESTIONE (CONSUMI SINGOLA RIGENERAZIONE E INTERVALLO) ---
 with tab3:
     st.header("🚰 Verifica Macchina Installata")
     g1, g2 = st.columns(2)
@@ -68,26 +69,26 @@ with tab3:
         do_g = st.number_input("Durezza Uscita (°f)", value=15, key="do_g")
         co_g = st.number_input("Consumo (m³/gg)", value=0.60, key="co_g")
     
-    p_delta = max(0.1, di_g - do_g)
+    delta_g = max(0.1, di_g - do_g)
     cap_cic = vr_g * 5
-    m3_autonomia = cap_cic / p_delta
+    m3_autonomia = cap_cic / delta_g
     sale_rig = (vr_g * 140) / 1000
     gg_intervallo = m3_autonomia / co_g if co_g > 0 else 0
 
     st.markdown('<p class="titolo-sezione">Risultati Ciclo</p>', unsafe_allow_html=True)
     res1, res2 = st.columns(2)
-    res1.metric("Produzione Acqua Dolce", f"{m3_autonomia:.2f} m³", f"Ogni {gg_intervallo:.1f} gg")
-    res2.metric("Sale a Rigenerazione", f"{sale_rig:.2f} kg", "Consumo per ciclo")
+    res1.metric("Autonomia", f"{m3_autonomia:.2f} m³", f"Ogni {gg_intervallo:.1f} gg")
+    res2.metric("Sale per Ciclo", f"{sale_rig:.2f} kg", "A rigenerazione")
 
     st.markdown('<p class="titolo-sezione">Dettagli Tecnici (Singola Rigenerazione)</p>', unsafe_allow_html=True)
     d1, d2, d3 = st.columns(3)
     d1.write(f"<span class='stat-label'>Cap. Ciclica</span><br><span class='stat-value'>{cap_cic} m³f</span>", unsafe_allow_html=True)
     d2.write(f"<span class='stat-label'>Salamoia</span><br><span class='stat-value'>{(sale_rig*3):.1f} L</span>", unsafe_allow_html=True)
-    d3.write(f"<span class='stat-label'>Acqua Scarico</span><br><span class='stat-value'>{vr_g*7} L</span>", unsafe_allow_html=True)
+    d3.write(f"<span class='stat-label'>Scarico</span><br><span class='stat-value'>{vr_g*7} L</span>", unsafe_allow_html=True)
 
-# --- TAB 4: PROGETTO UNI 9182 & CONFRONTO ANNUALE ---
+# --- TAB 4: PROGETTO UNI 9182 & CONFRONTO ---
 with tab4:
-    st.header("📐 Progettazione Professionale")
+    st.header("📐 Progettazione e Analisi Portate")
     p1, p2 = st.columns(2)
     with p1:
         tipo = st.selectbox("Tipo Utenza", ["Villetta", "Condominio"], key="p_tipo")
@@ -95,25 +96,35 @@ with tab4:
         p_out = st.number_input("Durezza Uscita desiderata (°f)", value=15, key="p_out")
     with p2:
         if tipo == "Villetta":
-            pers = st.number_input("Numero Persone", value=4, key="p_p")
+            pers = st.number_input("Persone", value=4, key="p_p")
             f_gg = pers * 0.20
             q_p = 1.20
         else:
-            app = st.number_input("Numero Appartamenti", value=10, key="p_a")
+            app = st.number_input("Appartamenti", value=10, key="p_a")
             f_gg = (app * 3) * 0.20
             q_p = round(0.20 * math.sqrt(app * 3) + 0.8, 2)
 
-    p_netta = max(0.1, p_in - p_out)
-    taglia_nec = (f_gg * 3 * p_netta) / 5
+    p_delta_pro = max(0.1, p_in - p_out)
+    taglia_nec = (f_gg * 3 * p_delta_pro) / 5
     taglie = [8, 12, 15, 20, 25, 30, 40, 50, 75, 100, 125, 150, 200, 250, 300]
     scelta = min([t for t in taglie if t >= taglia_nec] or [max(taglie)])
     
-    # Calcoli Annuali
-    m3_anno = f_gg * 365
-    n_rig_anno = m3_anno / ((scelta * 5) / p_netta)
-    sale_std_anno = (scelta * 0.14) * n_rig_anno
-    acqua_std_anno = (scelta * 7 * n_rig_anno) / 1000
+    n_rig_anno = 365 / (((scelta * 5) / p_delta_pro) / f_gg)
+    sale_anno = (scelta * 0.14) * n_rig_anno
+    acqua_anno = (scelta * 7 * n_rig_anno) / 1000
 
     st.markdown(f'<div class="result-box">Taglia Suggerita: <span class="valore-evidenziato">{scelta} Litri Resina</span></div>', unsafe_allow_html=True)
 
-    st.markdown('<p class="titolo
+    st.markdown('<p class="titolo-sezione">Dati di Progetto (UNI 9182)</p>', unsafe_allow_html=True)
+    c1, c2 = st.columns(2)
+    c1.metric("Consumo Giornaliero", f"{f_gg:.2f} m³/gg")
+    c2.metric("Portata di Picco", f"{q_p} m³/h")
+
+    st.markdown('<p class="titolo-sezione">📊 Confronto Annuale: Standard vs Clack</p>', unsafe_allow_html=True)
+    st.table({
+        "Dati Annuali": ["Sale Totale", "Sacchi (25kg)", "Acqua Scarico", "N. Rigenerazioni"],
+        "Valvola Standard": [f"{sale_anno:.0f} kg", f"{math.ceil(sale_anno/25)}", f"{acqua_anno:.2f} m³", f"{n_rig_anno:.0f}"],
+        "Clack Impression": [f"{sale_anno*0.8:.0f} kg", f"{math.ceil((sale_anno*0.8)/25)}", f"{acqua_anno*0.8:.2f} m³", "Ottimizzata"]
+    })
+    
+    st.success(f"📉 **Risparmio stimato con Clack:** {(sale_anno*0.2):.0f} kg di sale e {(acqua_anno*0.2)*1000:.0f} L d'acqua ogni anno.")
