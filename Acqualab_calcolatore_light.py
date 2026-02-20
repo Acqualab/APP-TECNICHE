@@ -1,129 +1,127 @@
 import streamlit as st
+import math
 
 # --- CONFIGURAZIONE PAGINA ---
-st.set_page_config(page_title="Acqualab Light", page_icon="💧", layout="centered")
+st.set_page_config(page_title="Acqualab Suite", page_icon="💧", layout="centered")
 
-# --- STILE CSS AGGIORNATO PER DARK E LIGHT MODE ---
+# --- STILE CSS UNIVERSALE ---
 st.markdown("""
     <style>
-    /* Numero gigante in rosso */
-    .misura-grande {
-        font-size: 40px !important;
-        font-weight: bold;
-        color: #FF4B4B; /* Rosso acceso più visibile */
-        margin-left: 10px;
+    .misura-grande { font-size: 36px !important; font-weight: bold; color: #FF4B4B; margin-left: 5px; }
+    .nome-prodotto { font-size: 17px; font-weight: 600; color: var(--text-color); }
+    .unita-misura { font-size: 18px; color: #00AEEF; font-weight: bold; }
+    .result-box { 
+        padding: 12px; border-radius: 10px; border: 1px solid rgba(128, 128, 128, 0.3); 
+        background-color: rgba(128, 128, 128, 0.05); margin-bottom: 10px; 
     }
-    /* Nome prodotto - Grigio chiarissimo per contrasto su nero e bianco */
-    .nome-prodotto {
-        font-size: 18px;
-        font-weight: 500;
-        color: #E0E0E0; 
+    .metric-card {
+        background-color: rgba(0, 174, 239, 0.05); padding: 15px; border-radius: 10px;
+        border-left: 5px solid #00AEEF; margin-bottom: 10px;
     }
-    /* Unità di misura - Azzurro chiaro */
-    .unita-misura {
-        font-size: 22px;
-        color: #00D1FF;
-        font-weight: bold;
-    }
-    /* Divider più visibile */
-    hr {
-        margin-top: 1rem;
-        margin-bottom: 1rem;
-        border: 0;
-        border-top: 1px solid #555;
-    }
+    .highlight-red { font-size: 22px; font-weight: bold; color: #FF4B4B; }
     </style>
     """, unsafe_allow_html=True)
 
-# --- SIDEBAR ---
+# --- SIDEBAR LOGO ---
 try:
     st.sidebar.image("Color con payoff - senza sfondo.png", use_container_width=True)
 except:
     st.sidebar.title("ACQUALAB S.R.L.")
 
-st.title("🧪 Suite Calcoli Light")
+st.title("🧪 Suite Professionale Acqualab")
 
-tab1, tab2 = st.tabs(["🏊 Pool Assistant", "💧 Soluzione"])
+# --- DEFINIZIONE TAB ---
+tab_pool, tab_sol, tab_add_dim, tab_add_cons = st.tabs([
+    "🏊 Pool Assistant", "💧 Soluzione", "🏢 Addolcitori: Progetto", "🧂 Addolcitori: Consumi"
+])
 
-# --- TAB 1: POOL ASSISTANT ---
-with tab1:
-    st.header("Analisi e Interventi")
-    
+# ==========================================
+# TAB 1: POOL ASSISTANT
+# ==========================================
+with tab_pool:
+    st.header("Analisi Piscina")
     c1, c2 = st.columns(2)
     with c1:
-        v_piscina = st.number_input("Volume Piscina (m³)", min_value=0.0, value=100.0)
+        v_piscina = st.number_input("Volume Piscina (m³)", min_value=0.0, value=100.0, key="pool_v")
         ph_ril = st.number_input("pH Rilevato", min_value=0.0, max_value=14.0, value=7.2, step=0.1)
+        cl_tot = st.number_input("Cloro Totale (ppm)", min_value=0.0, value=1.0, step=0.1)
     with c2:
-        cl_ril = st.number_input("Cloro Libero (ppm)", min_value=0.0, value=1.0, step=0.1)
+        cl_lib = st.number_input("Cloro Libero (ppm)", min_value=0.0, value=1.0, step=0.1)
         cya_ril = st.number_input("Acido Cianurico (ppm)", min_value=0.0, value=0.0)
+        sale_ril = st.number_input("Sale (mg/L - ppm)", min_value=0.0, value=0.0, step=100.0)
+    
+    cl_comb = max(0.0, cl_tot - cl_lib)
+    st.info(f"💡 Cloro Combinato (CC): **{cl_comb:.2f} ppm**")
 
-    st.markdown("---")
-    # SALE: Input in mg/L (ppm) dalle strisce reattive
-    sale_ril_mgl = st.number_input("Sale rilevato (mg/L o ppm)", min_value=0.0, value=0.0, step=100.0)
-
-    if st.button("🚀 CALCOLA TUTTI I DOSAGGI", type="primary", use_container_width=True):
+    if st.button("🚀 CALCOLA DOSAGGI PISCINA", type="primary", use_container_width=True):
         st.divider()
+        # Sezione Sale
+        st.subheader("🧂 Sale")
+        sale_gl = sale_ril / 1000
+        st.markdown(f'<div class="result-box"><span class="nome-prodotto">Standard (4.5):</span> <span class="misura-grande">{max(0.0, (4.5-sale_gl)*v_piscina):.1f}</span> <span class="unita-misura">kg</span></div>', unsafe_allow_html=True)
         
-        # 1. SEZIONE SALE
-        st.subheader("🧂 Sezione Sale")
-        sale_attuale_gl = sale_ril_mgl / 1000
-        m_std = max(0.0, 4.5 - sale_attuale_gl)
-        m_ls = max(0.0, 1.5 - sale_attuale_gl)
-        
-        st.markdown(f'<p class="nome-prodotto">🧂 Clorinatore Standard (Target 4.5): <span class="misura-grande">{(v_piscina * m_std):.2f}</span> <span class="unita-misura">kg</span></p>', unsafe_allow_html=True)
-        st.markdown(f'<p class="nome-prodotto">🧂 Bassa Salinità (Target 1.5): <span class="misura-grande">{(v_piscina * m_ls):.2f}</span> <span class="unita-misura">kg</span></p>', unsafe_allow_html=True)
-        st.divider()
-
-        # 2. SEZIONE PH
-        st.subheader("📊 Correzione pH")
+        # Sezione pH
+        st.subheader("📊 pH")
         if ph_ril > 7.2:
             diff = (ph_ril - 7.2) / 0.1
-            st.markdown(f'<p class="nome-prodotto">👉 Carisan pH meno G: <span class="misura-grande">{(v_piscina*10*diff)/1000:.2f}</span> <span class="unita-misura">kg</span></p>', unsafe_allow_html=True)
-            st.markdown(f'<p class="nome-prodotto">👉 Carisan pH meno L 15%: <span class="misura-grande">{(v_piscina*27*diff)/1000:.2f}</span> <span class="unita-misura">L</span></p>', unsafe_allow_html=True)
-            st.markdown(f'<p class="nome-prodotto">👉 Carisan pH meno L 40%: <span class="misura-grande">{(v_piscina*9*diff)/1000:.2f}</span> <span class="unita-misura">L</span></p>', unsafe_allow_html=True)
-        elif ph_ril < 7.2 and ph_ril > 0:
+            st.markdown(f'<div class="result-box"><span class="nome-prodotto">pH meno G:</span> <span class="misura-grande">{(v_piscina*10*diff)/1000:.2f}</span> <span class="unita-misura">kg</span></div>', unsafe_allow_html=True)
+        elif ph_ril < 7.2:
             diff = (7.2 - ph_ril) / 0.1
-            st.markdown(f'<p class="nome-prodotto">👉 pH Plus: <span class="misura-grande">{(v_piscina*10*diff)/1000:.2f}</span> <span class="unita-misura">kg</span></p>', unsafe_allow_html=True)
-        else:
-            st.success("✅ pH ottimale.")
-        st.divider()
-
-        # 3. SEZIONE CLORO
-        st.subheader("📊 Correzione Cloro")
-        if cl_ril < 1.5:
-            d_cl = 1.5 - cl_ril
-            st.markdown(f'<p class="nome-prodotto">👉 Chemacal 70: <span class="misura-grande">{(v_piscina*1.5*d_cl)/1000:.2f}</span> <span class="unita-misura">kg</span></p>', unsafe_allow_html=True)
-            st.markdown(f'<p class="nome-prodotto">👉 Power Clor 56: <span class="misura-grande">{(v_piscina*1.8*d_cl)/1000:.2f}</span> <span class="unita-misura">kg</span></p>', unsafe_allow_html=True)
-            st.markdown(f'<p class="nome-prodotto">👉 Chemaclor L: <span class="misura-grande">{(v_piscina*7*d_cl)/1000:.2f}</span> <span class="unita-misura">L</span></p>', unsafe_allow_html=True)
-        else:
-            st.success("✅ Cloro a norma.")
-        st.divider()
-            
-        # 4. SEZIONE STABILIZZANTE
-        st.subheader("📊 Stabilizzante")
-        cya_reale = cya_ril / 2
-        st.info(f"Dato Cianurico Reale: {cya_reale:.1f} ppm")
-        if cya_reale < 30:
-            st.markdown(f'<p class="nome-prodotto">👉 Dose Acido Cianurico: <span class="misura-grande">{(v_piscina*(30-cya_reale))/1000:.2f}</span> <span class="unita-misura">kg</span></p>', unsafe_allow_html=True)
-        else:
-            st.success("✅ Livello stabilizzante adeguato.")
-        st.divider()
+            st.markdown(f'<div class="result-box"><span class="nome-prodotto">pH Plus:</span> <span class="misura-grande">{(v_piscina*10*diff)/1000:.2f}</span> <span class="unita-misura">kg</span></div>', unsafe_allow_html=True)
         
-        # 5. SEZIONE ALGHICIDA (Algiprevent)
-        st.subheader("🌿 Alghicida")
-        st.markdown(f'<p class="nome-prodotto">✨ Algiprevent Inizio stagione: <span class="misura-grande">{(v_piscina*2)/100:.2f}</span> <span class="unita-misura">L</span></p>', unsafe_allow_html=True)
-        st.markdown(f'<p class="nome-prodotto">✨ Algiprevent Urto: <span class="misura-grande">{(v_piscina*5)/100:.2f}</span> <span class="unita-misura">L</span></p>', unsafe_allow_html=True)
-        st.markdown(f'<p class="nome-prodotto">✨ Algiprevent Mantenimento: <span class="misura-grande">{(v_piscina*1)/100:.2f}</span> <span class="unita-misura">L</span></p>', unsafe_allow_html=True)
+        # Sezione Cloro & Shock
+        st.subheader("💥 Cloro & Shock")
+        if cl_lib < 1.5:
+            d_cl = 1.5 - cl_lib
+            st.write(f"Integrazione Ripristino (+{d_cl:.1f} ppm):")
+            st.markdown(f'<div class="result-box"><span class="nome-prodotto">Chemacal 70:</span> <span class="misura-grande">{(v_piscina*1.5*d_cl)/1000:.2f}</span> <span class="unita-misura">kg</span></div>', unsafe_allow_html=True)
+        
+        if cl_comb >= 0.4:
+            st.warning(f"Shock necessario per Breakpoint (CC: {cl_comb:.2f})")
+            ppm_shock = max(0.0, (cl_comb * 10) - cl_lib)
+            st.markdown(f'<div class="result-box"><span class="nome-prodotto">🔥 Shock Chemacal 70:</span> <span class="misura-grande">{(v_piscina*1.5*ppm_shock)/1000:.2f}</span> <span class="unita-misura">kg</span></div>', unsafe_allow_html=True)
 
-# --- TAB 2: SOLUZIONE ---
-with tab2:
-    st.header("Preparazione Soluzione Vasca")
-    col_a, col_b = st.columns(2)
-    with col_a:
-        vol_vasca = st.number_input("Volume Vasca Soluzione (L)", min_value=0.0, value=100.0, key="vol_v")
-        litri_ins = st.number_input("Litri prodotto versati (L)", min_value=0.0, value=10.0, key="lit_i")
-    with col_b:
-        perc_prod = st.number_input("% Prodotto Commerciale", min_value=0.0, max_value=100.0, value=15.0, key="perc_p")
+        # Sezione Alghicida e CYA
+        st.subheader("🌿 Altri")
+        cya_reale = cya_ril / 2
+        st.write(f"Cianurico Reale: {cya_reale:.1f} ppm")
+        st.markdown(f'<div class="result-box"><span class="nome-prodotto">🌿 Algiprevent Mantenimento:</span> <span class="misura-grande">{(v_piscina*1)/100:.2f}</span> <span class="unita-misura">L</span></div>', unsafe_allow_html=True)
+
+# ==========================================
+# TAB 2: SOLUZIONE
+# ==========================================
+with tab_sol:
+    st.header("Preparazione Vasca Soluzione")
+    v_v = st.number_input("Volume Vasca (L)", min_value=0.0, value=100.0)
+    l_i = st.number_input("Litri prodotto versati (L)", min_value=0.0, value=10.0)
+    p_c = st.number_input("% Prodotto Commerciale", min_value=0.0, value=15.0)
+    if v_v > 0:
+        st.success(f"### ✅ Programmazione: {(l_i / v_v) * p_c:.2f} %")
+
+# ==========================================
+# TAB 3: ADDOLCITORI - PROGETTO
+# ==========================================
+with tab_add_dim:
+    st.header("🏢 Dimensionamento Impianto")
+    c_d1, c_d2 = st.columns(2)
+    with c_d1:
+        dur_in = st.number_input("Durezza Entrata (°f)", value=35, key="add_in")
+    with c_d2:
+        dur_out = st.number_input("Durezza Uscita (°f)", value=15, key="add_out")
     
-    ris_p = (litri_ins / vol_vasca) * perc_prod if vol_vasca > 0 else 0
-    st.success(f"### ✅ Valore in programmazione: {ris_p:.2f} %")
+    dur_abb = max(0, dur_in - dur_out)
+    tipo = st.radio("Tipo:", ["Villetta", "Condominio"])
+    
+    if tipo == "Villetta":
+        persone = st.number_input("Persone", value=4)
+        m3_giorno = persone * 0.2
+        picco = 1.2
+    else:
+        app = st.number_input("Appartamenti", value=10)
+        m3_giorno = app * 3 * 0.2
+        picco = round(0.20 * math.sqrt(app * 3) + 0.8, 2)
+
+    st.divider()
+    col_a, col_b = st.columns(2)
+    col_a.markdown(f'<div class="metric-card">Consumo Stimato:<br><span class="highlight-red">{m3_giorno:.2f} m³/g</span></div>', unsafe_allow_html=True)
+    col_b.markdown(
