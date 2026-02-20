@@ -54,11 +54,11 @@ with tab1:
         
         st.subheader("📊 Correzione pH")
         if ph_ril > 7.2:
-            diff = (ph_ril - 7.2) / 0.1
-            st.markdown(f'<div class="result-box"><span class="nome-prodotto">👉 pH meno G:</span> <span class="misura-grande">{(v_piscina*10*diff)/1000:.2f}</span> <span class="unita-misura">kg</span></div>', unsafe_allow_html=True)
+            diff_ph = (ph_ril - 7.2) / 0.1
+            st.markdown(f'<div class="result-box"><span class="nome-prodotto">👉 pH meno G:</span> <span class="misura-grande">{(v_piscina*10*diff_ph)/1000:.2f}</span> <span class="unita-misura">kg</span></div>', unsafe_allow_html=True)
         elif ph_ril < 7.2 and ph_ril > 0:
-            diff = (7.2 - ph_ril) / 0.1
-            st.markdown(f'<div class="result-box"><span class="nome-prodotto">👉 pH Plus:</span> <span class="misura-grande">{(v_piscina*10*diff)/1000:.2f}</span> <span class="unita-misura">kg</span></div>', unsafe_allow_html=True)
+            diff_ph_plus = (7.2 - ph_ril) / 0.1
+            st.markdown(f'<div class="result-box"><span class="nome-prodotto">👉 pH Plus:</span> <span class="misura-grande">{(v_piscina*10*diff_ph_plus)/1000:.2f}</span> <span class="unita-misura">kg</span></div>', unsafe_allow_html=True)
 
         st.subheader("📊 Sezione Cloro")
         if cl_libero < 1.5:
@@ -75,12 +75,12 @@ with tab1:
 with tab2:
     st.header("Preparazione Soluzione Vasca")
     vol_vasca_sol = st.number_input("Volume Vasca Soluzione (L)", min_value=1.0, value=100.0)
-    litri_ins_sol = st.number_input("Litri prodotto versati (L)", value=10.0)
-    perc_prod_sol = st.number_input("% Prodotto Commerciale", value=15.0)
+    litri_ins_sol = st.number_input("Litri prodotto versati (L)", min_value=0.0, value=10.0)
+    perc_prod_sol = st.number_input("% Prodotto Commerciale", min_value=0.0, value=15.0)
     ris_p_sol = (litri_ins_sol / vol_vasca_sol) * perc_prod_sol if vol_vasca_sol > 0 else 0
     st.success(f"### ✅ Valore in programmazione: {ris_p_sol:.2f} %")
 
-# --- TAB 3: GESTIONE (ESISTENTE) ---
+# --- TAB 3: GESTIONE ---
 with tab3:
     st.header("🚰 Verifica Impianto Esistente")
     ca1, ca2 = st.columns(2)
@@ -107,11 +107,50 @@ with tab3:
     d_c2.metric("Salamoia", f"{(sale_rig*3):.1f} L")
     d_c3.metric("Scarico", f"{(vr_gest*7):.0f} L")
 
-# --- TAB 4: PROGETTO (COMPLETA CON MIX E INTERVALLO) ---
+# --- TAB 4: PROGETTO (CORRETTA) ---
 with tab4:
     st.header("📐 Progettazione e Risparmio Clack")
     cp1, cp2 = st.columns(2)
     with cp1:
         tipo_ut = st.selectbox("Tipo Utenza", ["Villetta", "Condominio"])
-        d_ingresso = st.number_input("Durezza Acquedotto (°f)", value=35, key="d_ing_p")
-        d_mix_des = st.number_input("Durezza Mix Desiderata (°f)", value=15,
+        d_ingresso = st.number_input("Durezza Acquedotto (°f)", min_value=1, value=35, key="d_ing_p")
+        d_mix_des = st.number_input("Durezza Mix Desiderata (°f)", min_value=0, value=15, key="d_mix_p")
+    with cp2:
+        if tipo_ut == "Villetta":
+            pers = st.number_input("Numero Persone", min_value=1, value=4)
+            c_gg_pro = pers * 0.20
+            p_picco = 1.20
+        else:
+            apps = st.number_input("Numero Appartamenti", min_value=1, value=10)
+            c_gg_pro = (apps * 3) * 0.20
+            p_picco = round(0.20 * math.sqrt(apps * 3) + 0.8, 2)
+
+    d_netta_pro = max(0.1, d_ingresso - d_mix_des)
+    res_ideale = (c_gg_pro * 4 * d_netta_pro) / 5
+    taglie_std = [8, 12, 15, 20, 25, 30, 40, 50, 75, 100, 125, 150, 200, 250, 300]
+    t_proposta = min([t for t in taglie_std if t >= res_ideale] or [300])
+    
+    m3_proposta = (t_proposta * 5) / d_netta_pro
+    gg_proposta = m3_proposta / c_gg_pro if c_gg_pro > 0 else 0
+
+    st.markdown(f'<div class="result-box">🎯 <b>Taglia Suggerita: {t_proposta} Litri</b><br>Intervallo Rigenerazione: <b>Ogni {gg_proposta:.1f} giorni</b></div>', unsafe_allow_html=True)
+
+    n_rig_anno = 365 / gg_proposta if gg_proposta > 0 else 0
+    s_anno_std = (t_proposta * 0.14) * n_rig_anno
+    s_anno_clack = s_anno_std * 0.75 
+    
+    st.markdown('<p class="titolo-sezione">📊 Analisi Annuale Standard vs Clack</p>', unsafe_allow_html=True)
+    st.table({
+        "Parametro Annuo": ["Sale Totale (kg)", "Sacchi (25kg)", "Acqua Scarico (m³)", "Portata Picco"],
+        "Valvola Standard": [f"{s_anno_std:.1f}", f"{math.ceil(s_anno_std/25)}", f"{(t_proposta*7*n_rig_anno)/1000:.2f}", f"{p_picco} m³/h"],
+        "Clack Impression": [f"{s_anno_clack:.1f}", f"{math.ceil(s_anno_clack/25)}", f"{(t_proposta*5*n_rig_anno)/1000:.2f}", f"{p_picco} m³/h"]
+    })
+
+    st.markdown(f"""
+    <div class="comparison-card">
+        <h4>💰 Vantaggi Tecnologia Clack</h4>
+        • Risparmio sale stimato: <b>{(s_anno_std - s_anno_clack):.1f} kg/anno</b><br>
+        • Riduzione scarichi idrici: <b>25% rispetto a valvole temporizzate</b><br>
+        • Autonomia ciclica netta: <b>{m3_proposta:.2f} m³</b> con mix a {d_mix_des}°f
+    </div>
+    """, unsafe_allow_html=True)
