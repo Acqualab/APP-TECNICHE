@@ -4,15 +4,17 @@ import math
 # --- CONFIGURAZIONE PAGINA ---
 st.set_page_config(page_title="Acqualab PRO", page_icon="🏢", layout="centered")
 
-# --- STILE CSS UNIVERSALE ---
+# --- STILE CSS AVANZATO (Stile Light + PRO) ---
 st.markdown("""
     <style>
-    .misura-grande { font-size: 38px !important; font-weight: bold; color: #FF4B4B; margin-left: 10px; }
-    .valore-evidenziato { font-size: 30px !important; font-weight: bold; color: #00AEEF; }
+    .misura-grande { font-size: 36px !important; font-weight: bold; color: #FF4B4B; }
+    .valore-evidenziato { font-size: 32px !important; font-weight: bold; color: #00AEEF; }
     .nome-prodotto { font-size: 18px; font-weight: 600; color: var(--text-color); }
     .unita-misura { font-size: 20px; color: #00AEEF; font-weight: bold; }
-    .result-box { padding: 15px; border-radius: 10px; border: 1px solid rgba(128, 128, 128, 0.3); background-color: rgba(128, 128, 128, 0.05); margin-bottom: 12px; }
-    .titolo-sezione { font-size: 20px; font-weight: bold; color: var(--text-color); border-bottom: 2px solid #00AEEF; margin-bottom: 15px; margin-top: 10px; }
+    .result-box { padding: 20px; border-radius: 12px; border: 1px solid rgba(128, 128, 128, 0.2); background-color: rgba(128, 128, 128, 0.05); margin-bottom: 15px; text-align: center; }
+    .titolo-sezione { font-size: 22px; font-weight: bold; color: var(--text-color); border-bottom: 2px solid #00AEEF; margin-bottom: 20px; margin-top: 15px; }
+    .stat-label { font-size: 14px; color: gray; font-weight: bold; text-transform: uppercase; }
+    .stat-value { font-size: 24px; font-weight: bold; }
     </style>
     """, unsafe_allow_html=True)
 
@@ -22,121 +24,118 @@ try:
 except:
     st.sidebar.title("ACQUALAB S.R.L.")
 st.sidebar.markdown("---")
-st.sidebar.info("🚀 **VERSIONE PRO**\nCalcolo UNI 9182 integrato")
+st.sidebar.success("🚀 **VERSIONE PRO ATTIVA**")
 
 st.title("🧪 Suite Calcoli PRO")
 
-# Definizione corretta dei 4 Tab
-tab1, tab2, tab3, tab4 = st.tabs(["🏊 Assistente piscina", "💧 Soluzione", "🚰 Gestione", "📐 Progetto"])
+# Definizione corretta dei 4 Tab per evitare NameError
+tab1, tab2, tab3, tab4 = st.tabs(["🏊 Assistente Piscina", "💧 Soluzione", "🚰 Gestione Impianto", "📐 Progetto UNI 9182"])
 
-# --- TAB 1: POOL ASSISTANT COMPLETO ---
+# --- TAB 1: PISCINA (Completo) ---
 with tab1:
-    st.header("Analisi e Interventi Piscina")
+    st.header("Analisi e Interventi")
     c1, c2 = st.columns(2)
     with c1:
-        v_piscina = st.number_input("Volume Piscina (m³)", min_value=0.0, value=100.0)
+        v_piscina = st.number_input("Volume Piscina (m³)", min_value=1.0, value=100.0)
         ph_ril = st.number_input("pH Rilevato", min_value=0.0, max_value=14.0, value=7.2, step=0.1)
-        cl_totale = st.number_input("Cloro Totale (ppm)", min_value=0.0, value=1.0)
     with c2:
-        cl_libero = st.number_input("Cloro Libero (ppm)", min_value=0.0, value=1.0)
-        cya_ril = st.number_input("Acido Cianurico (ppm)", min_value=0.0, value=0.0)
+        cl_lib = st.number_input("Cloro Libero (ppm)", min_value=0.0, value=1.0)
+        cl_tot = st.number_input("Cloro Totale (ppm)", min_value=0.0, value=1.0)
     
-    cl_combinato = max(0.0, cl_totale - cl_libero)
-    st.info(f"💡 Cloro Combinato (CC): **{cl_combinato:.2f} ppm**")
+    cl_comb = max(0.0, cl_tot - cl_lib)
+    st.info(f"💡 Cloro Combinato (CC): **{cl_comb:.2f} ppm**")
     
-    if st.button("🚀 CALCOLA TUTTI I DOSAGGI", type="primary", use_container_width=True):
-        st.divider()
-        # Sezione pH
-        st.subheader("📊 Correzione pH")
-        if ph_ril > 7.2:
-            diff = (ph_ril - 7.2) / 0.1
-            st.markdown(f'<div class="result-box"><span class="nome-prodotto">👉 pH meno G:</span> <span class="misura-grande">{(v_piscina*10*diff)/1000:.2f}</span> <span class="unita-misura">kg</span></div>', unsafe_allow_html=True)
-        elif ph_ril < 7.2 and ph_ril > 0:
-            diff = (7.2 - ph_ril) / 0.1
-            st.markdown(f'<div class="result-box"><span class="nome-prodotto">👉 pH Plus:</span> <span class="misura-grande">{(v_piscina*10*diff)/1000:.2f}</span> <span class="unita-misura">kg</span></div>', unsafe_allow_html=True)
-
-        # Sezione Cloro
-        st.subheader("📊 Sezione Cloro")
-        if cl_combinato >= 0.4:
-            ppm_shock = max(0.0, (cl_combinato * 10) - cl_libero)
-            st.markdown(f'<div class="result-box"><span class="nome-prodotto">🔥 Shock Chemacal 70:</span> <span class="misura-grande">{(v_piscina*1.5*ppm_shock)/1000:.2f}</span> <span class="unita-misura">kg</span></div>', unsafe_allow_html=True)
-        
-        # Sezione Alghicida
-        st.subheader("🌿 Sezione Alghicida")
-        st.markdown(f'<div class="result-box"><span class="nome-prodotto">✨ Algiprevent Mantenimento:</span> <span class="misura-grande">{(v_piscina*1)/100:.2f}</span> <span class="unita-misura">L</span></div>', unsafe_allow_html=True)
+    if st.button("🚀 GENERA DOSAGGI", use_container_width=True):
+        st.markdown('<p class="titolo-sezione">Dosaggi Consigliati</p>', unsafe_allow_html=True)
+        # Logica pH
+        if ph_ril > 7.4:
+            st.markdown(f'<div class="result-box">pH meno G: <span class="misura-grande">{(v_piscina*10*((ph_ril-7.2)/0.1))/1000:.2f} kg</span></div>', unsafe_allow_html=True)
+        # Logica Cloro Shock
+        if cl_comb >= 0.4:
+            ppm_shock = (cl_comb * 10) - cl_lib
+            st.markdown(f'<div class="result-box">Shock Chemacal 70: <span class="misura-grande">{(v_piscina*1.5*ppm_shock)/1000:.2f} kg</span></div>', unsafe_allow_html=True)
 
 # --- TAB 2: SOLUZIONE ---
 with tab2:
-    st.header("Preparazione Soluzione")
-    col_v1, col_v2 = st.columns(2)
-    with col_v1:
-        vol_v = st.number_input("Volume Vasca Soluzione (L)", value=100.0)
-        lit_i = st.number_input("Litri prodotto versati (L)", value=10.0)
-    with col_v2:
-        per_p = st.number_input("% Prodotto Commerciale", value=15.0)
-    
-    risultato_sol = (lit_i / vol_v) * per_p if vol_v > 0 else 0
-    st.success(f"### ✅ Valore in programmazione: {risultato_sol:.2f} %")
+    st.header("Preparazione Soluzione Vasca")
+    v_vasca = st.number_input("Volume Vasca Soluzione (L)", value=100.0)
+    l_prod = st.number_input("Litri prodotto versati (L)", value=10.0)
+    p_comm = st.number_input("% Prodotto Commerciale", value=15.0)
+    st.success(f"### ✅ Programmazione Pompa: {(l_prod/v_vasca)*p_comm if v_vasca > 0 else 0:.2f} %")
 
-# --- TAB 3: GESTIONE (Macchina Esistente) ---
+# --- TAB 3: GESTIONE (Replica Grafica Light) ---
 with tab3:
     st.header("🚰 Verifica Macchina Installata")
-    c_g1, c_g2 = st.columns(2)
-    with c_g1:
-        vr_g = st.number_input("Volume Resina (L)", min_value=1, value=25, key="g_res")
-        di_g = st.number_input("Durezza Entrata (°f)", min_value=1, value=35, key="g_in")
-    with c_g2:
-        do_g = st.number_input("Durezza Uscita (°f)", min_value=0, value=15, key="g_out")
-        co_g = st.number_input("Consumo Acqua (m³/gg)", min_value=0.01, value=0.6, key="g_cons")
-    
-    da_g = di_g - do_g
-    if da_g > 0:
-        cap_ciclica = vr_g * 5
-        m3_c = cap_ciclica / da_g
+    st.markdown('<p class="titolo-sezione">1. Parametri Impianto</p>', unsafe_allow_html=True)
+    cg1, cg2 = st.columns(2)
+    with cg1:
+        vr_g = st.number_input("Volume Resina (Litri)", value=25, key="vr_g")
+        di_g = st.number_input("Durezza Acqua Grezza (°f)", value=35, key="di_g")
+    with cg2:
+        do_g = st.number_input("Durezza Miscelata Uscita (°f)", value=15, key="do_g")
+        co_g = st.number_input("Consumo Acqua Giornaliero (m³)", value=0.6, key="co_g")
+
+    delta_g = max(0, di_g - do_g)
+    if delta_g > 0:
+        cap_c = vr_g * 5
+        m3_c = cap_c / delta_g
         s_rig = (vr_g * 140) / 1000
         
-        st.markdown(f'<div class="result-box">Autonomia: <span class="valore-evidenziato">{m3_c:.2f} m³</span><br>Giorni stimati tra rigenerazioni: {m3_c/co_g:.1f}</div>', unsafe_allow_html=True)
-        st.write(f"📊 **Dettagli tecnici:** Cap. Ciclica: {cap_ciclica} m³f | Sale per rigenerazione: {s_rig:.2f} kg")
+        st.markdown('<p class="titolo-sezione">2. Risultati Calcolo</p>', unsafe_allow_html=True)
+        r1, r2 = st.columns(2)
+        with r1:
+            st.write("🌊 **Produzione Acqua Dolce**")
+            st.markdown(f'<div class="result-box"><span class="valore-evidenziato">{m3_c:.2f} m³</span><br>Ogni {m3_c/co_g:.1f} giorni</div>', unsafe_allow_html=True)
+        with r2:
+            st.write("🧂 **Consumo Sale**")
+            st.markdown(f'<div class="result-box"><span class="valore-evidenziato">{s_rig:.2f} kg</span><br>A rigenerazione</div>', unsafe_allow_html=True)
 
-# --- TAB 4: PROGETTO (Dimensionamento Professionale) ---
+        st.markdown("---")
+        st.write("📊 **Dettagli Tecnici:**")
+        d1, d2, d3 = st.columns(3)
+        d1.write(f"<span class='stat-label'>Cap. Ciclica</span><br><span class='stat-value'>{cap_c} m³f</span>", unsafe_allow_html=True)
+        d2.write(f"<span class='stat-label'>Salamoia</span><br><span class='stat-value'>{(s_rig*3):.1f} L</span>", unsafe_allow_html=True)
+        d3.write(f"<span class='stat-label'>Scarico</span><br><span class='stat-value'>{(vr_g*7):.0f} L</span>", unsafe_allow_html=True)
+
+# --- TAB 4: PROGETTO (Versione PRO con Statistiche Annue) ---
 with tab4:
-    st.header("📐 Progettazione Nuovo Impianto")
+    st.header("📐 Progettazione e Preventivazione")
+    st.markdown('<p class="titolo-sezione">Parametri di Progetto</p>', unsafe_allow_html=True)
     
-    col_p1, col_p2 = st.columns(2)
-    with col_p1:
-        tipo_u = st.selectbox("Tipo Utenza", ["Villetta / Abitazione Singola", "Condominio / Plurifamiliare"])
-        dur_in_p = st.number_input("Durezza Acqua Grezza (°f)", value=35, key="p_in")
-    with col_p2:
-        dur_out_p = st.number_input("Durezza Miscelata desiderata (°f)", value=15, key="p_out")
-        if tipo_u == "Villetta / Abitazione Singola":
-            n_p = st.number_input("Numero persone", min_value=1, value=4)
-            fabbisogno_p = n_p * 0.200
-            q_picco_p = 1.20
+    cp1, cp2 = st.columns(2)
+    with cp1:
+        tipo = st.selectbox("Tipo Utenza", ["Villetta", "Condominio"])
+        d_in = st.number_input("Durezza Ingresso (°f)", value=35)
+        d_out = st.number_input("Durezza Uscita desiderata (°f)", value=15)
+    with cp2:
+        if tipo == "Villetta":
+            pers = st.number_input("Numero Persone", value=4)
+            fabb_gg = pers * 0.20
+            q_picco = 1.20
         else:
-            n_a = st.number_input("Numero appartamenti", min_value=1, value=10)
-            fabbisogno_p = (n_a * 3) * 0.200
-            q_picco_p = round(0.20 * math.sqrt(n_a * 3) + 0.8, 2)
+            apps = st.number_input("Numero Appartamenti", value=10)
+            fabb_gg = (apps * 3) * 0.20
+            q_picco = round(0.20 * math.sqrt(apps * 3) + 0.8, 2)
 
-    dur_netta_p = max(0, dur_in_p - dur_out_p)
-
-    st.markdown('<p class="titolo-sezione">Dati di Progetto</p>', unsafe_allow_html=True)
-    rp1, rp2 = st.columns(2)
-    rp1.metric("Consumo stimato", f"{fabbisogno_p:.2f} m³/gg")
-    rp2.metric("Portata di Picco (UNI 9182)", f"{q_picco_p:.2f} m³/h")
-
-    if dur_netta_p > 0:
-        resina_req = (fabbisogno_p * 3 * dur_netta_p) / 5
-        taglie_comm = [8, 12, 15, 20, 25, 30, 40, 50, 75, 100, 125, 150, 200, 250, 300, 500]
-        scelta_p = min([t for t in taglie_comm if t >= resina_req] or [max(taglie_comm)])
-
-        st.markdown(f"""
-        <div class="result-box">
-            <span class="nome-prodotto">Taglia Consigliata:</span> <span class="misura-grande" style="color:#00AEEF">{scelta_p} L</span><br>
-            <small>Dimensionato su delta durezza di {dur_netta_p}°f e 3gg di autonomia.</small>
-        </div>
-        """, unsafe_allow_html=True)
+    d_netta = max(0, d_in - d_out)
+    
+    if d_netta > 0:
+        # Calcolo taglia
+        res_nec = (fabb_gg * 3 * d_netta) / 5 # 3 giorni autonomia
+        taglie = [8, 12, 15, 20, 25, 30, 40, 50, 75, 100, 125, 150, 200, 250, 300]
+        scelta = min([t for t in taglie if t >= res_nec] or [max(taglie)])
         
-        if q_picco_p > 2.5:
-            st.warning(f"⚠️ Portata di picco elevata ({q_picco_p} m³/h). Valutare valvola da 1\" 1/4 o superiore.")
-    else:
-        st.error("La durezza in uscita non può essere superiore o uguale a quella in entrata.")
+        # Calcoli Statistici Annui
+        m3_anno = fabb_gg * 365
+        sale_anno = (m3_anno * d_netta * 0.028) # 28g di sale per ogni m3 per ogni grado francese
+        sacchi_anno = math.ceil(sale_anno / 25)
+
+        st.markdown(f'<div class="result-box"><span class="nome-prodotto">Taglia Addolcitore Consigliata:</span><br><span class="valore-evidenziato" style="font-size:45px !important;">{scelta} Litri Resina</span></div>', unsafe_allow_html=True)
+
+        st.markdown('<p class="titolo-sezione">Statistiche e Consumi Stimati</p>', unsafe_allow_html=True)
+        s1, s2, s3 = st.columns(3)
+        s1.metric("Acqua annua", f"{m3_anno:.0f} m³")
+        s2.metric("Sale annuo", f"{sale_anno:.0f} kg")
+        s3.metric("Sacchi (25kg)", f"{sacchi_anno}")
+        
+        st.info(f"👉 **Nota Tecnica:** Portata di picco calcolata: **{q_picco} m³/h**. Assicurarsi che la valvola supporti tale flusso.")
