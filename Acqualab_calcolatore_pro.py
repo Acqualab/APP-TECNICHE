@@ -2,7 +2,7 @@ import streamlit as st
 import math
 
 # --- CONFIGURAZIONE PAGINA ---
-st.set_page_config(page_title="Acqualab PRO - Clack Edition", page_icon="🏢", layout="centered")
+st.set_page_config(page_title="Acqualab PRO - Comparison", page_icon="🏢", layout="centered")
 
 # --- STILE CSS ---
 st.markdown("""
@@ -11,17 +11,17 @@ st.markdown("""
     .valore-evidenziato { font-size: 32px !important; font-weight: bold; color: #00AEEF; }
     .result-box { padding: 20px; border-radius: 12px; border: 1px solid rgba(128, 128, 128, 0.2); background-color: rgba(128, 128, 128, 0.05); margin-bottom: 15px; text-align: center; }
     .titolo-sezione { font-size: 22px; font-weight: bold; color: var(--text-color); border-bottom: 2px solid #00AEEF; margin-bottom: 20px; margin-top: 15px; }
-    .label-risparmio { color: #28a745; font-weight: bold; font-size: 18px; }
+    .green-text { color: #28a745; font-weight: bold; }
     </style>
     """, unsafe_allow_html=True)
 
 st.title("🧪 Suite Calcoli PRO")
 
-tab1, tab2, tab3, tab4 = st.tabs(["🏊 Assistente Piscina", "💧 Soluzione", "🚰 Gestione", "📐 Progetto & Risparmio"])
+tab1, tab2, tab3, tab4 = st.tabs(["🏊 Assistente Piscina", "💧 Soluzione", "🚰 Gestione", "📐 Progetto & Confronto"])
 
-# ... (Tab 1, 2 e 3 rimangono invariati rispetto alla versione precedente)
+# I primi 3 tab mantengono la logica consolidata...
 
-# --- TAB 4: PROGETTO AVANZATO & CLACK IMPRESSION ---
+# --- TAB 4: PROGETTO & CONFRONTO ESAUSTIVO ---
 with tab4:
     st.header("📐 Progettazione e Analisi dei Consumi")
     
@@ -43,53 +43,35 @@ with tab4:
     d_netta = max(0, d_in - d_out)
     
     if d_netta > 0:
-        # 1. Dimensionamento Taglia
+        # 1. Dimensionamento Taglia (3 giorni autonomia)
         res_nec = (fabb_gg * 3 * d_netta) / 5 
         taglie = [8, 12, 15, 20, 25, 30, 40, 50, 75, 100, 125, 150, 200, 250, 300]
         scelta = min([t for t in taglie if t >= res_nec] or [max(taglie)])
         
-        # 2. Metriche richieste (Disponibilità per ciclo e intervallo)
-        cap_ciclica = scelta * 5
-        m3_disponibili = cap_ciclica / d_netta
-        giorni_intervallo = m3_disponibili / fabb_gg
+        # 2. Dati Ciclo
+        cap_ciclica = scelta * 5 #
+        m3_disponibili = cap_ciclica / d_netta #
+        g_intervallo = m3_disponibili / fabb_gg #
         
-        # 3. Consumi tecnici per rigenerazione
-        acqua_rig = scelta * 7 # Litri medi per rigenerazione
-        sale_rig = (scelta * 140) / 1000 # kg sale per rigenerazione
+        # 3. Consumi Standard (per confronto)
+        acqua_rig = scelta * 7 #
+        sale_rig = (scelta * 140) / 1000 #
+        n_rig_anno = 365 / g_intervallo
         
-        # 4. Statistiche Annuali Standard
-        n_rig_anno = 365 / giorni_intervallo
-        acqua_rig_annua = acqua_rig * n_rig_anno
-        sale_anno_standard = sale_rig * n_rig_anno
-        m3_anno_utenza = fabb_gg * 365
+        # Totali Standard
+        sale_std_anno = sale_rig * n_rig_anno #
+        acqua_std_anno = (acqua_rig * n_rig_anno) / 1000
+        
+        # 4. Totali Clack Impression (Risparmio medio 20% su sale/acqua)
+        sale_clack_anno = sale_std_anno * 0.80
+        acqua_clack_anno = acqua_std_anno * 0.80
 
-        st.markdown(f'<div class="result-box"><span class="nome-prodotto">Taglia Consigliata:</span><br><span class="valore-evidenziato" style="font-size:45px !important;">{scelta} Litri Resina</span></div>', unsafe_allow_html=True)
+        st.markdown(f'<div class="result-box"><span class="nome-prodotto">Taglia Consigliata:</span><br><span class="valore-evidenziato">{scelta} Litri Resina</span></div>', unsafe_allow_html=True)
 
-        st.markdown('<p class="titolo-sezione">Dettagli Ciclo e Autonomia</p>', unsafe_allow_html=True)
-        col1, col2, col3 = st.columns(3)
-        col1.metric("Acqua per Ciclo", f"{m3_disponibili:.2f} m³")
-        col2.metric("Intervallo Rig.", f"{giorni_intervallo:.1f} gg")
-        col3.metric("Acqua Scarico", f"{acqua_rig} L")
-
-        st.markdown('<p class="titolo-sezione">💡 Analisi Clack Impression (Proporzionale)</p>', unsafe_allow_html=True)
-        st.write("Confronto tra addolcitore standard e sistema a rigenerazione proporzionale Clack Impression.")
+        st.markdown('<p class="titolo-sezione">📊 Report Efficienza: Standard vs Clack</p>', unsafe_allow_html=True)
         
-        # Stima risparmio Clack (tipicamente 15-20% su sale e acqua grazie al calcolo del reale consumo)
-        perc_risparmio = 0.18 # 18% medio
-        risparmio_sale = sale_anno_standard * perc_risparmio
-        risparmio_acqua = acqua_rig_annua * perc_risparmio
-        
-        c_clack1, c_clack2 = st.columns(2)
-        with c_clack1:
-            st.write("📉 **Risparmio Annuo Stimato**")
-            st.markdown(f'<span class="label-risparmio">-{risparmio_sale:.1f} kg di Sale</span>', unsafe_allow_html=True)
-            st.markdown(f'<span class="label-risparmio">-{risparmio_acqua:.0f} L di Acqua</span>', unsafe_allow_html=True)
-        
-        with c_clack2:
-            st.write("📊 **Consumi Totali con Clack**")
-            st.write(f"Sale annuo: **{(sale_anno_standard - risparmio_sale)/25:.0f} sacchi**")
-            st.write(f"Acqua scarico annua: **{(acqua_rig_annua - risparmio_acqua)/1000:.2f} m³**")
-
-        st.info(f"⚙️ **Nota Tecnica:** La valvola Clack Impression ottimizza la salamoia in base all'esaurimento reale. I valori sopra sono stime basate su un utilizzo medio dell'utenza.")
-    else:
-        st.error("Verificare i parametri di durezza.")
+        # Tabella di confronto
+        st.write("Confronto basato su consumo annuo stimato:")
+        st.table({
+            "Parametro": ["Cap. Ciclica", "Intervallo Rig.", "Sale Annuo", "Sacchi (25kg)", "Acqua Scarico"],
+            "Valvola Standard": [f"{cap_ciclica} m³f", f"{g_intervallo:.1f} gg", f"{
