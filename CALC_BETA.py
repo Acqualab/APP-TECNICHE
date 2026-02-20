@@ -1,4 +1,5 @@
 import streamlit as st
+import math
 
 # --- CONFIGURAZIONE PAGINA ---
 st.set_page_config(page_title="Acqualab Light Beta", page_icon="💧", layout="centered")
@@ -25,6 +26,12 @@ st.markdown("""
         color: #00AEEF;
         font-weight: bold;
     }
+    /* Valore evidenziato per Addolcitori */
+    .valore-evidenziato {
+        font-size: 30px !important;
+        font-weight: bold;
+        color: #00AEEF;
+    }
     /* Box trasparente con bordo per visibilità universale */
     .result-box {
         padding: 15px;
@@ -32,6 +39,15 @@ st.markdown("""
         border: 1px solid rgba(128, 128, 128, 0.3);
         background-color: rgba(128, 128, 128, 0.05);
         margin-bottom: 12px;
+    }
+    /* Titoli sezioni Addolcitori */
+    .titolo-sezione {
+        font-size: 20px;
+        font-weight: bold;
+        color: var(--text-color);
+        border-bottom: 2px solid #00AEEF;
+        margin-bottom: 15px;
+        margin-top: 10px;
     }
     </style>
     """, unsafe_allow_html=True)
@@ -44,7 +60,8 @@ except:
 
 st.title("🧪 Suite Calcoli Light Beta")
 
-tab1, tab2 = st.tabs(["🏊 Pool Assistant", "💧 Soluzione"])
+# Aggiunto il terzo Tab "Addolcitori"
+tab1, tab2, tab3 = st.tabs(["🏊 Pool Assistant", "💧 Soluzione", "🚰 Addolcitori"])
 
 # --- TAB 1: POOL ASSISTANT ---
 with tab1:
@@ -133,3 +150,51 @@ with tab2:
     perc_prod = st.number_input("% Prodotto Commerciale", min_value=0.0, max_value=100.0, value=15.0)
     ris_p = (litri_ins / vol_vasca) * perc_prod if vol_vasca > 0 else 0
     st.success(f"### ✅ Valore in programmazione: {ris_p:.2f} %")
+
+# --- TAB 3: ADDOLCITORI ---
+with tab3:
+    st.header("🚰 Calcolo Addolcitori")
+    
+    st.markdown('<p class="titolo-sezione">1. Parametri Impianto</p>', unsafe_allow_html=True)
+    ca1, ca2 = st.columns(2)
+    with ca1:
+        v_resina = st.number_input("Volume Resina (Litri)", min_value=1, value=25)
+        dur_in = st.number_input("Durezza Acqua Grezza (°f)", min_value=1, value=35)
+    with ca2:
+        dur_out = st.number_input("Durezza Miscelata Uscita (°f)", min_value=0, value=15)
+        cons_m3 = st.number_input("Consumo Acqua Giornaliero (m³)", min_value=0.01, value=0.6, step=0.1)
+
+    dur_abb = dur_in - dur_out
+    if dur_abb <= 0:
+        st.error("La durezza in uscita deve essere inferiore a quella in entrata.")
+    else:
+        # Calcoli Addolcitore
+        cap_c = v_resina * 5 
+        m3_c = cap_c / dur_abb
+        gg_a = m3_c / cons_m3
+        s_rig = (v_resina * 140) / 1000
+        sal_l = s_rig * 3
+        
+        st.markdown('<p class="titolo-sezione">2. Risultati Calcolo</p>', unsafe_allow_html=True)
+        r1, r2 = st.columns(2)
+        with r1:
+            st.write("🌊 **Produzione Acqua Dolce**")
+            st.markdown(f'<div class="result-box"><span class="valore-evidenziato">{m3_c:.2f} m³</span></div>', unsafe_allow_html=True)
+            st.write(f"Ogni **{gg_a:.1f}** giorni l'impianto rigenera.")
+        with r2:
+            st.write("🧂 **Consumo Sale**")
+            st.markdown(f'<div class="result-box"><span class="valore-evidenziato">{s_rig:.2f} kg</span></div>', unsafe_allow_html=True)
+            st.write(f"Sale per singola rigenerazione.")
+
+        st.markdown("---")
+        st.write("📊 **Dettagli Tecnici:**")
+        d1, d2, d3 = st.columns(3)
+        d1.metric("Cap. Ciclica", f"{cap_c} m³f")
+        d2.metric("Volume Salamoia", f"{sal_l:.1f} L")
+        d3.metric("Acqua Scarico", f"{(v_resina*7):.0f} L")
+
+        st.markdown('<p class="titolo-sezione">3. Previsione Annuale</p>', unsafe_allow_html=True)
+        rig_anno = 365 / gg_a
+        s_anno = rig_anno * s_rig
+        st.write(f"📅 Rigenerazioni: **{int(rig_anno)}/anno**")
+        st.write(f"📦 Consumo stimato: **{math.ceil(s_anno/25)} sacchi** da 25kg/anno")
