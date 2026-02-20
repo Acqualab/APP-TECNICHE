@@ -3,36 +3,35 @@ import streamlit as st
 # --- CONFIGURAZIONE PAGINA ---
 st.set_page_config(page_title="Acqualab Light Beta", page_icon="💧", layout="centered")
 
-# --- STILE CSS UNIVERSALE (AUTO-ADATTIVO) ---
+# --- STILE CSS UNIVERSALE ADATTIVO ---
 st.markdown("""
     <style>
-    /* Numero gigante rosso - funziona su entrambi i temi */
+    /* Numero gigante rosso */
     .misura-grande {
         font-size: 38px !important;
         font-weight: bold;
         color: #FF4B4B; 
         margin-left: 10px;
-        text-shadow: 1px 1px 2px rgba(0,0,0,0.2);
     }
-    /* Nome prodotto - USA IL COLORE DI TESTO DEL TEMA ATTIVO */
+    /* Nome prodotto - Colore variabile in base al tema (chiaro/scuro) */
     .nome-prodotto {
         font-size: 18px;
         font-weight: 600;
-        color: var(--text-color); /* CAMBIA DA SOLO TRA BIANCO E NERO */
+        color: var(--text-color); 
     }
-    /* Unità di misura in azzurro vivace */
+    /* Unità di misura azzurra */
     .unita-misura {
         font-size: 20px;
         color: #00AEEF;
         font-weight: bold;
     }
-    /* Box con bordo colorato per far risaltare il contenuto */
+    /* Box trasparente con bordo per visibilità universale */
     .result-box {
-        padding: 12px;
-        border-radius: 8px;
+        padding: 15px;
+        border-radius: 10px;
         border: 1px solid rgba(128, 128, 128, 0.3);
         background-color: rgba(128, 128, 128, 0.05);
-        margin-bottom: 10px;
+        margin-bottom: 12px;
     }
     </style>
     """, unsafe_allow_html=True)
@@ -51,6 +50,7 @@ tab1, tab2 = st.tabs(["🏊 Pool Assistant", "💧 Soluzione"])
 with tab1:
     st.header("Analisi e Interventi")
     
+    # DATI INGRESSO
     c1, c2 = st.columns(2)
     with c1:
         v_piscina = st.number_input("Volume Piscina (m³)", min_value=0.0, value=100.0)
@@ -60,6 +60,7 @@ with tab1:
         cl_libero = st.number_input("Cloro Libero (ppm)", min_value=0.0, value=1.0, step=0.1)
         cya_ril = st.number_input("Acido Cianurico (ppm)", min_value=0.0, value=0.0)
     
+    # CALCOLO CLORO COMBINATO
     cl_combinato = max(0.0, cl_totale - cl_libero)
     st.info(f"💡 Cloro Combinato (CC): **{cl_combinato:.2f} ppm**")
 
@@ -90,7 +91,7 @@ with tab1:
         else:
             st.success("✅ pH ottimale.")
 
-        # 3. CLORO
+        # 3. CLORO (RIPRISTINO + SHOCK)
         st.subheader("📊 Sezione Cloro")
         if cl_libero < 1.5:
             d_cl = 1.5 - cl_libero
@@ -109,19 +110,26 @@ with tab1:
         else:
             st.success("✅ Cloro Combinato ok.")
             
-        # 4. ALTRI
-        st.subheader("📊 Altri Interventi")
+        # 4. STABILIZZANTE (CON DATO REALE)
+        st.subheader("📊 Stabilizzante")
         cya_reale = cya_ril / 2
+        st.info(f"Dato Cianurico Reale: {cya_reale:.1f} ppm")
         if cya_reale < 30:
             st.markdown(f'<div class="result-box"><span class="nome-prodotto">👉 Acido Cianurico:</span> <span class="misura-grande">{(v_piscina*(30-cya_reale))/1000:.2f}</span> <span class="unita-misura">kg</span></div>', unsafe_allow_html=True)
-        
-        st.markdown(f'<div class="result-box"><span class="nome-prodotto">🌿 Algiprevent Mantenimento:</span> <span class="misura-grande">{(v_piscina*1)/100:.2f}</span> <span class="unita-misura">L</span></div>', unsafe_allow_html=True)
+        else:
+            st.success("✅ Livello stabilizzante adeguato.")
+
+        # 5. ALGHICIDA (TUTTE LE 3 VARIABILI)
+        st.subheader("🌿 Sezione Alghicida")
+        st.markdown(f'<div class="result-box"><span class="nome-prodotto">✨ Algiprevent Inizio stagione:</span> <span class="misura-grande">{(v_piscina*2)/100:.2f}</span> <span class="unita-misura">L</span></div>', unsafe_allow_html=True)
+        st.markdown(f'<div class="result-box"><span class="nome-prodotto">✨ Algiprevent Urto:</span> <span class="misura-grande">{(v_piscina*5)/100:.2f}</span> <span class="unita-misura">L</span></div>', unsafe_allow_html=True)
+        st.markdown(f'<div class="result-box"><span class="nome-prodotto">✨ Algiprevent Mantenimento:</span> <span class="misura-grande">{(v_piscina*1)/100:.2f}</span> <span class="unita-misura">L</span></div>', unsafe_allow_html=True)
 
 # --- TAB 2: SOLUZIONE ---
 with tab2:
     st.header("Preparazione Soluzione Vasca")
-    v_v = st.number_input("Volume Vasca (L)", min_value=0.0, value=100.0)
-    l_i = st.number_input("Litri prodotto versati (L)", min_value=0.0, value=10.0)
-    p_c = st.number_input("% Prodotto Commerciale", min_value=0.0, max_value=100.0, value=15.0)
-    res = (l_i / v_v) * p_c if v_v > 0 else 0
-    st.success(f"### ✅ Programmazione: {res:.2f} %")
+    vol_vasca = st.number_input("Volume Vasca Soluzione (L)", min_value=0.0, value=100.0)
+    litri_ins = st.number_input("Litri prodotto versati (L)", min_value=0.0, value=10.0)
+    perc_prod = st.number_input("% Prodotto Commerciale", min_value=0.0, max_value=100.0, value=15.0)
+    ris_p = (litri_ins / vol_vasca) * perc_prod if vol_vasca > 0 else 0
+    st.success(f"### ✅ Valore in programmazione: {ris_p:.2f} %")
