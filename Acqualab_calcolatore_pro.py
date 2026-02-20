@@ -23,13 +23,13 @@ try:
 except:
     st.sidebar.title("ACQUALAB S.R.L.")
 st.sidebar.markdown("---")
-st.sidebar.info("🚀 **VERSIONE PRO**\nModulo Integrato UNI 9182")
+st.sidebar.info("🚀 **VERSIONE PRO**\nSistema Integrato")
 
 st.title("🧪 Suite Calcoli PRO")
 
 tab1, tab2, tab3, tab4 = st.tabs(["🏊 Pool Assistant", "💧 Soluzione", "🚰 Gestione", "📐 Progetto"])
 
-# --- TAB 1: POOL ASSISTANT (VERSIONE LIGHT INTEGRATA) ---
+# --- TAB 1: POOL ASSISTANT (VERSIONE LIGHT ORIGINALE COMPLETA) ---
 with tab1:
     st.header("Analisi e Interventi")
     c1, c2 = st.columns(2)
@@ -48,10 +48,14 @@ with tab1:
 
     if st.button("🚀 CALCOLA TUTTI I DOSAGGI", type="primary", use_container_width=True):
         st.divider()
+        
+        # 1. SEZIONE SALE
         st.subheader("🧂 Sezione Sale")
         sale_gl = sale_ril_mgl / 1000
-        st.markdown(f'<div class="result-box"><span class="nome-prodotto">🧂 Clorinatore Standard (4.5):</span> <span class="misura-grande">{(v_piscina * max(0.0, 4.5 - sale_gl)):.2f}</span> <span class="unita-misura">kg</span></div>', unsafe_allow_html=True)
+        mancante_sale = max(0.0, 4.5 - sale_gl)
+        st.markdown(f'<div class="result-box"><span class="nome-prodotto">🧂 Clorinatore Standard (4.5):</span> <span class="misura-grande">{(v_piscina * mancante_sale):.2f}</span> <span class="unita-misura">kg</span></div>', unsafe_allow_html=True)
         
+        # 2. SEZIONE PH
         st.subheader("📊 Correzione pH")
         if ph_ril > 7.2:
             diff_ph = (ph_ril - 7.2) / 0.1
@@ -60,27 +64,30 @@ with tab1:
             diff_ph_plus = (7.2 - ph_ril) / 0.1
             st.markdown(f'<div class="result-box"><span class="nome-prodotto">👉 pH Plus:</span> <span class="misura-grande">{(v_piscina*10*diff_ph_plus)/1000:.2f}</span> <span class="unita-misura">kg</span></div>', unsafe_allow_html=True)
 
+        # 3. SEZIONE CLORO
         st.subheader("📊 Sezione Cloro")
         if cl_libero < 1.5:
             d_cl = 1.5 - cl_libero
-            st.markdown(f'<div class="result-box"><span class="nome-prodotto">🔹 Chemacal 70:</span> <span class="misura-grande">{(v_piscina*1.5*d_cl)/1000:.2f}</span> <span class="unita-misura">kg</span></div>', unsafe_allow_html=True)
+            st.markdown(f'<div class="result-box"><span class="nome-prodotto">🔹 Chemacal 70 (Mantenimento):</span> <span class="misura-grande">{(v_piscina*1.5*d_cl)/1000:.2f}</span> <span class="unita-misura">kg</span></div>', unsafe_allow_html=True)
+        
         if cl_combinato >= 0.4:
             ppm_shock = max(0.0, (cl_combinato * 10) - cl_libero)
             st.markdown(f'<div class="result-box"><span class="nome-prodotto">🔥 Shock Chemacal 70:</span> <span class="misura-grande">{(v_piscina*1.5*ppm_shock)/1000:.2f}</span> <span class="unita-misura">kg</span></div>', unsafe_allow_html=True)
 
+        # 4. SEZIONE ALGHICIDA
         st.subheader("🌿 Sezione Alghicida")
         st.markdown(f'<div class="result-box"><span class="nome-prodotto">✨ Algiprevent Mantenimento:</span> <span class="misura-grande">{(v_piscina*1)/100:.2f}</span> <span class="unita-misura">L</span></div>', unsafe_allow_html=True)
 
 # --- TAB 2: SOLUZIONE ---
 with tab2:
     st.header("Preparazione Soluzione Vasca")
-    vol_vasca_sol = st.number_input("Volume Vasca Soluzione (L)", min_value=1.0, value=100.0)
-    litri_ins_sol = st.number_input("Litri prodotto versati (L)", min_value=0.0, value=10.0)
-    perc_prod_sol = st.number_input("% Prodotto Commerciale", min_value=0.0, value=15.0)
-    ris_p_sol = (litri_ins_sol / vol_vasca_sol) * perc_prod_sol if vol_vasca_sol > 0 else 0
+    vol_v_sol = st.number_input("Volume Vasca Soluzione (L)", min_value=1.0, value=100.0)
+    litri_i_sol = st.number_input("Litri prodotto versati (L)", min_value=0.0, value=10.0)
+    perc_p_sol = st.number_input("% Prodotto Commerciale", min_value=0.0, value=15.0)
+    ris_p_sol = (litri_i_sol / vol_v_sol) * perc_p_sol if vol_v_sol > 0 else 0
     st.success(f"### ✅ Valore in programmazione: {ris_p_sol:.2f} %")
 
-# --- TAB 3: GESTIONE ---
+# --- TAB 3: GESTIONE (ESISTENTE) ---
 with tab3:
     st.header("🚰 Verifica Impianto Esistente")
     ca1, ca2 = st.columns(2)
@@ -102,19 +109,20 @@ with tab3:
     r_c1.metric("Autonomia", f"{m3_c:.2f} m³", f"Ogni {gg_a:.1f} gg")
     r_c2.metric("Sale/Rigenerazione", f"{sale_rig:.2f} kg")
 
-    d_c1, d_c2, d_c3 = st.columns(3)
-    d_c1.metric("Cap. Ciclica", f"{cap_c} m³f")
-    d_c2.metric("Salamoia", f"{(sale_rig*3):.1f} L")
-    d_c3.metric("Scarico", f"{(vr_gest*7):.0f} L")
+    st.markdown("---")
+    d1, d2, d3 = st.columns(3)
+    d1.metric("Cap. Ciclica", f"{cap_c} m³f")
+    d2.metric("Salamoia", f"{(sale_rig*3):.1f} L")
+    d3.metric("Scarico", f"{(vr_gest*7):.0f} L")
 
-# --- TAB 4: PROGETTO (CORRETTA) ---
+# --- TAB 4: PROGETTO (DETTAGLIATA) ---
 with tab4:
-    st.header("📐 Progettazione e Risparmio Clack")
+    st.header("📐 Progettazione Nuovo Impianto")
     cp1, cp2 = st.columns(2)
     with cp1:
         tipo_ut = st.selectbox("Tipo Utenza", ["Villetta", "Condominio"])
-        d_ingresso = st.number_input("Durezza Acquedotto (°f)", min_value=1, value=35, key="d_ing_p")
-        d_mix_des = st.number_input("Durezza Mix Desiderata (°f)", min_value=0, value=15, key="d_mix_p")
+        d_ingresso = st.number_input("Durezza Acquedotto (°f)", min_value=1, value=35, key="di_p")
+        d_mix_des = st.number_input("Durezza Mix Desiderata (°f)", min_value=0, value=15, key="dm_p")
     with cp2:
         if tipo_ut == "Villetta":
             pers = st.number_input("Numero Persone", min_value=1, value=4)
@@ -128,29 +136,28 @@ with tab4:
     d_netta_pro = max(0.1, d_ingresso - d_mix_des)
     res_ideale = (c_gg_pro * 4 * d_netta_pro) / 5
     taglie_std = [8, 12, 15, 20, 25, 30, 40, 50, 75, 100, 125, 150, 200, 250, 300]
-    t_proposta = min([t for t in taglie_std if t >= res_ideale] or [300])
+    t_scelta = min([t for t in taglie_std if t >= res_ideale] or [300])
     
-    m3_proposta = (t_proposta * 5) / d_netta_pro
-    gg_proposta = m3_proposta / c_gg_pro if c_gg_pro > 0 else 0
+    m3_p = (t_scelta * 5) / d_netta_pro
+    gg_p = m3_p / c_gg_pro if c_gg_pro > 0 else 0
 
-    st.markdown(f'<div class="result-box">🎯 <b>Taglia Suggerita: {t_proposta} Litri</b><br>Intervallo Rigenerazione: <b>Ogni {gg_proposta:.1f} giorni</b></div>', unsafe_allow_html=True)
+    st.markdown(f'<div class="result-box">🎯 <b>Taglia Suggerita: {t_scelta} L</b><br>Intervallo Rigenerazione: <b>Ogni {gg_p:.1f} giorni</b></div>', unsafe_allow_html=True)
 
-    n_rig_anno = 365 / gg_proposta if gg_proposta > 0 else 0
-    s_anno_std = (t_proposta * 0.14) * n_rig_anno
-    s_anno_clack = s_anno_std * 0.75 
+    n_rig_anno = 365 / gg_p if gg_p > 0 else 0
+    s_std = (t_scelta * 0.14) * n_rig_anno
+    s_clack = s_std * 0.75 
     
-    st.markdown('<p class="titolo-sezione">📊 Analisi Annuale Standard vs Clack</p>', unsafe_allow_html=True)
+    st.markdown('<p class="titolo-sezione">📊 Analisi Annuale vs Clack</p>', unsafe_allow_html=True)
     st.table({
         "Parametro Annuo": ["Sale Totale (kg)", "Sacchi (25kg)", "Acqua Scarico (m³)", "Portata Picco"],
-        "Valvola Standard": [f"{s_anno_std:.1f}", f"{math.ceil(s_anno_std/25)}", f"{(t_proposta*7*n_rig_anno)/1000:.2f}", f"{p_picco} m³/h"],
-        "Clack Impression": [f"{s_anno_clack:.1f}", f"{math.ceil(s_anno_clack/25)}", f"{(t_proposta*5*n_rig_anno)/1000:.2f}", f"{p_picco} m³/h"]
+        "Valvola Standard": [f"{s_std:.1f}", f"{math.ceil(s_std/25)}", f"{(t_scelta*7*n_rig_anno)/1000:.2f}", f"{p_picco} m³/h"],
+        "Clack Impression": [f"{s_clack:.1f}", f"{math.ceil(s_clack/25)}", f"{(t_scelta*5*n_rig_anno)/1000:.2f}", f"{p_picco} m³/h"]
     })
 
     st.markdown(f"""
     <div class="comparison-card">
         <h4>💰 Vantaggi Tecnologia Clack</h4>
-        • Risparmio sale stimato: <b>{(s_anno_std - s_anno_clack):.1f} kg/anno</b><br>
-        • Riduzione scarichi idrici: <b>25% rispetto a valvole temporizzate</b><br>
-        • Autonomia ciclica netta: <b>{m3_proposta:.2f} m³</b> con mix a {d_mix_des}°f
+        • Risparmio sale stimato: <b>{(s_std - s_clack):.1f} kg/anno</b><br>
+        • Autonomia ciclica netta: <b>{m3_p:.2f} m³</b> con mix a {d_mix_des}°f
     </div>
     """, unsafe_allow_html=True)
