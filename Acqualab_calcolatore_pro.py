@@ -15,6 +15,7 @@ st.markdown("""
     .titolo-sezione { font-size: 20px; font-weight: bold; color: var(--text-color); border-bottom: 2px solid #00AEEF; margin-bottom: 15px; margin-top: 10px; }
     .stat-label { font-size: 12px; color: gray; font-weight: bold; text-transform: uppercase; }
     .stat-value { font-size: 22px; font-weight: bold; color: #333; }
+    .comparison-card { background-color: #f1f8ff; border-radius: 10px; padding: 20px; border-left: 5px solid #00AEEF; }
     </style>
     """, unsafe_allow_html=True)
 
@@ -24,13 +25,13 @@ try:
 except:
     st.sidebar.title("ACQUALAB S.R.L.")
 st.sidebar.markdown("---")
-st.sidebar.info("🚀 **VERSIONE PRO**\nCalcoli UNI 9182 e Risparmio Clack attivi.")
+st.sidebar.info("🚀 **VERSIONE PRO**\nModulo Progettazione UNI 9182 & Risparmio Clack")
 
 st.title("🧪 Suite Calcoli PRO")
 
 tab1, tab2, tab3, tab4 = st.tabs(["🏊 Pool Assistant", "💧 Soluzione", "🚰 Gestione", "📐 Progetto"])
 
-# --- TAB 1: POOL ASSISTANT (Ripristinato) ---
+# --- TAB 1: POOL ASSISTANT ---
 with tab1:
     st.header("Analisi e Interventi")
     c1, c2 = st.columns(2)
@@ -64,7 +65,7 @@ with tab2:
     p_p = st.number_input("% Prodotto Commerciale", value=15.0)
     st.success(f"### ✅ Valore in programmazione: {(l_i / v_v) * p_p if v_v > 0 else 0:.2f} %")
 
-# --- TAB 3: GESTIONE (Consumi Singola Rigenerazione) ---
+# --- TAB 3: GESTIONE (Analisi Macchina Esistente) ---
 with tab3:
     st.header("🚰 Verifica Impianto Esistente")
     ca1, ca2 = st.columns(2)
@@ -83,52 +84,69 @@ with tab3:
 
     st.markdown('<p class="titolo-sezione">Risultati Ciclo e Autonomia</p>', unsafe_allow_html=True)
     r1, r2 = st.columns(2)
-    r1.metric("Produzione Acqua Dolce", f"{m3_ciclo:.2f} m³", f"Ogni {gg_intervallo:.1f} gg")
-    r2.metric("Sale / Rigenerazione", f"{sale_rig:.2f} kg", "Consumo per ciclo")
+    r1.metric("Autonomia Reale", f"{m3_ciclo:.2f} m³", f"Ogni {gg_intervallo:.1f} gg")
+    r2.metric("Sale per Ciclo", f"{sale_rig:.2f} kg", "Consumo rigenerazione")
 
-    st.markdown('<p class="titolo-sezione">Dettagli Tecnici (Singolo Ciclo)</p>', unsafe_allow_html=True)
+    st.markdown('<p class="titolo-sezione">Dettagli Tecnici Singola Rigenerazione</p>', unsafe_allow_html=True)
     d1, d2, d3 = st.columns(3)
     d1.write(f"<span class='stat-label'>Cap. Ciclica</span><br><span class='stat-value'>{cap_ciclo} m³f</span>", unsafe_allow_html=True)
-    d2.write(f"<span class='stat-label'>Volume Salamoia</span><br><span class='stat-value'>{(sale_rig*3):.1f} L</span>", unsafe_allow_html=True)
+    d2.write(f"<span class='stat-label'>Vol. Salamoia</span><br><span class='stat-value'>{(sale_rig*3):.1f} L</span>", unsafe_allow_html=True)
     d3.write(f"<span class='stat-label'>Acqua Scarico</span><br><span class='stat-value'>{vr_gest*7} L</span>", unsafe_allow_html=True)
 
-# --- TAB 4: PROGETTO (Risparmio Annuale e UNI 9182) ---
+# --- TAB 4: PROGETTO (CON CONFRONTO DETTAGLIATO) ---
 with tab4:
-    st.header("📐 Progettazione e Confronto")
+    st.header("📐 Progettazione e Analisi di Risparmio")
     cp1, cp2 = st.columns(2)
     with cp1:
         tipo = st.selectbox("Tipo Utenza", ["Villetta", "Condominio"])
-        d_in_p = st.number_input("Durezza Ingresso (°f)", value=35, key="d_in_p")
-        d_out_p = st.number_input("Durezza Uscita (°f)", value=15, key="d_out_p")
+        d_in_pro = st.number_input("Durezza Ingresso (°f)", value=35, key="d_in_pro")
+        d_out_pro = st.number_input("Durezza Uscita (°f)", value=15, key="d_out_pro")
     with cp2:
         if tipo == "Villetta":
             u_val = st.number_input("Numero Persone", value=4)
             cons_gg = u_val * 0.20
-            picco_p = 1.20
+            q_picco = 1.20
         else:
             u_val = st.number_input("Numero Appartamenti", value=10)
             cons_gg = (u_val * 3) * 0.20
-            picco_p = round(0.20 * math.sqrt(u_val * 3) + 0.8, 2)
+            q_picco = round(0.20 * math.sqrt(u_val * 3) + 0.8, 2)
 
-    d_delta = max(0.1, d_in_p - d_out_p)
-    res_nec = (cons_gg * 3 * d_delta) / 5
-    taglie_std = [8, 12, 15, 20, 25, 30, 40, 50, 75, 100, 125, 150, 200, 250, 300]
-    scelta_p = min([t for t in taglie_std if t >= res_nec] or [max(taglie_std)])
+    d_delta = max(0.1, d_in_pro - d_out_pro)
+    resina_nec = (cons_gg * 3 * d_delta) / 5
+    taglie = [8, 12, 15, 20, 25, 30, 40, 50, 75, 100, 125, 150, 200, 250, 300]
+    taglia_scelta = min([t for t in taglie if t >= resina_nec] or [max(taglie)])
 
-    st.markdown(f'<div class="result-box">Taglia Suggerita: <span class="valore-evidenziato">{scelta_p} Litri Resina</span></div>', unsafe_allow_html=True)
+    st.markdown(f'<div class="result-box">Taglia Suggerita: <span class="valore-evidenziato">{taglia_scelta} Litri Resina</span></div>', unsafe_allow_html=True)
 
-    # Calcoli Annuali
+    # --- LOGICA CONFRONTO ANNUALE ---
     m3_anno = cons_gg * 365
-    rig_anno = m3_anno / ((scelta_p * 5) / d_delta)
-    sale_anno_std = (scelta_p * 0.14) * rig_anno
-    acqua_anno_std = (scelta_p * 7 * rig_anno) / 1000
+    rig_anno = m3_anno / ((taglia_scelta * 5) / d_delta)
+    
+    # Consumi Standard (Testa Standard)
+    sale_std = (taglia_scelta * 0.14) * rig_anno
+    acqua_std = (taglia_scelta * 7 * rig_anno) / 1000
+    
+    # Consumi Clack (Ottimizzati -25% sale/acqua grazie alla salamoia proporzionale)
+    sale_clack = sale_std * 0.75
+    acqua_clack = acqua_std * 0.75
 
-    st.markdown('<p class="titolo-sezione">📊 Risparmio Annuale: Standard vs Clack</p>', unsafe_allow_html=True)
+    st.markdown('<p class="titolo-sezione">📊 Confronto Annuale: Standard vs Clack Impression</p>', unsafe_allow_html=True)
+    
     st.table({
-        "Parametro (Annuo)": ["Sale Totale", "Sacchi (25kg)", "Acqua Scarico", "N. Rigenerazioni"],
-        "Valvola Standard": [f"{sale_anno_std:.0f} kg", f"{math.ceil(sale_anno_std/25)}", f"{acqua_anno_std:.2f} m³", f"{rig_anno:.0f}"],
-        "Clack Impression": [f"{sale_anno_std*0.8:.0f} kg", f"{math.ceil((sale_anno_std*0.8)/25)}", f"{acqua_anno_std*0.8:.2f} m³", "Ottimizzata"]
+        "Parametro Annuo": ["Sale Totale (kg)", "Sacchi da 25kg", "Acqua Scarico (m³)", "N. Rigenerazioni"],
+        "Valvola Standard": [f"{sale_std:.1f}", f"{math.ceil(sale_std/25)}", f"{acqua_std:.2f}", f"{rig_anno:.0f}"],
+        "Clack Impression": [f"{sale_clack:.1f}", f"{math.ceil(sale_clack/25)}", f"{acqua_clack:.2f}", "Variabile (Ottimizzata)"]
     })
 
-    st.success(f"📉 **Risparmio Stimato:** {sale_anno_std*0.2:.0f} kg di sale e {(acqua_anno_std*0.2)*1000:.0f} L d'acqua ogni anno.")
-    st.info(f"⚙️ **Portata di Picco UNI 9182:** {picco_p} m³/h")
+    # Card di Risparmio
+    risparmio_kg = sale_std - sale_clack
+    risparmio_sacchi = math.ceil(sale_std/25) - math.ceil(sale_clack/25)
+    
+    st.markdown(f"""
+    <div class="comparison-card">
+        <h4>💰 Risparmio Stimato con Clack</h4>
+        • <b>{risparmio_kg:.1f} kg</b> di sale risparmiati all'anno<br>
+        • Circa <b>{risparmio_sacchi} sacchi</b> di sale in meno<br>
+        • Portata di Picco (UNI 9182): <b>{q_picco} m³/h</b>
+    </div>
+    """, unsafe_allow_html=True)
