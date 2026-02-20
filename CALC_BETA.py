@@ -3,41 +3,36 @@ import streamlit as st
 # --- CONFIGURAZIONE PAGINA ---
 st.set_page_config(page_title="Acqualab Light Beta", page_icon="💧", layout="centered")
 
-# --- STILE CSS OTTIMIZZATO PER CHIARO E SCURO ---
+# --- STILE CSS UNIVERSALE (AUTO-ADATTIVO) ---
 st.markdown("""
     <style>
-    /* Numero gigante in rosso (visibile ovunque) */
+    /* Numero gigante rosso - funziona su entrambi i temi */
     .misura-grande {
         font-size: 38px !important;
         font-weight: bold;
-        color: #E63946; 
+        color: #FF4B4B; 
         margin-left: 10px;
+        text-shadow: 1px 1px 2px rgba(0,0,0,0.2);
     }
-    /* Nome prodotto con colore adattivo o grigio medio scuro */
+    /* Nome prodotto - USA IL COLORE DI TESTO DEL TEMA ATTIVO */
     .nome-prodotto {
         font-size: 18px;
         font-weight: 600;
-        color: #495057; /* Grigio antracite leggibile su bianco */
+        color: var(--text-color); /* CAMBIA DA SOLO TRA BIANCO E NERO */
     }
-    /* Se siamo in Dark Mode, forziamo il testo più chiaro */
-    @media (prefers-color-scheme: dark) {
-        .nome-prodotto {
-            color: #E9ECEF; 
-        }
-    }
-    /* Unità di misura in azzurro corazzato */
+    /* Unità di misura in azzurro vivace */
     .unita-misura {
         font-size: 20px;
-        color: #457B9D;
+        color: #00AEEF;
         font-weight: bold;
     }
-    /* Box per i risultati per dare profondità */
+    /* Box con bordo colorato per far risaltare il contenuto */
     .result-box {
-        padding: 15px;
-        border-radius: 10px;
-        background-color: rgba(128, 128, 128, 0.1);
+        padding: 12px;
+        border-radius: 8px;
+        border: 1px solid rgba(128, 128, 128, 0.3);
+        background-color: rgba(128, 128, 128, 0.05);
         margin-bottom: 10px;
-        border-left: 5px solid #E63946;
     }
     </style>
     """, unsafe_allow_html=True)
@@ -71,10 +66,10 @@ with tab1:
     st.markdown("---")
     sale_ril_mgl = st.number_input("Sale rilevato (mg/L - ppm)", min_value=0.0, value=0.0, step=100.0)
 
-    if st.button("🚀 CALCOLA TUTTI I DOSAGGI", type="primary"):
+    if st.button("🚀 CALCOLA TUTTI I DOSAGGI", type="primary", use_container_width=True):
         st.divider()
         
-        # 1. SEZIONE SALE
+        # 1. SALE
         st.subheader("🧂 Sezione Sale")
         sale_gl = sale_ril_mgl / 1000
         m_std = max(0.0, 4.5 - sale_gl)
@@ -82,7 +77,7 @@ with tab1:
         st.markdown(f'<div class="result-box"><span class="nome-prodotto">🧂 Clorinatore Standard (4.5):</span> <span class="misura-grande">{(v_piscina * m_std):.2f}</span> <span class="unita-misura">kg</span></div>', unsafe_allow_html=True)
         st.markdown(f'<div class="result-box"><span class="nome-prodotto">🧂 Bassa Salinità (1.5):</span> <span class="misura-grande">{(v_piscina * m_ls):.2f}</span> <span class="unita-misura">kg</span></div>', unsafe_allow_html=True)
         
-        # 2. SEZIONE PH
+        # 2. PH
         st.subheader("📊 Correzione pH")
         if ph_ril > 7.2:
             diff = (ph_ril - 7.2) / 0.1
@@ -95,11 +90,38 @@ with tab1:
         else:
             st.success("✅ pH ottimale.")
 
-        # 3. SEZIONE CLORO
+        # 3. CLORO
         st.subheader("📊 Sezione Cloro")
         if cl_libero < 1.5:
             d_cl = 1.5 - cl_libero
-            st.write("🛠 **Dosaggio per Ripristino (Target 1.5 ppm):**")
+            st.write("🛠 **Integrazione Ripristino (Target 1.5):**")
             st.markdown(f'<div class="result-box"><span class="nome-prodotto">🔹 Chemacal 70:</span> <span class="misura-grande">{(v_piscina*1.5*d_cl)/1000:.2f}</span> <span class="unita-misura">kg</span></div>', unsafe_allow_html=True)
             st.markdown(f'<div class="result-box"><span class="nome-prodotto">🔹 Power Clor 56:</span> <span class="misura-grande">{(v_piscina*1.8*d_cl)/1000:.2f}</span> <span class="unita-misura">kg</span></div>', unsafe_allow_html=True)
-            st.markdown(f'<div class="result-box"><span class="nome-prodotto">🔹 Chemaclor L:
+            st.markdown(f'<div class="result-box"><span class="nome-prodotto">🔹 Chemaclor L:</span> <span class="misura-grande">{(v_piscina*7*d_cl)/1000:.2f}</span> <span class="unita-misura">L</span></div>', unsafe_allow_html=True)
+        
+        if cl_combinato >= 0.4:
+            st.write(f"💥 **Trattamento SHOCK (CC: {cl_combinato:.2f}):**")
+            ppm_shock = max(0.0, (cl_combinato * 10) - cl_libero)
+            if ppm_shock > 0:
+                st.markdown(f'<div class="result-box"><span class="nome-prodotto">🔥 Shock Chemacal 70:</span> <span class="misura-grande">{(v_piscina*1.5*ppm_shock)/1000:.2f}</span> <span class="unita-misura">kg</span></div>', unsafe_allow_html=True)
+                st.markdown(f'<div class="result-box"><span class="nome-prodotto">🔥 Shock Power Clor 56:</span> <span class="misura-grande">{(v_piscina*1.8*ppm_shock)/1000:.2f}</span> <span class="unita-misura">kg</span></div>', unsafe_allow_html=True)
+                st.markdown(f'<div class="result-box"><span class="nome-prodotto">🔥 Shock Chemaclor L:</span> <span class="misura-grande">{(v_piscina*7*ppm_shock)/1000:.2f}</span> <span class="unita-misura">L</span></div>', unsafe_allow_html=True)
+        else:
+            st.success("✅ Cloro Combinato ok.")
+            
+        # 4. ALTRI
+        st.subheader("📊 Altri Interventi")
+        cya_reale = cya_ril / 2
+        if cya_reale < 30:
+            st.markdown(f'<div class="result-box"><span class="nome-prodotto">👉 Acido Cianurico:</span> <span class="misura-grande">{(v_piscina*(30-cya_reale))/1000:.2f}</span> <span class="unita-misura">kg</span></div>', unsafe_allow_html=True)
+        
+        st.markdown(f'<div class="result-box"><span class="nome-prodotto">🌿 Algiprevent Mantenimento:</span> <span class="misura-grande">{(v_piscina*1)/100:.2f}</span> <span class="unita-misura">L</span></div>', unsafe_allow_html=True)
+
+# --- TAB 2: SOLUZIONE ---
+with tab2:
+    st.header("Preparazione Soluzione Vasca")
+    v_v = st.number_input("Volume Vasca (L)", min_value=0.0, value=100.0)
+    l_i = st.number_input("Litri prodotto versati (L)", min_value=0.0, value=10.0)
+    p_c = st.number_input("% Prodotto Commerciale", min_value=0.0, max_value=100.0, value=15.0)
+    res = (l_i / v_v) * p_c if v_v > 0 else 0
+    st.success(f"### ✅ Programmazione: {res:.2f} %")
