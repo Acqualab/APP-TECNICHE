@@ -2,7 +2,7 @@ import streamlit as st
 import math
 
 # --- CONFIGURAZIONE PAGINA ---
-st.set_page_config(page_title="Acqualab Light Beta", page_icon="💧", layout="centered")
+st.set_page_config(page_title="Acqualab Light", page_icon="💧", layout="centered")
 
 # --- STILE CSS UNIVERSALE ADATTIVO ---
 st.markdown("""
@@ -58,7 +58,7 @@ try:
 except:
     st.sidebar.title("ACQUALAB S.R.L.")
 
-st.title("🧪 Suite Calcoli Light Beta")
+st.title("🧪 Suite Calcoli Light")
 
 # Aggiunto il terzo Tab "Addolcitori"
 tab1, tab2, tab3 = st.tabs(["🏊 Pool Assistant", "💧 Soluzione", "🚰 Addolcitori"])
@@ -193,8 +193,4 @@ with tab3:
         d2.metric("Volume Salamoia", f"{sal_l:.1f} L")
         d3.metric("Acqua Scarico", f"{(v_resina*7):.0f} L")
 
-        st.markdown('<p class="titolo-sezione">3. Previsione Annuale</p>', unsafe_allow_html=True)
-        rig_anno = 365 / gg_a
-        s_anno = rig_anno * s_rig
-        st.write(f"📅 Rigenerazioni: **{int(rig_anno)}/anno**")
-        st.write(f"📦 Consumo stimato: **{math.ceil(s_anno/25)} sacchi** da 25kg/anno")
+        st.markdown
