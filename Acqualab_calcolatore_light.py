@@ -124,4 +124,32 @@ with tab_add_dim:
     st.divider()
     col_a, col_b = st.columns(2)
     col_a.markdown(f'<div class="metric-card">Consumo Stimato:<br><span class="highlight-red">{m3_giorno:.2f} m³/g</span></div>', unsafe_allow_html=True)
-    col_b.markdown(
+    col_b.markdown(f'<div class="metric-card">Portata Picco:<br><span class="highlight-red">{picco:.2f} m³/h</span></div>', unsafe_allow_html=True)
+    
+    v_res_cons = (m3_giorno * 4 * dur_abb) / 5
+    st.success(f"🛠 Taglia consigliata per 4gg autonomia: **{math.ceil(v_res_cons)} Litri**")
+
+# ==========================================
+# TAB 4: ADDOLCITORI - CONSUMI
+# ==========================================
+with tab_add_cons:
+    st.header("🧂 Gestione e Costi")
+    v_eff = st.number_input("Volume Resina Macchina (L)", value=25)
+    
+    # Riutilizzo valori da Tab 3 se possibile
+    cap_c = v_eff * 5
+    m3_c = cap_c / dur_abb if dur_abb > 0 else 0
+    gg_aut = m3_c / m3_giorno if m3_giorno > 0 else 0
+    s_rig = v_eff * 0.14
+    
+    st.markdown(f"""
+    <div class="result-box">
+    🌊 Acqua per ciclo: <b>{m3_c:.2f} m³</b><br>
+    📅 Rigenerazione ogni: <b>{gg_aut:.1f} giorni</b><br>
+    🧂 Sale per rigenerazione: <b>{s_rig:.2f} kg</b><br>
+    🧪 Salamoia: <b>{s_rig * 3:.1f} Litri</b>
+    </div>
+    """, unsafe_allow_html=True)
+    
+    s_anno = (365/gg_aut) * s_rig if gg_aut > 0 else 0
+    st.write(f"📦 Consumo annuale: **{math.ceil(s_anno/25)} sacchi** da 25kg")
