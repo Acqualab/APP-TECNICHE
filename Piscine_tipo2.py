@@ -2,24 +2,18 @@ import streamlit as st
 import math
 import matplotlib.pyplot as plt
 
+# --- CONFIGURAZIONE FISSA ---
 st.set_page_config(page_title="Progetto Professionale UNI 10637", layout="wide")
 
-# --- FUNZIONI DI SUPPORTO ---
 def suggerisci_pvc(d_interno):
     tabella_pvc = {32:28, 40:36, 50:45, 63:57, 75:69, 90:82, 110:100, 125:114, 140:127, 160:146, 200:184}
     for esterno, interno in tabella_pvc.items():
-        if interno >= d_interno: return esterno, interno
-    return "Fuori scala", d_interno
+        if interno >= d_interno: return esterno
+    return "N/A"
 
-def get_t(h):
-    if h > 1.35: return 3.0
-    if h > 0.6:  return 2.5
-    if h > 0.4:  return 1.0
-    return 0.5
-
-# --- INTERFACCIA ---
+# --- 1. LAYOUT APPROVATO: INPUT E GEOMETRIA ---
 st.title("🛠️ Suite Professionale Progettazione Piscine")
-st.subheader("Calcolo Idraulico Avanzato - UNI 10637:2024")
+st.subheader("Calcolo Integrato UNI 10637:2024")
 
 with st.sidebar:
     st.header("📋 Dati Vasca")
@@ -29,105 +23,65 @@ with st.sidebar:
     h_max = st.number_input("Prof. max (m)", value=1.6)
     
     st.divider()
-    st.header("🛡️ Sicurezza Prese Fondo")
-    q_max_produttore = st.number_input("Portata max griglia produttore (m³/h)", value=15.0)
-    st.caption("Verificare sul datasheet della presa di fondo.")
+    st.header("🚀 Parametri Tecnici")
+    v_filtrazione = st.slider("Velocità filtrazione (m/h)", 20, 50, 30)
+    q_max_griglia = st.number_input("Portata max griglia fondo (m³/h)", value=15.0)
+    cap_bocchetta = st.number_input("Portata singola bocchetta (m³/h)", value=6.0)
 
-# --- CALCOLO PORTATA GENERALE ---
+# Calcolo Portata Totale (Prospetto 3)
 superficie_tot = L * W
-pendenza = (h_max - h_min) / L
+passo = 0.1
 q_tot = 0
-passo = 0.05
 for i in range(int(L/passo)):
-    h_c = h_min + (i * passo * pendenza)
-    q_tot += ((passo * W) * h_c) / get_t(h_c)
+    h_c = h_min + (i * passo * (h_max - h_min) / L)
+    # Tempi di ricircolo Prospetto 3
+    t = 3.0 if h_c > 1.35 else (2.5 if h_c > 0.6 else (1.0 if h_c > 0.4 else 0.5))
+    q_tot += ((passo * W) * h_c) / t
 
-# --- DIMENSIONAMENTO COMPONENTI ---
-# 1. SKIMMER
-if superficie_tot <= 100:
-    n_skimmer = math.ceil(superficie_tot / 20)
-    q_stacco_skimmer = q_tot / n_skimmer
-else:
-    n_skimmer = 0
-    q_stacco_skimmer = 0
-
-# 2. PRESE DI FONDO (Minimo 2 in parallelo)
-n_prese_fondo = 2
-q_stacco_fondo = q_tot / n_prese_fondo # Caso peggiore: 100% portata dal fondo
-
-# 3. BOCCHETTE
-cap_bocchetta = 6.0 # m3/h default
-n_bocchette = math.ceil(q_tot / cap_bocchetta)
-q_stacco_man = q_tot / n_bocchette
-
-# --- RISULTATI IDRAULICI ---
-st.info(f"### 📊 Analisi Flussi (Portata Totale: {q_tot:.2f} m³/h)")
+# --- 2. LAYOUT APPROVATO: COMPONENTI E IDRAULICA ---
+st.info(f"### 📊 Analisi Generale (Portata: {q_tot:.2f} m³/h - Sup: {superficie_tot:.2f} m²)")
 
 col1, col2 = st.columns(2)
-
 with col1:
     st.write("#### 📥 Aspirazione")
-    # Calcolo Tubi
-    est_s_sk, _ = suggerisci_pvc(math.sqrt(((q_stacco_skimmer/3600)/1.7)/math.pi)*2000) if n_skimmer > 0 else (0,0)
-    est_s_fo, _ = suggerisci_pvc(math.sqrt(((q_stacco_fondo/3600)/1.7)/math.pi)*2000)
-    
-    if n_skimmer > 0:
-        st.write(f"🔹 **N. {n_skimmer} Skimmer**: Stacchi Ø {est_s_sk} mm")
+    if superficie_tot <= 100:
+        n_skimmer = math.ceil(superficie_tot / 20)
+        q_sk = q_tot / n_skimmer
+        d_sk = suggerisci_pvc(math.sqrt(((q_sk/3600)/1.7)/math.pi)*2000)
+        st.write(f"🔹 **N. {n_skimmer} Skimmer**: Tubo Ø {d_sk} mm")
     else:
-        st.error("⚠️ OBBLIGO SFIORO (>100 m²)")
-
-    st.write(f"🔹 **N. {n_prese_fondo} Prese di Fondo** (Parallelo)")
-    st.write(f"• Distanza minima: **2.5 m**")
-    st.write(f"• Stacchi singoli: **Ø {est_s_fo} mm**")
+        st.error("⚠️ OLTRE 100 m²: OBBLIGO SFIORO")
     
-    # Verifica Portata Griglia
-    if q_stacco_fondo > q_max_produttore:
-        st.error(f"❌ PORTATA ECCESSIVA: {q_stacco_fondo:.1f} m³/h per griglia. Scegliere un modello più grande o aumentare il numero di prese.")
-    else:
-        st.success(f"✅ Verifica griglia: {q_stacco_fondo:.1f} m³/h < {q_max_produttore} m³/h")
+    q_fo = q_tot / 2
+    d_fo = suggerisci_pvc(math.sqrt(((q_fo/3600)/1.7)/math.pi)*2000)
+    st.write(f"🔹 **N. 2 Prese Fondo**: Tubo Ø {d_fo} mm (Dist. 2.5m)")
+    if q_fo > q_max_griglia: st.error(f"Griglia insufficiente ({q_fo:.1f} m³/h)")
 
 with col2:
     st.write("#### 📤 Mandata")
-    est_s_man, _ = suggerisci_pvc(math.sqrt(((q_stacco_man/3600)/2.5)/math.pi)*2000)
-    st.write(f"🔹 **N. {n_bocchette} Bocchette**: Stacchi Ø {est_s_man} mm")
+    n_boc = math.ceil(q_tot / cap_bocchetta)
+    q_boc = q_tot / n_boc
+    d_boc = suggerisci_pvc(math.sqrt(((q_boc/3600)/2.5)/math.pi)*2000)
+    st.write(f"🔹 **N. {n_boc} Bocchette**: Tubo Ø {d_boc} mm")
 
-# --- SCHEMA TECNICO ---
-st.divider()
-st.subheader("📐 Schema di Collegamento Prese di Fondo")
-st.write("Le due prese devono essere collegate 'a specchio' rispetto al collettore per garantire perdite di carico identiche.")
-
-
-
-st.warning("⚠️ **Nota di Installazione:** Utilizzare un collettore di fondo di diametro adeguato prima di risalire verso il locale tecnico per mantenere la velocità < 1.0 m/s.")
-# --- MODULO LOCALE TECNICO AGGIORNATO ---
+# --- 3. NUOVO MODULO: LOCALE TECNICO ---
 st.divider()
 st.subheader("🏗️ Dimensionamento Locale Tecnico")
+c_tec1, c_tec2 = st.columns(2)
 
-col_tec1, col_tec2 = st.columns(2)
-
-with col_tec1:
-    st.write("#### 🔍 Scelta Filtrazione")
-    
-    # Selettore tipologia filtro
+with c_tec1:
     tipo_filtro = st.radio("Tipologia Filtro:", ["Sabbia", "Cartuccia"], horizontal=True)
-    
-    # Calcolo superficie filtrante necessaria
     sup_filtrante_mq = q_tot / v_filtrazione
+    st.metric("Superficie Filtrante Minima", f"{sup_filtrante_mq:.2f} m²")
     
     if tipo_filtro == "Sabbia":
-        # Calcolo diametro per filtri a sabbia (circolari)
-        diam_filtro_mm = math.sqrt(sup_filtrante_mq / math.pi) * 2 * 1000
-        st.metric("Superficie Filtrante Minima", f"{sup_filtrante_mq:.2f} m²")
-        st.info(f"Ø Filtro a Sabbia consigliato: **{diam_filtro_mm:.0f} mm**")
+        diam_f = math.sqrt(sup_filtrante_mq / math.pi) * 2000
+        st.info(f"Ø Filtro consigliato: **{diam_f:.0f} mm**")
     else:
-        # Per i filtri a cartuccia si ragiona direttamente in superficie (mq o sq.ft)
-        st.metric("Superficie Filtrante Minima", f"{sup_filtrante_mq:.2f} m²")
-        st.success(f"Cerca una cartuccia con almeno **{sup_filtrante_mq:.2f} m²** di tessuto filtrante.")
-        st.caption("Nota: I produttori spesso indicano la superficie in sq.ft (1 m² ≈ 10.76 sq.ft).")
+        st.success(f"Richiesti **{sup_filtrante_mq * 10.76:.0f} sq.ft** di superficie filtrante")
 
-with col_tec2:
-    st.write("#### ⚙️ Circolazione")
-    portata_pompa = q_tot * 1.10
-    st.metric("Portata Nominale Pompa (+10%)", f"{portata_pompa:.2f} m³/h")
-    prevalenza_stimata = st.selectbox("Prevalenza stimata (m.c.a.)", [10, 12, 15, 18], index=1)
-    st.write(f"Punto di lavoro: **{q_tot:.2f} m³/h @ {prevalenza_stimata} m.c.a.**")
+with c_tec2:
+    st.write("#### ⚙️ Pompa di Circolazione")
+    st.metric("Punto di Lavoro", f"{q_tot:.2f} m³/h")
+    prevalenza = st.selectbox("Prevalenza (m.c.a.)", [10, 12, 15, 18], index=1)
+    st.caption(f"Selezionare pompa capace di {q_tot:.1f} m³/h a {prevalenza} m di prevalenza.")            
