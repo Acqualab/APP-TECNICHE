@@ -75,3 +75,22 @@ with c3:
 st.subheader("📐 Suggerimento Condotte")
 d_mandata = math.sqrt(((portata_totale/3600)/1.5)/math.pi) * 2 * 1000
 st.success(f"Diametro interno mandata: **{d_mandata:.0f} mm** (V=1.5m/s)")
+st.divider()
+st.subheader("📦 Calcolo Componenti Vasca")
+
+col_comp1, col_comp2 = st.columns(2)
+
+with col_comp1:
+    cap_skimmer = st.slider("Capacità singolo skimmer (m³/h)", 5, 15, 8)
+    cap_bocchetta = st.slider("Capacità singola bocchetta (m³/h)", 3, 10, 5)
+
+# Calcolo numeri necessari (arrotondati per eccesso)
+n_skimmer = math.ceil(portata_totale / cap_skimmer)
+n_bocchette = math.ceil(portata_totale / cap_bocchetta)
+
+with col_comp2:
+    st.write(f"### Totale componenti:")
+    st.info(f"🔹 **N. {n_skimmer}** Skimmer necessari")
+    st.success(f"🔹 **N. {n_bocchette}** Bocchette di mandata")
+
+st.caption("Nota: Il calcolo degli skimmer assume che la filtrazione avvenga al 100% tramite essi.")
