@@ -2,86 +2,99 @@ import streamlit as st
 import math
 import matplotlib.pyplot as plt
 
-# Configurazione Pagina
-st.set_page_config(page_title="UNI 10637:2024 - Progetto Piscine", layout="wide")
+# Funzione per mappare il diametro commerciale PVC (Approssimativo PN10)
+def suggerisci_pvc(d_interno):
+    tabella_pvc = {
+        32: 28, 40: 36, 50: 45, 63: 57, 
+        75: 69, 90: 82, 110: 100, 125: 114, 
+        140: 127, 160: 146, 200: 184
+    }
+    for esterno, interno in tabella_pvc.items():
+        if interno >= d_interno:
+            return esterno, interno
+    return "Fuori scala", d_interno
 
-st.title("🏊 Partner di Programmazione: Progetto Piscine")
-st.subheader("Dimensionamento Impianto Tipo 2 - Norma UNI 10637:2024")
+st.set_page_config(page_title="Progetto Professionale UNI 10637", layout="wide")
 
-# --- SIDEBAR: INPUT DATI ---
+st.title("🛠️ Suite Professionale Progettazione Piscine")
+st.subheader("Calcolo Avanzato Condotte e Componenti - UNI 10637:2024")
+
+# --- SIDEBAR ---
 with st.sidebar:
-    st.header("⚙️ Dati Geometrici")
-    L = st.number_input("Lunghezza vasca (m)", min_value=1.0, value=12.0, step=0.5)
-    W = st.number_input("Larghezza vasca (m)", min_value=1.0, value=6.0, step=0.5)
-    h_min = st.number_input("Profondità minima (m)", min_value=0.0, value=1.0, step=0.1)
-    h_max = st.number_input("Profondità massima (m)", min_value=0.0, value=1.6, step=0.1)
+    st.header("📋 Dati di Progetto")
+    L = st.number_input("Lunghezza (m)", value=12.0)
+    W = st.number_input("Larghezza (m)", value=6.0)
+    h_min = st.number_input("Prof. min (m)", value=1.0)
+    h_max = st.number_input("Prof. max (m)", value=1.6)
     
     st.divider()
-    st.header("💧 Parametri Tecnici")
-    v_filtrazione = st.slider("Velocità filtrazione (m/h)", 20, 50, 30)
-    cap_bocchetta = st.number_input("Portata singola bocchetta (m³/h)", value=6.0, step=0.5)
+    st.header("🌊 Limiti Idraulici")
+    v_asp_lim = 1.7  # m/s (Tua specifica)
+    v_man_lim = 2.5  # m/s (Tua specifica)
+    cap_bocchetta = st.number_input("Portata Bocchetta (m³/h)", value=6.0)
 
-# --- LOGICA DI CALCOLO (PROSPETTO 3) ---
-superficie_totale = L * W
-
-def get_tempo_ricircolo(h):
-    if h > 1.35: return 3.0    # Zona C
-    if h > 0.6:  return 2.5    # Zona D
-    if h > 0.4:  return 1.0    # Zona E
-    return 0.5                 # Zona F
-
-passo = 0.05 
-portata_totale = 0
-volume_totale = 0
+# --- CALCOLO PORTATA (PROSPETTO 3) ---
+superficie_tot = L * W
 pendenza = (h_max - h_min) / L
+q_tot = 0
+passo = 0.05
 
-x_grafico, h_grafico = [], []
+for i in range(int(L/passo)):
+    h_c = h_min + (i * passo * pendenza)
+    t = 3.0 if h_c > 1.35 else (2.5 if h_c > 0.6 else (1.0 if h_c > 0.4 else 0.5))
+    q_tot += ((passo * W) * h_c) / t
 
-for i in range(int(L/passo) + 1):
-    dist_x = i * passo
-    h_curr = h_min + (dist_x * pendenza)
-    x_grafico.append(dist_x)
-    h_grafico.append(-h_curr)
-    if i < int(L/passo):
-        t_zona = get_tempo_ricircolo(h_curr)
-        portata_totale += ((passo * W) * h_curr) / t_zona
-        volume_totale += (passo * W) * h_curr
+# --- COMPONENTI ---
+if superficie_tot <= 100:
+    n_skimmer = math.ceil(superficie_tot / 20)
+    q_stacco_asp = q_tot / n_skimmer
+else:
+    n_skimmer = 0 # Obbligo Sfioro
+    q_stacco_asp = 0
 
-# --- SEZIONE COMPONENTI E AVVISI NORMATIVI ---
-st.divider()
-c1, c2, c3 = st.columns(3)
+n_bocchette = math.ceil(q_tot / cap_bocchetta)
+q_stacco_man = q_tot / n_bocchette
 
-with c1:
-    st.metric("Volume Totale", f"{volume_totale:.1f} m³")
-    st.metric("Superficie Acqua", f"{superficie_totale:.1f} m²")
+# --- LOGICA DIAMETRI ---
+def calcola_e_mappa(q, v_lim):
+    if q <= 0: return 0, 0
+    d_int = math.sqrt(((q/3600)/v_lim)/math.pi) * 2 * 1000
+    return suggerisci_pvc(d_int)
 
-with c2:
-    st.metric("Portata Progetto (Q)", f"{portata_totale:.2f} m³/h")
-    st.metric("Area Filtrazione", f"{portata_totale / v_filtrazione:.2f} m²")
+# 1. Collettori (Velocità ridotta per efficienza)
+est_coll_asp, int_coll_asp = calcola_e_mappa(q_tot, 1.2)
+est_coll_man, int_coll_man = calcola_e_mappa(q_tot, 1.8)
 
-with c3:
-    st.subheader("📦 Componenti")
-    # Controllo limite 100mq per skimmer
-    if superficie_totale > 100:
-        st.error("⚠️ SUPERFICIE > 100 m²")
-        st.write("Per piscine di Tipo 2 oltre i 100 m², la norma impone il **bordo sfioratore**.")
-        n_skimmer = "NON CONSENTITI"
+# 2. Stacchi (Tue specifiche)
+est_stacco_asp, int_stacco_asp = calcola_e_mappa(q_stacco_asp, v_asp_lim)
+est_stacco_man, int_stacco_man = calcola_e_mappa(q_stacco_man, v_man_lim)
+
+# --- DISPLAY ---
+st.info(f"### 📊 Riepilogo Idraulico Generale (Q = {q_tot:.2f} m³/h)")
+col1, col2 = st.columns(2)
+
+with col1:
+    st.write("#### 📥 Aspirazione")
+    st.write(f"**Collettore Centrale:** Ø Est. {est_coll_asp} mm (Int. {int_coll_asp} mm)")
+    if n_skimmer > 0:
+        st.write(f"**Stacco Skimmer (x{n_skimmer}):** Ø Est. {est_stacco_asp} mm")
     else:
-        n_skimmer = math.ceil(superficie_totale / 20)
-        st.write(f"✅ **N. {n_skimmer}** Skimmer (1/20m²)")
-    
-    n_bocchette = math.ceil(portata_totale / cap_bocchetta)
-    st.write(f"✅ **N. {n_bocchette}** Bocchette (a {cap_bocchetta} m³/h)")
+        st.error("SISTEMA A SFIORO OBBLIGATORIO")
 
-# --- GRAFICO PROFILO ---
-st.subheader("📉 Analisi Profilo Vasca")
-fig, ax = plt.subplots(figsize=(10, 2.5))
-ax.fill_between(x_grafico, h_grafico, color='#3498db', alpha=0.3)
-ax.plot(x_grafico, h_grafico, color='#2980b9')
-ax.set_ylim(-(h_max + 0.5), 0.2)
-st.pyplot(fig)
+with col2:
+    st.write("#### 📤 Mandata")
+    st.write(f"**Collettore Centrale:** Ø Est. {est_coll_man} mm (Int. {int_coll_man} mm)")
+    st.write(f"**Stacco Bocchetta (x{n_bocchette}):** Ø Est. {est_stacco_man} mm")
 
-# --- TUBAZIONI ---
-st.subheader("📐 Condotte")
-d_mandata = math.sqrt(((portata_totale/3600)/1.5)/math.pi) * 2 * 1000
-st.success(f"Mandata (1.5 m/s): **{d_mandata:.1f} mm** (interno)")
+
+
+# --- TABELLA TECNICA ---
+st.divider()
+st.subheader("📋 Tabella Riassuntiva per Relazione Tecnica")
+dati_tabella = {
+    "Elemento": ["Collettore Aspirazione", "Collettore Mandata", "Stacco Skimmer", "Stacco Bocchetta"],
+    "Portata (m3/h)": [q_tot, q_tot, q_stacco_asp, q_stacco_man],
+    "Velocità (m/s)": [1.2, 1.8, v_asp_lim, v_man_lim],
+    "Tubo PVC consigliato (Ø)": [est_coll_asp, est_coll_man, est_stacco_asp, est_stacco_man]
+}
+st.table(dati_tabella)
