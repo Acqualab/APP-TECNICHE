@@ -85,3 +85,40 @@ with c_tec2:
     st.metric("Punto di Lavoro", f"{q_tot:.2f} m³/h")
     prevalenza = st.selectbox("Prevalenza (m.c.a.)", [10, 12, 15, 18], index=1)
     st.caption(f"Selezionare pompa capace di {q_tot:.1f} m³/h a {prevalenza} m di prevalenza.")            
+# --- MODULO AGGIORNATO: COLLETTORI E RIEPILOGO IDRAULICO ---
+st.divider()
+st.subheader("🏛️ Dimensionamento Collettori Principali")
+
+col_coll1, col_coll2 = st.columns(2)
+
+with col_coll1:
+    st.write("#### 📥 Collettore di Aspirazione")
+    # Velocità prudenziale per collettore aspirazione: 1.0 m/s
+    d_int_coll_asp = math.sqrt(((q_tot/3600)/1.0)/math.pi) * 2000
+    est_coll_asp = suggerisci_pvc(d_int_coll_asp)
+    
+    st.metric("Portata Tot. Aspirazione", f"{q_tot:.2f} m³/h")
+    st.success(f"Diametro consigliato: **Ø {est_coll_asp} mm**")
+    st.caption("Calcolato con velocità di 1.0 m/s per prevenire cavitazione.")
+
+with col_coll2:
+    st.write("#### 📤 Collettore di Mandata")
+    # Velocità prudenziale per collettore mandata: 1.5 m/s
+    d_int_coll_man = math.sqrt(((q_tot/3600)/1.5)/math.pi) * 2000
+    est_coll_man = suggerisci_pvc(d_int_coll_man)
+    
+    st.metric("Portata Tot. Mandata", f"{q_tot:.2f} m³/h")
+    st.success(f"Diametro consigliato: **Ø {est_coll_man} mm**")
+    st.caption("Calcolato con velocità di 1.5 m/s.")
+
+# --- TABELLA RIASSUNTIVA FINALE PER RELAZIONE ---
+st.divider()
+st.subheader("📋 Riepilogo Dimensioni Tubazioni (Diametri Esterni PVC)")
+
+dati_tubi = {
+    "Tratto": ["Collettore Aspirazione", "Collettore Mandata", "Stacco Skimmer", "Stacco Presa Fondo", "Stacco Bocchetta"],
+    "Portata (m³/h)": [q_tot, q_tot, q_sk if n_skimmer > 0 else 0, q_fo, q_boc],
+    "Velocità (m/s)": [1.0, 1.5, 1.7, 1.7, 2.5],
+    "Diametro PVC (Ø)": [est_coll_asp, est_coll_man, d_sk if n_skimmer > 0 else "N/A", d_fo, d_boc]
+}
+st.table(dati_tubi)
