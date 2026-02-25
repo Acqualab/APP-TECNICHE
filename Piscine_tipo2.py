@@ -99,3 +99,35 @@ st.write("Le due prese devono essere collegate 'a specchio' rispetto al colletto
 
 
 st.warning("⚠️ **Nota di Installazione:** Utilizzare un collettore di fondo di diametro adeguato prima di risalire verso il locale tecnico per mantenere la velocità < 1.0 m/s.")
+# --- MODULO LOCALE TECNICO AGGIORNATO ---
+st.divider()
+st.subheader("🏗️ Dimensionamento Locale Tecnico")
+
+col_tec1, col_tec2 = st.columns(2)
+
+with col_tec1:
+    st.write("#### 🔍 Scelta Filtrazione")
+    
+    # Selettore tipologia filtro
+    tipo_filtro = st.radio("Tipologia Filtro:", ["Sabbia", "Cartuccia"], horizontal=True)
+    
+    # Calcolo superficie filtrante necessaria
+    sup_filtrante_mq = q_tot / v_filtrazione
+    
+    if tipo_filtro == "Sabbia":
+        # Calcolo diametro per filtri a sabbia (circolari)
+        diam_filtro_mm = math.sqrt(sup_filtrante_mq / math.pi) * 2 * 1000
+        st.metric("Superficie Filtrante Minima", f"{sup_filtrante_mq:.2f} m²")
+        st.info(f"Ø Filtro a Sabbia consigliato: **{diam_filtro_mm:.0f} mm**")
+    else:
+        # Per i filtri a cartuccia si ragiona direttamente in superficie (mq o sq.ft)
+        st.metric("Superficie Filtrante Minima", f"{sup_filtrante_mq:.2f} m²")
+        st.success(f"Cerca una cartuccia con almeno **{sup_filtrante_mq:.2f} m²** di tessuto filtrante.")
+        st.caption("Nota: I produttori spesso indicano la superficie in sq.ft (1 m² ≈ 10.76 sq.ft).")
+
+with col_tec2:
+    st.write("#### ⚙️ Circolazione")
+    portata_pompa = q_tot * 1.10
+    st.metric("Portata Nominale Pompa (+10%)", f"{portata_pompa:.2f} m³/h")
+    prevalenza_stimata = st.selectbox("Prevalenza stimata (m.c.a.)", [10, 12, 15, 18], index=1)
+    st.write(f"Punto di lavoro: **{q_tot:.2f} m³/h @ {prevalenza_stimata} m.c.a.**")
