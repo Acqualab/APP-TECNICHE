@@ -2471,7 +2471,7 @@ function Fase5({d,u,Qtot,rip,sup,perim,volTot,dc:dcPrelim,pr,go,bk}){
     }
     var nfE=sf?(sf.nf||1):1;
     // Calcolo iterativo Qmin (filtro sporco (da pulire) per intersezione curva pompa/impianto
-    var Qmin_cfg=a.qMin||Qp;
+    var QmPP=a.qMin||Qp;
     if(sp){
       var hFS2=isC?PR.HF_C:PR.HF_S;
       for(var it2=0;it2<6;it2++){
