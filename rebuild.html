@@ -3040,6 +3040,7 @@ function Fase6({d,volTot,Qtot,dc,pr,bk,saveProject,setD,setFase}){
     const autoProg_p=autoSelFP(Qprog_p,d.tipoPisc,d.tipoFiltro,supCirc_p,nPompeCalc,hTprog_p);
     var _sc=d.risultati&&d.risultati.selComp;
     const sF=(_sc&&_sc.filtro)?_sc.filtro:autoProg_p.filtro;
+    const _qrFiltro=autoProg_p.qrFiltro||(sF&&sF.q)||25; // portata max filtro
     const sP=(_sc&&_sc.pompa)?_sc.pompa:autoProg_p.pompa;
     const nPompe=autoProg_p.nPompe||nPompeCalc;
     const auto=autoProg_p;
@@ -3484,8 +3485,8 @@ else{const _nPF_=dc_p.pf?dc_p.pf.n:0;const _qGr=dc_p.pf?dc_p.pf.qMaxGriglia:15;i
 const _s2=100;const _n2='Tutti i tratti conformi (v e J nei limiti) \u2713';
 // s3: filtrazione
 const _Teff_=QminTot_p>0?+(volTot/QminTot_p).toFixed(1):null;const _Tb=d.tRic||5;
-const _s3=(_Teff_&&_Teff_<=_Tb&&_Qmx<=(sF?sF.qrFiltro:25))?100:0;
-const _n3='T='+(_Teff_||'?')+'h \u2264 '+_Tb+'h \u2713 \u00b7 Q pompa '+_Qmx+' \u2264 '+(sF?sF.qrFiltro:25)+' m\u00b3/h \u2713';
+const _s3=(_Teff_&&_Teff_<=_Tb&&_Qmx<=_qrFiltro)?100:0;
+const _n3='T='+(_Teff_||'?')+'h \u2264 '+_Tb+'h \u2713 \u00b7 Q pompa '+_Qmx+' \u2264 '+_qrFiltro+' m\u00b3/h \u2713';
 // s4: componenti
 const _qBo=+(_Qmx/_nB).toFixed(2);const _skiRac=sS&&sS.q?sS.q:7.5;const _qSki_=dc_p.ski?+(dc_p.ski.qEa||0).toFixed(2):0;
 const _boccOk=_qBo<=PR.Q_MAX_BOCC;const _skiOk=_qSki_<=_skiRac;
