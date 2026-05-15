@@ -3487,7 +3487,7 @@ const _Teff_=QminTot_p>0?+(volTot/QminTot_p).toFixed(1):null;const _Tb=d.tRic||5
 const _s3=(_Teff_&&_Teff_<=_Tb&&_Qmx<=(sF?sF.qrFiltro:25))?100:0;
 const _n3='T='+(_Teff_||'?')+'h \u2264 '+_Tb+'h \u2713 \u00b7 Q pompa '+_Qmx+' \u2264 '+(sF?sF.qrFiltro:25)+' m\u00b3/h \u2713';
 // s4: componenti
-const _qBo=+(_Qmx/_nB).toFixed(2);const _skiRac=sS_p?sS_p.q:7.5;const _qSki_=dc_p.ski?+(dc_p.ski.qEa||0).toFixed(2):0;
+const _qBo=+(_Qmx/_nB).toFixed(2);const _skiRac=sS&&sS.q?sS.q:7.5;const _qSki_=dc_p.ski?+(dc_p.ski.qEa||0).toFixed(2):0;
 const _boccOk=_qBo<=PR.Q_MAX_BOCC;const _skiOk=_qSki_<=_skiRac;
 const _s4=_boccOk&&_skiOk?100:(_boccOk||_skiOk)?85:0;
 const _n4='Q/bocc='+_qBo+' \u2264 '+PR.Q_MAX_BOCC+' m\u00b3/h '+(_boccOk?'\u2713':'NON CONF')+' | Q/ski='+_qSki_+' \u2264 '+_skiRac+' m\u00b3/h '+(_skiOk?'\u2713':'NON CONF');
