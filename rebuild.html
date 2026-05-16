@@ -3576,6 +3576,13 @@ return 'ICT = '+_ict+'/100 \u2014 Classe '+_cls+_lbl+'\n'+
     prompt='⚠ Errore tecnico nella generazione del testo:\n'+e.message+'\n\nStack: '+e.stack+'\n\nRipercorrere le fasi 3-5 e tornare in fase 6.';
   }
 
+  const downloadPrompt=()=>{
+    const blob=new Blob([prompt],{type:'text/plain;charset=utf-8'});
+    const url=URL.createObjectURL(blob);
+    const a=document.createElement('a');
+    a.href=url;a.download='prompt_last.txt';a.click();
+    URL.revokeObjectURL(url);
+  };
   const copyPrompt=()=>{navigator.clipboard.writeText(prompt).then(()=>alert('Prompt copiato!\n\n'+
     (d.imgRef?'⚠ HAI UN\'IMMAGINE ALLEGATA: scaricala con il pulsante "Scarica immagine" e allegala nella nuova conversazione Claude prima di incollare il prompt.':'Incollalo in una nuova conversazione Claude per generare la relazione Word.')
   )).catch(()=>{});};
@@ -3617,6 +3624,7 @@ return 'ICT = '+_ict+'/100 \u2014 Classe '+_cls+_lbl+'\n'+
       <div style={{fontSize:'.6rem',color:'#888',marginTop:3}}>Scarica → apri nuova chat Claude → allega immagine → incolla prompt</div>
     </div>}
     <button className="bn bn-go" onClick={copyPrompt} style={{marginBottom:6}}>📋 Copia prompt per relazione tecnica</button>
+    <button className="bn" onClick={downloadPrompt} style={{marginBottom:6,background:'#1A5057',color:'#fff',fontSize:'.78rem'}}>⬇ Scarica prompt_last.txt</button>
     <button className="bn" onClick={()=>setShowPrompt(!showPrompt)} style={{background:'#eee',color:'#333',fontSize:'.68rem'}}>{showPrompt?'Nascondi':'Mostra'} prompt</button>
     {showPrompt&&<pre style={{fontSize:'.55rem',background:'#f5f5f5',padding:8,borderRadius:6,marginTop:6,maxHeight:300,overflow:'auto',whiteSpace:'pre-wrap',wordBreak:'break-word'}}>{prompt}</pre>}
   </div>
