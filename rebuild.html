@@ -3390,7 +3390,7 @@ tcLines.join('\n\n')+'\n\n'+
 'Punto di lavoro a filtro pulito (appena lavato) (H = '+auto.Hclean+' mca, curva impianto reale): Q = '+Qmax_p.toFixed(1)+' m3/h <= Q max filtro '+(auto.qrFiltro||'-')+' m3/h -> ESITO POSITIVO\n'+
 '>>> Q MEDIA DI ESERCIZIO (DATO DI RIFERIMENTO — EVIDENZIARE IN GRASSETTO): '+(((auto.qMin||0)+Qmax_p)/2).toFixed(2)+' m3/h\n'+'    Media tra filtro a meta vita ('+(auto.qMin||'-')+' m3/h) e filtro pulito (appena lavato) ('+Qmax_p.toFixed(1)+' m3/h).\n'+
 'T ricircolo medio: '+(volTot/(((auto.qMin||0)+Qmax_p)/2)).toFixed(2)+' h\n'+
-'Q media per skimmer: '+((((auto.qMin||0)+Qmax_p)/2*2/3)/2).toFixed(2)+' m3/h per skimmer\n'+
+'Q media per skimmer: '+(()=>{const _Qmed=((auto.qMin||0)+Qmax_p)/2;const _qSup=d.noPF?1:(d.tipoPisc==='Tipo 2'?0.75:2/3);const _nSki=nSki*nCirc||1;return (_Qmed*_qSup/_nSki).toFixed(2);})()+' m3/h per skimmer\n'+
 'Fornitore: '+(sF_full?sF_full.forn:'-')+'\n':
 'Pompa: non determinata - verificare manualmente\n')+'\n'+
 '====================================================================\n'+
