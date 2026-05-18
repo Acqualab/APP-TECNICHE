@@ -1,0 +1,1433 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Contratto di Appalto — Acqualab</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400&family=Inter:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap');
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --teal-900: #0A2E2A;
+    --teal-800: #0D3D37;
+    --teal-700: #125249;
+    --teal-600: #176860;
+    --teal-500: #1C8076;
+    --teal-400: #20958A;
+    --teal-300: #4DAAA1;
+    --teal-200: #AEDCD8;
+    --teal-100: #D4EDEB;
+    --teal-50:  #EDF7F6;
+    --gold: #9B7A2E;
+    --gold-mid: #B8912A;
+    --gold-light: #F7F0E0;
+    --gray-900: #181D1C;
+    --gray-700: #374341;
+    --gray-500: #66736F;
+    --gray-400: #8E9C99;
+    --gray-200: #DDE5E4;
+    --gray-100: #EFF4F3;
+    --white: #FFFFFF;
+    --danger: #B83232;
+    --warn: #B87C0A;
+    --font: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif;
+    --font-display: 'Cormorant Garamond', 'Palatino Linotype', Georgia, serif;
+    --mono: 'DM Mono', monospace;
+    --radius: 10px;
+    --shadow: 0 2px 8px rgba(10,46,42,0.09);
+    --shadow-lg: 0 8px 24px rgba(10,46,42,0.15);
+  }
+
+  body { font-family: var(--font); background: var(--teal-50); color: var(--gray-900); min-height: 100vh; }
+
+  /* HEADER */
+  .site-header { background: var(--teal-900); color: #fff; position: sticky; top: 0; z-index: 100; box-shadow: 0 2px 16px rgba(10,46,42,0.35); }
+  .header-inner { max-width: 1100px; margin: 0 auto; padding: 0 2rem; display: flex; align-items: center; gap: 1.5rem; height: 72px; }
+  .header-title-block { flex: 1; }
+  .header-title { font-family: var(--font-display); font-size: 18px; font-weight: 600; color: #fff; letter-spacing: 0.01em; }
+  .header-subtitle { font-size: 11px; color: rgba(255,255,255,0.5); letter-spacing: 0.08em; text-transform: uppercase; margin-top: 2px; }
+  .logo-badge { background: var(--teal-400); color: #fff; font-size: 11px; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; padding: 6px 14px; border-radius: 6px; }
+  .header-nav { display: flex; gap: 4px; }
+  .nav-btn { background: none; border: 1px solid rgba(255,255,255,0.2); color: rgba(255,255,255,0.8); font-family: var(--font); font-size: 12px; font-weight: 500; padding: 6px 14px; border-radius: 6px; cursor: pointer; transition: all 0.15s; white-space: nowrap; }
+  .nav-btn:hover { background: rgba(255,255,255,0.1); color: #fff; }
+  .nav-btn.active { background: var(--teal-400); color: #fff; border-color: var(--teal-400); }
+
+  /* TOOLBAR */
+  .toolbar { background: rgba(0,0,0,0.25); border-top: 1px solid rgba(255,255,255,0.08); }
+  .toolbar-inner { max-width: 1100px; margin: 0 auto; padding: 0 2rem; display: flex; align-items: center; gap: 8px; height: 42px; }
+  .toolbar-label { font-size: 11px; color: rgba(255,255,255,0.4); margin-right: 4px; letter-spacing: 0.05em; text-transform: uppercase; }
+  .tool-btn { display: flex; align-items: center; gap: 6px; background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.14); color: rgba(255,255,255,0.85); font-family: var(--font); font-size: 11.5px; font-weight: 500; padding: 5px 12px; border-radius: 6px; cursor: pointer; transition: all 0.15s; white-space: nowrap; }
+  .tool-btn:hover { background: rgba(255,255,255,0.15); color: #fff; }
+  .tool-btn.primary { background: var(--teal-400); border-color: var(--teal-400); color: #fff; }
+  .tool-btn.primary:hover { background: var(--teal-500); }
+  .toolbar-sep { width: 1px; height: 20px; background: rgba(255,255,255,0.12); margin: 0 4px; }
+  .save-name-input { background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.14); color: #fff; font-family: var(--font); font-size: 11.5px; padding: 4px 10px; border-radius: 6px; outline: none; width: 180px; }
+  .save-name-input::placeholder { color: rgba(255,255,255,0.35); }
+  .save-name-input:focus { border-color: var(--teal-400); }
+
+  /* DROPDOWN */
+  .saved-files-wrap { position: relative; }
+  .saved-files-dropdown { position: absolute; top: calc(100% + 6px); left: 0; background: var(--white); border: 1px solid var(--gray-200); border-radius: var(--radius); box-shadow: var(--shadow-lg); min-width: 260px; z-index: 200; display: none; }
+  .saved-files-dropdown.open { display: block; }
+  .dropdown-header { padding: 10px 14px 8px; font-size: 10px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: var(--gray-400); border-bottom: 1px solid var(--gray-200); }
+  .saved-file-item { display: flex; align-items: center; gap: 8px; padding: 8px 10px; border-bottom: 1px solid var(--gray-200); }
+  .saved-file-item:last-child { border-bottom: none; }
+  .saved-file-info { flex: 1; cursor: pointer; padding: 2px 4px; border-radius: 6px; transition: background 0.15s; }
+  .saved-file-info:hover { background: var(--teal-50); }
+  .saved-file-name { font-size: 13px; font-weight: 500; color: var(--gray-900); }
+  .saved-file-date { font-size: 11px; color: var(--gray-400); margin-top: 1px; }
+  .saved-file-del { background: none; border: none; color: var(--gray-400); cursor: pointer; font-size: 13px; padding: 4px; border-radius: 4px; transition: color 0.15s; }
+  .saved-file-del:hover { color: var(--danger); }
+  .empty-state { padding: 14px; text-align: center; font-size: 12px; color: var(--gray-400); }
+
+  /* TOAST */
+  .toast { position: fixed; bottom: 24px; right: 24px; background: var(--gray-900); color: #fff; font-family: var(--font); font-size: 13px; padding: 10px 18px; border-radius: 8px; box-shadow: 0 4px 16px rgba(0,0,0,0.25); z-index: 9999; opacity: 0; transform: translateY(8px); transition: all 0.25s; pointer-events: none; }
+  .toast.show { opacity: 1; transform: translateY(0); }
+  .toast.success { background: var(--teal-400); }
+  .toast.error { background: var(--danger); }
+
+  /* LAYOUT */
+  .layout { max-width: 1100px; margin: 0 auto; padding: 2rem; display: grid; grid-template-columns: 240px 1fr; gap: 2rem; align-items: start; }
+
+  /* SIDEBAR */
+  .sidebar { position: sticky; top: 126px; background: var(--white); border-radius: var(--radius); border: 1px solid var(--gray-200); overflow: hidden; box-shadow: var(--shadow); }
+  .sidebar-section { padding: 1rem; border-bottom: 1px solid var(--gray-200); }
+  .sidebar-section:last-child { border-bottom: none; }
+  .sidebar-label { font-size: 10px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: var(--gray-400); margin-bottom: 8px; }
+  .art3-nav { display: flex; flex-direction: column; gap: 3px; }
+  .art3-nav-btn { display: flex; align-items: center; gap: 8px; padding: 6px 8px; border-radius: 7px; border: none; background: none; cursor: pointer; font-family: var(--font); font-size: 12px; color: var(--gray-700); text-align: left; transition: background 0.15s; width: 100%; }
+  .art3-nav-btn:hover { background: var(--gray-100); }
+  .art3-nav-btn.active-voce { background: var(--teal-50); color: var(--teal-600); font-weight: 500; }
+  .art3-nav-btn.inactive-voce { color: var(--gray-400); }
+  .voce-dot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; background: var(--gray-200); }
+  .voce-dot.on { background: var(--teal-400); }
+  .progress-wrap { padding: 0 1rem 1rem; }
+  .progress-label { font-size: 11px; color: var(--gray-400); margin-bottom: 5px; display: flex; justify-content: space-between; }
+  .progress-bar-bg { background: var(--gray-200); border-radius: 20px; height: 4px; overflow: hidden; }
+  .progress-bar-fill { height: 100%; background: linear-gradient(90deg, var(--teal-400), var(--teal-300)); border-radius: 20px; transition: width 0.3s; }
+
+  /* MAIN */
+  .main { min-width: 0; }
+  .section-panel { display: none; }
+  .section-panel.active { display: block; }
+
+  /* CARD BASE */
+  .card { background: var(--white); border-radius: var(--radius); border: 1px solid var(--gray-200); margin-bottom: 1.5rem; overflow: hidden; box-shadow: var(--shadow); }
+  .card-header { background: linear-gradient(135deg, var(--teal-900) 0%, var(--teal-600) 100%); color: #fff; padding: 1.25rem 1.5rem; }
+  .card-header h2 { font-family: var(--font-display); font-size: 20px; font-weight: 600; }
+  .card-header .sub { font-size: 12px; color: rgba(255,255,255,0.65); margin-top: 3px; }
+  .card-header.gold { background: linear-gradient(135deg, #5C4010 0%, var(--gold-mid) 100%); }
+  .card-header.slate { background: linear-gradient(135deg, #1a1a2e 0%, #374341 100%); }
+
+  /* FIELD */
+  .field-row { padding: 1rem 1.25rem; border-bottom: 1px solid var(--gray-200); }
+  .field-row:last-child { border-bottom: none; }
+  .field-row.grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  .field-row.grid3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; }
+  .field-label { font-size: 10px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: var(--gray-400); margin-bottom: 6px; }
+  .field-input { width: 100%; border: none; border-bottom: 1.5px solid var(--gray-200); padding: 7px 2px; font-family: var(--font); font-size: 13px; color: var(--gray-900); background: transparent; outline: none; transition: border-color 0.15s; }
+  .field-input:focus { border-bottom-color: var(--teal-400); }
+  .field-textarea { width: 100%; border: 1px solid var(--gray-200); border-radius: 6px; padding: 8px 10px; font-family: var(--font); font-size: 13px; color: var(--gray-700); background: transparent; outline: none; resize: vertical; line-height: 1.7; transition: border-color 0.15s; min-height: 80px; }
+  .field-textarea:focus { border-color: var(--teal-400); }
+  .field-sub { font-size: 10px; color: var(--gray-400); margin-bottom: 6px; }
+
+  /* PAGAMENTI TABLE */
+  .pagamenti-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  .pagamenti-table th { background: var(--teal-50); color: var(--teal-700); font-size: 10px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; padding: 8px 12px; text-align: left; border-bottom: 1px solid var(--teal-200); }
+  .pagamenti-table td { padding: 8px 12px; border-bottom: 1px solid var(--gray-200); vertical-align: middle; }
+  .pagamenti-table tr:last-child td { border-bottom: none; }
+  .pagamenti-table tr.total-row td { background: var(--teal-50); font-weight: 600; color: var(--teal-800); }
+  .pagamenti-table input { border: none; border-bottom: 1px solid var(--gray-200); background: transparent; font-family: var(--font); font-size: 13px; color: var(--gray-900); outline: none; width: 100%; padding: 2px 0; }
+  .pagamenti-table input:focus { border-bottom-color: var(--teal-400); }
+  .sal-badge { display: inline-block; font-size: 10px; font-weight: 600; letter-spacing: 0.06em; padding: 2px 7px; border-radius: 20px; background: var(--teal-100); color: var(--teal-700); }
+  .sal-importo { font-size: 13px; font-weight: 600; color: var(--teal-800); }
+  .sal-pct-input { border: none !important; border-bottom: 1.5px solid var(--teal-200) !important; background: var(--teal-50) !important; border-radius: 4px !important; font-size: 13px !important; }
+
+  /* ART 3 — VOCI */
+  .voce-card { background: var(--white); border-radius: var(--radius); border: 1px solid var(--gray-200); margin-bottom: 10px; overflow: hidden; transition: all 0.2s; }
+  .voce-card.disabled { opacity: 0.45; }
+  .voce-header { display: flex; align-items: center; gap: 12px; padding: 0.9rem 1.25rem; cursor: pointer; transition: background 0.15s; }
+  .voce-header:hover { background: var(--gray-100); }
+  .voce-toggle-btn { position: relative; width: 36px; height: 20px; border-radius: 10px; border: none; cursor: pointer; transition: background 0.2s; flex-shrink: 0; background: var(--gray-200); }
+  .voce-toggle-btn.on { background: var(--teal-400); }
+  .voce-toggle-btn::after { content: ''; position: absolute; top: 3px; left: 3px; width: 14px; height: 14px; border-radius: 50%; background: #fff; transition: transform 0.2s; box-shadow: 0 1px 3px rgba(0,0,0,0.2); }
+  .voce-toggle-btn.on::after { transform: translateX(16px); }
+  .voce-num { font-family: var(--mono); font-size: 10px; font-weight: 500; color: var(--white); background: var(--teal-800); padding: 3px 8px; border-radius: 5px; flex-shrink: 0; }
+  .voce-title-wrap { flex: 1; }
+  .voce-title { font-size: 14px; font-weight: 500; color: var(--gray-900); }
+  .voce-subtitle { font-size: 11px; color: var(--gray-400); margin-top: 2px; }
+  .voce-expand { font-size: 14px; color: var(--gray-400); transition: transform 0.2s; flex-shrink: 0; }
+  .voce-card.open .voce-expand { transform: rotate(180deg); }
+  .voce-body { display: none; border-top: 1px solid var(--gray-200); padding: 1rem 1.25rem; }
+  .voce-card.open .voce-body { display: block; }
+  .voce-desc-label { font-size: 10px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--gray-400); margin-bottom: 8px; }
+  .voce-textarea { width: 100%; border: 1px solid var(--gray-200); border-radius: 7px; padding: 10px 12px; font-family: var(--font); font-size: 13px; color: var(--gray-700); background: var(--gray-100); outline: none; resize: vertical; line-height: 1.75; transition: all 0.15s; min-height: 120px; }
+  .voce-textarea:focus { border-color: var(--teal-400); background: #fff; }
+  .voce-card.disabled .voce-textarea { pointer-events: none; }
+
+  /* ALLEGATI */
+  .allegati-drop-zone { border: 2px dashed var(--teal-300); border-radius: var(--radius); background: var(--teal-50); padding: 3rem 2rem; text-align: center; cursor: pointer; transition: all 0.2s; }
+  .allegati-drop-zone:hover, .allegati-drop-zone.dragover { background: var(--teal-100); border-color: var(--teal-500); }
+  .allegati-drop-icon { font-size: 2.5rem; margin-bottom: 0.75rem; }
+  .allegati-drop-text { font-size: 14px; color: var(--gray-700); margin-bottom: 4px; }
+  .allegati-drop-sub { font-size: 12px; color: var(--gray-400); }
+  .allegato-item { background: var(--white); border: 1px solid var(--gray-200); border-radius: var(--radius); padding: 0.75rem 1rem; display: flex; align-items: center; gap: 12px; box-shadow: var(--shadow); }
+  .allegato-thumb { width: 48px; height: 48px; border-radius: 6px; object-fit: cover; border: 1px solid var(--gray-200); flex-shrink: 0; }
+  .allegato-thumb-pdf { width: 48px; height: 48px; border-radius: 6px; background: var(--teal-900); display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 700; letter-spacing: 0.05em; flex-shrink: 0; color: #fff; }
+  .allegato-info { flex: 1; min-width: 0; }
+  .allegato-name { font-size: 13px; font-weight: 500; color: var(--gray-900); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .allegato-meta { font-size: 11px; color: var(--gray-400); margin-top: 2px; }
+  .allegato-del { background: none; border: 1px solid var(--gray-200); color: var(--gray-400); border-radius: 6px; width: 28px; height: 28px; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 13px; transition: all 0.15s; flex-shrink: 0; }
+  .allegato-del:hover { background: #fde8e8; border-color: #f5c6c6; color: var(--danger); }
+
+
+  /* ESCLUSIONI */
+  .esclusione-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 9px 8px;
+    border-radius: 8px;
+    transition: background 0.15s;
+    cursor: pointer;
+    border-bottom: 1px solid var(--gray-100);
+  }
+  .esclusione-item:last-child { border-bottom: none; }
+  .esclusione-item:hover { background: var(--gray-100); }
+  .esclusione-item.off { opacity: 0.38; }
+  .escl-toggle { position: relative; width: 32px; height: 18px; border-radius: 9px; border: none; cursor: pointer; transition: background 0.2s; flex-shrink: 0; background: var(--gray-200); }
+  .escl-toggle.on { background: var(--teal-400); }
+  .escl-toggle::after { content: ''; position: absolute; top: 2px; left: 2px; width: 14px; height: 14px; border-radius: 50%; background: #fff; transition: transform 0.2s; box-shadow: 0 1px 3px rgba(0,0,0,0.2); }
+  .escl-toggle.on::after { transform: translateX(14px); }
+  .escl-icon { font-size: 15px; flex-shrink: 0; width: 22px; text-align: center; }
+  .escl-text { flex: 1; }
+  .escl-title { font-size: 13px; font-weight: 500; color: var(--gray-900); }
+  .escl-detail { font-size: 11.5px; color: var(--gray-400); margin-top: 1px; }
+  /* Print esclusioni — mostra solo quelle attive */
+  @media print {
+    .esclusione-item.off { display: none !important; }
+    .escl-toggle { display: none !important; }
+    .esclusione-item { padding: 3pt 4pt !important; border-bottom: 0.5pt solid #eee !important; }
+    .escl-title { font-size: 8.5pt !important; }
+    .escl-detail { font-size: 7.5pt !important; }
+    .escl-icon { font-size: 10pt !important; }
+  }
+  /* ART 9 CHECKBOX */
+  .checkbox-row { display: flex; align-items: center; gap: 10px; padding: 8px 0; }
+  .checkbox-row input[type=checkbox] { width: 16px; height: 16px; accent-color: var(--teal-500); cursor: pointer; flex-shrink: 0; }
+  .checkbox-row label { font-size: 13px; color: var(--gray-700); cursor: pointer; }
+
+  /* FIRME */
+  .firme-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; padding: 1.25rem; }
+  .firma-box { border: 1px solid var(--gray-200); border-radius: 8px; padding: 1rem; }
+  .firma-title { font-size: 11px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--gray-400); margin-bottom: 8px; }
+  .firma-name { font-size: 14px; font-weight: 500; color: var(--gray-900); margin-bottom: 4px; }
+  .firma-role { font-size: 12px; color: var(--gray-500); margin-bottom: 1rem; }
+  .firma-line { border-top: 1.5px solid var(--gray-300); margin-top: 2.5rem; padding-top: 6px; font-size: 11px; color: var(--gray-400); text-align: center; }
+
+  /* SECTION NAV */
+  .tab-switcher { display: flex; background: var(--white); border-radius: var(--radius); border: 1px solid var(--gray-200); padding: 4px; margin-bottom: 1.5rem; gap: 4px; }
+  .tab-btn { flex: 1; padding: 8px 10px; border: none; border-radius: 7px; background: none; font-family: var(--font); font-size: 12px; font-weight: 500; color: var(--gray-400); cursor: pointer; transition: all 0.15s; text-align: center; white-space: nowrap; }
+  .tab-btn.active { background: var(--teal-800); color: #fff; }
+
+  /* PRINT HEADER */
+  @media screen { .no-screen { display: none !important; } }
+
+  /* ALLEGATI PRINT */
+  #allegati-print-zone { display: none; }
+
+  @media (max-width: 900px) {
+    .layout { grid-template-columns: 1fr; padding: 1rem; }
+    .sidebar { position: static; }
+    .header-nav { display: none; }
+    .field-row.grid2, .field-row.grid3 { grid-template-columns: 1fr; }
+    .firme-grid { grid-template-columns: 1fr; }
+  }
+
+  @media (max-width: 600px) {
+    .header-inner { padding: 0 1rem; height: 60px; }
+    .header-title { font-size: 15px; }
+    .header-subtitle { display: none; }
+    .logo-badge { display: none; }
+    .toolbar-inner { padding: 0 1rem; gap: 6px; height: auto; min-height: 42px; flex-wrap: wrap; padding-top: 6px; padding-bottom: 6px; }
+    .toolbar-label { display: none; }
+    .save-name-input { width: 120px; font-size: 11px; }
+    .tool-btn { font-size: 11px; padding: 4px 9px; }
+    .layout { padding: 0.75rem; gap: 1rem; }
+    .card-header h2 { font-size: 15px; }
+    .field-row { padding: 0.75rem 1rem; }
+    .field-label { font-size: 9.5px; }
+    .field-input { font-size: 13px; }
+    .voce-title { font-size: 13px; }
+    .voce-header { padding: 0.75rem 1rem; }
+  }
+
+
+  /* ═══════════════════════════════════════
+     PRINT STYLES
+  ═══════════════════════════════════════ */
+  @media screen { .no-screen { display: none !important; } }
+
+  @page { margin: 1.2cm; }
+
+  @media print {
+    * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; box-sizing: border-box; }
+    body { background: #fff !important; font-size: 10pt; margin: 0; padding: 0; }
+    /* Nascondi placeholder campi vuoti */
+    input::placeholder, textarea::placeholder { color: transparent !important; }
+    ::-webkit-input-placeholder { color: transparent !important; }
+    .field-input::placeholder { color: transparent !important; }
+
+    .site-header, .toolbar, .sidebar, .tab-switcher, .toast { display: none !important; }
+    #panel-allegati { display: none !important; }
+
+    .layout { display: block !important; padding: 0 !important; margin: 0 !important; }
+    .main { display: block !important; width: 100% !important; }
+    .section-panel { display: block !important; margin: 0 !important; padding: 0 !important; }
+
+    /* Print header */
+    .no-screen { display: flex !important; justify-content: space-between; align-items: center; padding: 0 0 10pt; border-bottom: 1.5pt solid #0D3D37; margin-bottom: 14pt; }
+    .print-meta { font-size: 8pt; color: #444; text-align: right; line-height: 1.6; }
+
+    /* Cards */
+    .card { box-shadow: none !important; border: 0.5pt solid #ccc !important; border-radius: 0 !important; margin-bottom: 10pt !important; break-inside: avoid; }
+    .card-header { padding: 5pt 10pt !important; }
+    .card-header h2 { font-size: 13pt !important; }
+    .card-header .sub { font-size: 8pt !important; }
+    .field-row { padding: 4pt 10pt !important; }
+    .field-label { font-size: 7pt !important; margin-bottom: 2pt !important; }
+    .field-input { font-size: 9pt !important; padding: 2pt 0 !important; border-bottom: 0.5pt solid #aaa !important; }
+    .field-textarea { font-size: 9pt !important; border: 0.5pt solid #ccc !important; padding: 4pt 6pt !important; min-height: unset !important; background: #fff !important; }
+    .field-row.grid2 { gap: 8px !important; }
+
+    /* Pagamenti */
+    .pagamenti-table { font-size: 8.5pt !important; }
+    .pagamenti-table th { padding: 4pt 8pt !important; font-size: 7pt !important; }
+    .pagamenti-table td { padding: 4pt 8pt !important; }
+    .pagamenti-table input { font-size: 8.5pt !important; }
+
+    /* Voci Art.3 — mostra solo le attive */
+    .voce-card.disabled { display: none !important; }
+    .voce-card { box-shadow: none !important; border: 0.5pt solid #ccc !important; border-radius: 0 !important; margin-bottom: 5pt !important; break-inside: avoid; }
+    .voce-header { background: #EDF7F6 !important; padding: 4pt 8pt !important; cursor: default; }
+    .voce-toggle-btn { display: none !important; }
+    .voce-expand { display: none !important; }
+    .voce-body { display: block !important; padding: 4pt 8pt 8pt !important; }
+    .voce-num { font-size: 7pt !important; padding: 1pt 5pt !important; }
+    .voce-title { font-size: 9pt !important; font-weight: 600 !important; }
+    .voce-textarea { font-size: 8.5pt !important; border: none !important; background: transparent !important; padding: 0 !important; resize: none !important; line-height: 1.6 !important; min-height: unset !important; }
+
+    /* Firme */
+    .firme-grid { page-break-inside: avoid; break-inside: avoid; }
+    .firma-box { border: 0.5pt solid #ccc !important; }
+    .firma-line { margin-top: 30pt !important; }
+
+    /* Allegati print */
+    #allegati-print-zone { display: block; }
+    .allegato-print-page { page-break-before: always; page-break-inside: avoid; break-inside: avoid; width: 100%; height: 100vh; max-height: 100vh; overflow: hidden; display: flex; align-items: center; justify-content: center; padding: 0; margin: 0; }
+    .allegato-print-page img, .allegato-print-page canvas { max-width: 100% !important; max-height: 100vh !important; width: auto !important; height: auto !important; object-fit: contain; display: block; }
+  }
+</style>
+</head>
+<body>
+
+<div id="toast" class="toast"></div>
+<header class="site-header">
+  <div class="header-inner">
+    <div class="header-title-block">
+      <div class="header-title">Contratto di Appalto</div>
+      <div class="header-subtitle">Acqualab S.r.l. — Costruzione Piscina</div>
+    </div>
+    <nav class="header-nav">
+      <button class="nav-btn active" onclick="switchTab('contratto', event)">Contratto</button>
+      <button class="nav-btn" onclick="switchTab('allegati', event)">Allegati <span id="allegati-count" style="background:rgba(255,255,255,0.2);border-radius:10px;padding:1px 6px;font-size:10px;margin-left:2px;display:none">0</span></button>
+    </nav>
+  </div>
+  <div class="toolbar">
+    <div class="toolbar-inner">
+      <span class="toolbar-label">Contratto:</span>
+      <input class="save-name-input" id="save-name" type="text" placeholder="Nome cliente..." maxlength="60">
+      <button class="tool-btn primary" onclick="salvaFile()">Salva</button>
+      <div class="toolbar-sep"></div>
+
+      <label class="tool-btn" style="cursor:pointer" title="Carica un file JSON salvato">⬆ Carica<input type="file" accept=".json" onchange="importaJSON(this)" style="display:none"></label>
+      <div class="toolbar-sep"></div>
+      <button class="tool-btn" onclick="stampaProfessionale()">🖨 Stampa PDF</button>
+    </div>
+  </div>
+</header>
+
+<div class="layout">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="sidebar-section">
+      <div class="sidebar-label">Sezioni contratto</div>
+      <div style="display:flex;flex-direction:column;gap:3px">
+        <button class="art3-nav-btn" onclick="scrollToSection('art1')">Art. 1 — Oggetto</button>
+        <button class="art3-nav-btn" onclick="scrollToSection('art2')">Art. 2 — Corrispettivo</button>
+        <button class="art3-nav-btn" onclick="scrollToSection('art3')">Art. 3 — Descrizione lavori</button>
+        <button class="art3-nav-btn" onclick="scrollToSection('art4')">Art. 4 — Termini</button>
+        <button class="art3-nav-btn" onclick="scrollToSection('art5')">Art. 5 — Esclusioni</button>
+        <button class="art3-nav-btn" onclick="scrollToSection('art6')">Art. 6 — Varianti</button>
+        <button class="art3-nav-btn" onclick="scrollToSection('art7')">Art. 7 — Garanzie</button>
+        <button class="art3-nav-btn" onclick="scrollToSection('art8')">Art. 8 — Recesso</button>
+        <button class="art3-nav-btn" onclick="scrollToSection('art9')">Art. 9 — Liceità</button>
+        <button class="art3-nav-btn" onclick="scrollToSection('art10')">Art. 10 — GDPR</button>
+        <button class="art3-nav-btn" onclick="scrollToSection('art11')">Art. 11 — Foro</button>
+        <button class="art3-nav-btn" onclick="scrollToSection('firme')">Firme</button>
+      </div>
+    </div>
+    <div class="sidebar-section">
+      <div class="sidebar-label">Voci Art. 3 attive</div>
+      <div class="art3-nav" id="sidebar-voci"></div>
+    </div>
+    <div class="sidebar-section progress-wrap">
+      <div class="progress-label">
+        <span id="progress-text">0 / 7 voci</span>
+        <span id="progress-pct">0%</span>
+      </div>
+      <div class="progress-bar-bg">
+        <div class="progress-bar-fill" id="progress-bar" style="width:0%"></div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <main class="main">
+
+    <!-- PRINT HEADER -->
+    <div class="print-header no-screen" id="print-header-block">
+      <div>
+        <div style="font-family:'Cormorant Garamond',Georgia,serif;font-size:18pt;font-weight:700;color:#0D3D37">Acqualab S.r.l.</div>
+        <div style="font-size:8pt;color:#666;margin-top:2pt">Viale Aldo Moro 2 — 50023 Impruneta (FI) · P.IVA 02281140976</div>
+      </div>
+      <div class="print-meta">
+        <div style="font-size:12pt;font-weight:700;color:#0D3D37;font-family:'Cormorant Garamond',Georgia,serif">PREVENTIVO-CONTRATTO D'APPALTO</div>
+        <div id="print-contratto-num" style="margin-top:2pt;color:#0D3D37;font-weight:600"></div>
+        <div id="print-date" style="margin-top:2pt"></div>
+      </div>
+    </div>
+
+    <!-- TAB: CONTRATTO -->
+    <div class="section-panel active" id="panel-contratto">
+
+      <!-- INTESTAZIONE PARTI -->
+      <div class="card" id="art-intestazione">
+        <div class="card-header">
+          <h2>Parti del Contratto</h2>
+          <div class="sub">Appaltatore e Committente</div>
+        </div>
+        <div class="field-row grid2">
+          <div>
+            <div class="field-label">N. Contratto / Revisione</div>
+            <input class="field-input" id="contratto-num" type="text" placeholder="es. N. 41 — REV. 01">
+          </div>
+          <div>
+            <div class="field-label">Data</div>
+            <input class="field-input" id="contratto-data" type="date">
+          </div>
+        </div>
+        <div class="field-row" style="background:rgba(15,140,126,0.04)">
+          <div class="field-label">Appaltatore</div>
+          <div style="font-size:13px;font-weight:600;color:var(--teal-800);margin-bottom:4px">Acqualab S.r.l.</div>
+          <div style="font-size:12px;color:var(--gray-500)">Viale Aldo Moro 2 — 50023 Impruneta (FI) · Tel. 055 0136621 · P.IVA 02281140976 · Legale rappresentante: Marco Pagnini</div>
+        </div>
+        <div class="field-row grid2">
+          <div>
+            <div class="field-label">Committente — Nome e Cognome / Ragione Sociale</div>
+            <input class="field-input" id="committente-nome" type="text" placeholder="Nome committente...">
+          </div>
+          <div>
+            <div class="field-label">Codice Fiscale / P.IVA</div>
+            <input class="field-input" id="committente-cf" type="text" placeholder="CF / P.IVA...">
+          </div>
+        </div>
+        <div class="field-row grid2">
+          <div>
+            <div class="field-label">Indirizzo</div>
+            <input class="field-input" id="committente-indirizzo" type="text" placeholder="Via, CAP Città (Prov)...">
+          </div>
+          <div>
+            <div class="field-label">Tel. / WhatsApp</div>
+            <input class="field-input" id="committente-tel" type="text" placeholder="Telefono...">
+          </div>
+        </div>
+        <div class="field-row grid2">
+          <div>
+            <div class="field-label">E-mail</div>
+            <input class="field-input" id="committente-email" type="text" placeholder="email@esempio.it">
+          </div>
+          <div>
+            <div class="field-label">Persona delegata (se diversa)</div>
+            <input class="field-input" id="committente-delegato" type="text" placeholder="Nome delegato e telefono...">
+          </div>
+        </div>
+      </div>
+
+      <!-- ART. 1 -->
+      <div class="card" id="art1">
+        <div class="card-header">
+          <h2>Art. 1 — Oggetto del Contratto</h2>
+        </div>
+        <div class="field-row" style="background:rgba(15,140,126,0.04)">
+          <div style="font-size:13px;line-height:1.8;color:var(--gray-700)">
+            Acqualab S.r.l. (di seguito "Appaltatore") si obbliga a eseguire, a regola d'arte e con propria organizzazione di mezzi e lavoro, le opere di seguito specificate presso l'immobile sito in:
+          </div>
+        </div>
+        <div class="field-row">
+          <div class="field-label">Indirizzo del cantiere</div>
+          <input class="field-input" id="cantiere-indirizzo" type="text" placeholder="Via, Città (Prov)...">
+        </div>
+        <div class="field-row">
+          <div class="field-label">Riepilogo dell'opera (per Art. 1)</div>
+          <div class="field-sub">Breve descrizione delle lavorazioni principali incluse nel contratto</div>
+          <textarea class="field-textarea" id="art1-opera" rows="5" placeholder="es. Impianto di circolazione per piscina a skimmer (vasca X×X×X m, vol. ~XX m³)&#10;Impianto di filtrazione...&#10;Rivestimento interno in membrana PVC..."></textarea>
+        </div>
+      </div>
+
+      <!-- ART. 2 — CORRISPETTIVO -->
+      <div class="card" id="art2">
+        <div class="card-header">
+          <h2>Art. 2 — Corrispettivo e Piano dei Pagamenti</h2>
+        </div>
+        <div class="field-row grid3">
+          <div>
+            <div class="field-label">Imponibile contrattuale (€)</div>
+            <input class="field-input" id="importo-imponibile" type="text" placeholder="00.000,00" oninput="calcolaPagamenti()">
+          </div>
+          <div>
+            <div class="field-label">Aliquota IVA (%)</div>
+            <input class="field-input" id="importo-iva-pct" type="text" placeholder="10" value="10" oninput="calcolaPagamenti()">
+          </div>
+          <div>
+            <div class="field-label">Totale contratto IVA incl. (€)</div>
+            <input class="field-input" id="importo-totale" type="text" placeholder="—" readonly style="color:var(--teal-700);font-weight:600;background:transparent">
+            <div id="importo-iva-label" style="font-size:11px;color:var(--gray-400);margin-top:3px"></div>
+          </div>
+        </div>
+        <div class="field-row">
+          <div class="field-label" style="margin-bottom:10px">Piano dei Pagamenti</div>
+          <table class="pagamenti-table">
+            <thead>
+              <tr>
+                <th style="width:42%">Voce</th>
+                <th style="width:8%;text-align:center">%</th>
+                <th style="width:20%">Importo (€)</th>
+                <th>Scadenza / Note</th>
+              </tr>
+            </thead>
+            <tbody id="pagamenti-tbody">
+              <tr>
+                <td>Acconto (già versato)</td>
+                <td style="text-align:center"><input class="field-input sal-pct-input" id="pct-0" type="text" value="10" oninput="calcolaPagamenti()" style="text-align:center;font-weight:600;color:var(--teal-700);width:40px"></td>
+                <td><span id="imp-0" class="sal-importo">—</span></td>
+                <td><input class="field-input" id="note-0" placeholder="Versato — Ft. n. ..."></td>
+              </tr>
+              <tr>
+                <td>Alla sottoscrizione del contratto</td>
+                <td style="text-align:center"><input class="field-input sal-pct-input" id="pct-1" type="text" value="20" oninput="calcolaPagamenti()" style="text-align:center;font-weight:600;color:var(--teal-700);width:40px"></td>
+                <td><span id="imp-1" class="sal-importo">—</span></td>
+                <td><input class="field-input" id="note-1" placeholder="Entro 5 gg dalla firma"></td>
+              </tr>
+              <tr>
+                <td>SAL 1 — completamento impianto circolazione interrato</td>
+                <td style="text-align:center"><input class="field-input sal-pct-input" id="pct-2" type="text" value="30" oninput="calcolaPagamenti()" style="text-align:center;font-weight:600;color:var(--teal-700);width:40px"></td>
+                <td><span id="imp-2" class="sal-importo">—</span></td>
+                <td><input class="field-input" id="note-2" placeholder="A verifica e approvazione SAL"></td>
+              </tr>
+              <tr>
+                <td>SAL 2 — completamento filtrazione e locale tecnico</td>
+                <td style="text-align:center"><input class="field-input sal-pct-input" id="pct-3" type="text" value="30" oninput="calcolaPagamenti()" style="text-align:center;font-weight:600;color:var(--teal-700);width:40px"></td>
+                <td><span id="imp-3" class="sal-importo">—</span></td>
+                <td><input class="field-input" id="note-3" placeholder="A verifica e approvazione SAL"></td>
+              </tr>
+              <tr>
+                <td>Saldo a 30 giorni dalla consegna</td>
+                <td style="text-align:center"><input class="field-input sal-pct-input" id="pct-4" type="text" value="10" oninput="calcolaPagamenti()" style="text-align:center;font-weight:600;color:var(--teal-700);width:40px"></td>
+                <td><span id="imp-4" class="sal-importo">—</span></td>
+                <td><input class="field-input" id="note-4" placeholder="30 gg data consegna"></td>
+              </tr>
+            </tbody>
+            <tfoot>
+              <tr class="total-row">
+                <td>Totale percentuali</td>
+                <td style="text-align:center"><span id="pct-totale" style="font-weight:700">100%</span></td>
+                <td colspan="2"><span id="imp-totale" style="font-weight:700">—</span></td>
+              </tr>
+            </tfoot>
+          </table>
+          <div id="pct-warning" style="display:none;margin-top:8px;padding:6px 10px;background:#FDE8E8;border-radius:6px;font-size:12px;color:var(--danger)">
+            ⚠ Le percentuali non sommano a 100%
+          </div>
+        </div>
+        <div id="nota-iva-10" class="field-row" style="background:rgba(15,140,126,0.04);display:none">
+          <div style="font-size:12.5px;line-height:1.8;color:var(--gray-700)">
+            L'IVA al 10% è applicata ai sensi dell'art. 7 della L. 488/1999 e del D.P.R. 633/1972 (manutenzione/recupero su abitazione privata). Il Committente ha rilasciato apposita dichiarazione, allegata al presente contratto (All. D), attestante i requisiti per l'agevolazione. In caso di dichiarazione mendace, ogni onere fiscale aggiuntivo è a esclusivo carico del Committente.
+          </div>
+        </div>
+        <div class="field-row">
+          <div class="field-label">IBAN e coordinate bancarie</div>
+          <div style="font-size:13px;color:var(--gray-700);line-height:1.8">IT74X0306902904100000008972 (Banca Intesa SanPaolo) — SWIFT: BCITITMM</div>
+        </div>
+        <div class="field-row" style="background:rgba(183,124,10,0.06);border-left:3px solid var(--warn)">
+          <div style="font-size:12px;line-height:1.8;color:var(--gray-700);font-style:italic">
+            In caso di ritardo nei pagamenti superiore a 15 (quindici) giorni, l'Appaltatore ha diritto di sospendere l'esecuzione dei lavori, previa comunicazione al Committente. Durante il periodo di sospensione:<br>
+            • i termini di esecuzione si intendono automaticamente prorogati per un periodo pari alla durata della sospensione;<br>
+            • l'Appaltatore non è responsabile di alcun ritardo nella ultimazione dei lavori riconducibile alla sospensione stessa;<br>
+            • restano a carico del Committente gli eventuali maggiori oneri documentati (es. costi di rimessa in opera del cantiere, maggiori costi di trasporto, riprogrammazione del personale).
+          </div>
+        </div>
+        <div class="field-row">
+          <div class="field-label">Note aggiuntive su corrispettivo / pagamenti</div>
+          <textarea class="field-textarea" id="art2-note" rows="2" placeholder="eventuali note specifiche per questo contratto..."></textarea>
+        </div>
+      </div>
+
+      <!-- ART. 3 — DESCRIZIONE LAVORI -->
+      <div class="card" id="art3">
+        <div class="card-header">
+          <h2>Art. 3 — Descrizione Tecnica dei Lavori</h2>
+          <div class="sub">Attiva le voci pertinenti e modifica il testo per questo cantiere</div>
+        </div>
+        <div style="padding:1rem 1.25rem;border-bottom:1px solid var(--gray-200);background:var(--teal-50)">
+          <div style="font-size:12px;color:var(--teal-700)">💡 Attiva/disattiva ogni voce con il toggle. Clicca sulla voce per espandere e modificare il testo.</div>
+        </div>
+
+        <!-- 3.1 Circolazione -->
+        <div style="padding:1rem 1.25rem">
+          <div class="voce-card open" id="voce-31" data-voce="31">
+            <div class="voce-header" onclick="toggleVoce('voce-31', event)">
+              <button class="voce-toggle-btn on" id="toggle-31" onclick="event.stopPropagation();attivaVoce('voce-31')"></button>
+              <span class="voce-num">3.1</span>
+              <div class="voce-title-wrap">
+                <div class="voce-title">Impianto di Circolazione</div>
+                <div class="voce-subtitle">Prese fondo, skimmer, immissioni, reintegro livello</div>
+              </div>
+              <span class="voce-expand">▾</span>
+            </div>
+            <div class="voce-body">
+              <div class="voce-desc-label">Descrizione tecnica — modificabile</div>
+              <textarea class="voce-textarea" id="testo-31" rows="8">Realizzazione di un impianto di circolazione per piscina a skimmer composto da:
+
+• n. 3 prese dal fondo configurate in parallelo bilanciato (anti-intrappolamento, UNI EN 16713-2016), con tubo PVC flessibile e/o rigido Ø 75 mm
+• n. 2 linee di aspirazione superficiale (skimmer), tubo Ø 63 mm, con skimmer sfioratori in ABS con battente, regolatore di portata e cesto raccoglifoglie
+• n. 3 linee di immissione a parete, tubo Ø 50 mm, complete di bocchetta in ABS
+• n. 1 regolatore automatico di livello con pozzetto a galleggiante e bocchetta ABS (esclusa tubazione di carico idrico)
+
+Sono incluse almeno 3 prove di tenuta dell'impianto prima e dopo il reinterro.</textarea>
+            </div>
+          </div>
+
+          <!-- 3.2 Filtrazione -->
+          <div class="voce-card open" id="voce-32" data-voce="32">
+            <div class="voce-header" onclick="toggleVoce('voce-32', event)">
+              <button class="voce-toggle-btn on" id="toggle-32" onclick="event.stopPropagation();attivaVoce('voce-32')"></button>
+              <span class="voce-num">3.2</span>
+              <div class="voce-title-wrap">
+                <div class="voce-title">Impianto di Filtrazione</div>
+                <div class="voce-subtitle">Locale tecnico, pompa, filtro, collettori</div>
+              </div>
+              <span class="voce-expand">▾</span>
+            </div>
+            <div class="voce-body">
+              <div class="voce-desc-label">Descrizione tecnica — modificabile</div>
+              <textarea class="voce-textarea" id="testo-32" rows="7">• n. 1 locale tecnico prefabbricato TEXAS MAXI (vetroresina, 143×143×130h cm, interrabile)
+• n. 1 pompa centrifuga autodescante Kripsol KS EVO 0,75 HP 220V (Noryl+fibra vetro, pre-filtro e cestello PP incorporati)
+• n. 1 filtro monocartuccia Hayward SwimClear o equivalente, portata max 25 m³/h
+• n. 1 collettore aspirazione con n. 2 valvole Ø 63 mm (skimmer) e n. 1 valvola Ø 75 mm (prese fondo)
+• n. 1 collettore mandata con n. 3 valvole Ø 50 mm</textarea>
+            </div>
+          </div>
+
+          <!-- 3.3 Trattamento chimico -->
+          <div class="voce-card open" id="voce-33" data-voce="33">
+            <div class="voce-header" onclick="toggleVoce('voce-33', event)">
+              <button class="voce-toggle-btn on" id="toggle-33" onclick="event.stopPropagation();attivaVoce('voce-33')"></button>
+              <span class="voce-num">3.3</span>
+              <div class="voce-title-wrap">
+                <div class="voce-title">Impianto di Trattamento Chimico</div>
+                <div class="voce-subtitle">Clorinatore, modulo pH, kit anodi</div>
+              </div>
+              <span class="voce-expand">▾</span>
+            </div>
+            <div class="voce-body">
+              <div class="voce-desc-label">Descrizione tecnica — modificabile</div>
+              <textarea class="voce-textarea" id="testo-33" rows="6">• n. 1 clorinatore a bassa salinità Kripsol KLX 30 LS (salinità 1,5 g/L, piscine fino a 120 m³, IP65)
+• n. 1 modulo pH auto completo (chip pH, elettrodo, portaelettrodo, pompa peristaltica)
+• n. 2 kit anodo sacrificale
+• By-pass cella elettrolitica con n. 3 valvole a sfera in PVC</textarea>
+            </div>
+          </div>
+
+          <!-- 3.4 Quadro elettrico -->
+          <div class="voce-card open" id="voce-34" data-voce="34">
+            <div class="voce-header" onclick="toggleVoce('voce-34', event)">
+              <button class="voce-toggle-btn on" id="toggle-34" onclick="event.stopPropagation();attivaVoce('voce-34')"></button>
+              <span class="voce-num">3.4</span>
+              <div class="voce-title-wrap">
+                <div class="voce-title">Quadro Elettrico</div>
+                <div class="voce-subtitle">Solo fornitura — allaccio escluso</div>
+              </div>
+              <span class="voce-expand">▾</span>
+            </div>
+            <div class="voce-body">
+              <div class="voce-desc-label">Descrizione tecnica — modificabile</div>
+              <textarea class="voce-textarea" id="testo-34" rows="4">Fornitura di n. 1 quadro Hayward con trasformatore 220/12V 100W, PLC, n. 2 timer (pompa + illuminazione), Bluetooth.
+
+Sono esclusi l'allaccio elettrico e la posa in opera, a cura dell'elettricista del Committente.</textarea>
+            </div>
+          </div>
+
+          <!-- 3.5 Illuminazione -->
+          <div class="voce-card open" id="voce-35" data-voce="35">
+            <div class="voce-header" onclick="toggleVoce('voce-35', event)">
+              <button class="voce-toggle-btn on" id="toggle-35" onclick="event.stopPropagation();attivaVoce('voce-35')"></button>
+              <span class="voce-num">3.5</span>
+              <div class="voce-title-wrap">
+                <div class="voce-title">Illuminazione Subacquea</div>
+                <div class="voce-subtitle">Solo fornitura — allaccio escluso</div>
+              </div>
+              <span class="voce-expand">▾</span>
+            </div>
+            <div class="voce-body">
+              <div class="voce-desc-label">Descrizione tecnica — modificabile</div>
+              <textarea class="voce-textarea" id="testo-35" rows="4">Fornitura di n. 2 fari 60 LED bianchi caldi (2200 lm, 23W, nicchia a murare con accessori per membrana PVC).
+
+Sono esclusi l'allaccio elettrico e la posa in opera, a cura dell'elettricista del Committente.</textarea>
+            </div>
+          </div>
+
+          <!-- 3.6 Rivestimento -->
+          <div class="voce-card open" id="voce-36" data-voce="36">
+            <div class="voce-header" onclick="toggleVoce('voce-36', event)">
+              <button class="voce-toggle-btn on" id="toggle-36" onclick="event.stopPropagation();attivaVoce('voce-36')"></button>
+              <span class="voce-num">3.6</span>
+              <div class="voce-title-wrap">
+                <div class="voce-title">Rivestimento Interno</div>
+                <div class="voce-subtitle">Membrana PVC, profilo hung, saldatura</div>
+              </div>
+              <span class="voce-expand">▾</span>
+            </div>
+            <div class="voce-body">
+              <div class="voce-desc-label">Descrizione tecnica — modificabile</div>
+              <textarea class="voce-textarea" id="testo-36" rows="6">• Fornitura e posa di profilo hung in alluminio anodizzato per ancoraggio membrana, lunghezza __ m
+• Fornitura e posa di membrana PVC CGT 3D AQUASENSE, superficie netta __ m², con saldatura ad aria calda Leister, compresi tutti gli accessori
+• Texture a scelta tra: Black Slate, Golden Riviera, Calacatta White Marble, Granit Grey, Granit Sand, Granit Blue, Granit Green, Granit Gold, White Riviera
+
+Posa in opera in condizioni ottimali (15–30°C). In condizioni diverse saranno adottati protocolli di stoccaggio protetto del materiale.</textarea>
+            </div>
+          </div>
+
+          <!-- 3.7 Complementi -->
+          <div class="voce-card open" id="voce-37" data-voce="37">
+            <div class="voce-header" onclick="toggleVoce('voce-37', event)">
+              <button class="voce-toggle-btn on" id="toggle-37" onclick="event.stopPropagation();attivaVoce('voce-37')"></button>
+              <span class="voce-num">3.7</span>
+              <div class="voce-title-wrap">
+                <div class="voce-title">Complementi e Avviamento</div>
+                <div class="voce-subtitle">Kit pulizia, robot, avviamento impianti</div>
+              </div>
+              <span class="voce-expand">▾</span>
+            </div>
+            <div class="voce-body">
+              <div class="voce-desc-label">Descrizione tecnica — modificabile</div>
+              <textarea class="voce-textarea" id="testo-37" rows="4">• n. 1 kit pulizia piscina
+• n. 1 pulitore automatico Zodiac RA 6900 Alpha iQ PRO
+• Avviamento e regolazione impianti dopo il primo riempimento</textarea>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ART. 4 — TERMINI -->
+      <div class="card" id="art4">
+        <div class="card-header">
+          <h2>Art. 4 — Termini di Esecuzione</h2>
+        </div>
+        <div class="field-row grid2">
+          <div>
+            <div class="field-label">Inizio lavori entro (giorni dalla firma)</div>
+            <input class="field-input" id="art4-inizio" type="text" placeholder="es. 60">
+          </div>
+          <div>
+            <div class="field-label">Note particolari sui termini</div>
+            <input class="field-input" id="art4-note" type="text" placeholder="eventuali condizioni specifiche...">
+          </div>
+        </div>
+        <div class="field-row" style="background:rgba(15,140,126,0.04)">
+          <div style="font-size:12.5px;line-height:1.8;color:var(--gray-700)">
+            La data di inizio dei lavori avrà luogo entro il numero di giorni indicato dalla sottoscrizione del presente contratto, termine dopo il quale il preventivo decade ed è necessaria una revisione dei prezzi.<br><br>
+            I termini di esecuzione sono indicativi e non costituiscono termine essenziale ai sensi dell'art. 1457 c.c. La data effettiva di completamento è subordinata a fattori che esulano dal controllo dell'Appaltatore, tra cui: il cronoprogramma e l'avanzamento delle opere civili a cura dell'impresa edile coordinatrice; condizioni meteo-climatiche; la puntuale messa a disposizione del sito da parte del Committente; ritardi nelle consegne di materiali per cause di forza maggiore.<br><br>
+            Comportano un automatico slittamento dei termini di completamento per un periodo almeno pari alla durata dell'impedimento, senza responsabilità dell'Appaltatore: ritardi o difformità nelle opere edili; mancata o ritardata messa a disposizione del cantiere o delle utenze; ritardo nella consegna di materiali per cause non imputabili all'Appaltatore.<br><br>
+            L'Appaltatore risponde esclusivamente dei ritardi direttamente e documentabilmente imputabili alla propria organizzazione e al proprio personale, e si impegna a comunicare tempestivamente al Committente eventuali variazioni significative del programma lavori, indicandone le cause.
+          </div>
+        </div>
+      </div>
+
+      <!-- ART. 5 — ESCLUSIONI (testo fisso, non editabile) -->
+      <div class="card" id="art5">
+        <div class="card-header">
+          <h2>Art. 5 — Esclusioni — Oneri a Carico del Committente</h2>
+          <div class="sub">Attiva/disattiva le esclusioni applicabili a questo cantiere</div>
+        </div>
+        <div style="padding:0.75rem 1.25rem;border-bottom:1px solid var(--gray-200);background:var(--gray-100)">
+          <div style="font-size:12px;color:var(--gray-500)">Sono espressamente escluse dal presente contratto, salvo diverso accordo scritto, le seguenti lavorazioni e forniture:</div>
+        </div>
+        <div id="esclusioni-list" style="padding:0.5rem 1.25rem 0.25rem"></div>
+        <div class="field-row" style="border-top:1px solid var(--gray-200)">
+          <div class="field-label">Esclusioni aggiuntive specifiche</div>
+          <textarea class="field-textarea" id="art5-extra" rows="2" placeholder="eventuali esclusioni aggiuntive per questo cantiere..."></textarea>
+        </div>
+      </div>
+
+      <!-- ART. 6 — VARIANTI -->
+      <div class="card" id="art6">
+        <div class="card-header">
+          <h2>Art. 6 — Varianti e Lavori Extra</h2>
+          <div class="sub">Testo standard di contratto</div>
+        </div>
+        <div class="field-row">
+          <div style="font-size:13px;line-height:1.8;color:var(--gray-700)">
+            Qualsiasi modifica alle opere indicate all'Art. 3, sia a richiesta del Committente sia necessaria per cause sopravvenute, dovrà essere concordata per iscritto tra le parti prima dell'esecuzione, con indicazione del costo aggiuntivo o della riduzione del corrispettivo.<br><br>
+            Lavori extra eseguiti senza preventiva autorizzazione scritta non daranno diritto ad alcun compenso aggiuntivo salvo che siano stati eseguiti in situazioni di urgenza e pericolo, nel qual caso l'Appaltatore ne darà comunicazione immediata al Committente.
+          </div>
+        </div>
+      </div>
+
+      <!-- ART. 7 — GARANZIE -->
+      <div class="card" id="art7">
+        <div class="card-header">
+          <h2>Art. 7 — Garanzie e Responsabilità</h2>
+          <div class="sub">Testo standard di contratto</div>
+        </div>
+        <div class="field-row">
+          <div style="font-size:13px;line-height:1.8;color:var(--gray-700)">
+            Il Committente prende atto che il corretto funzionamento e la durata degli impianti e del rivestimento sono subordinati al mantenimento continuativo dei parametri dell'acqua nei range indicati nel verbale di avviamento (pH, cloro, alcalinità, durezza, salinità, ecc.) e all'esecuzione della manutenzione ordinaria secondo le istruzioni d'uso consegnate.<br><br>
+            L'Appaltatore garantisce:<br>
+            • <strong>Copertura assicurativa:</strong> polizza RC attiva con Groupama a tutela del Committente per danni derivanti dalle attività oggetto del contratto<br>
+            • <strong>Regolarità del personale:</strong> lavoratori regolarmente assunti e assicurati; DURC disponibile su richiesta<br>
+            • <strong>Garanzia prodotti:</strong> termini di garanzia come da Codice del Consumo o specifiche estensioni dei produttori (es. 3 anni su cella elettrolitica Kripsol KLX)<br>
+            • <strong>Garanzia impianti:</strong> 24 mesi dalla data di collaudo per vizi occulti delle lavorazioni eseguite dall'Appaltatore<br>
+            • <strong>Idoneità tecnico-professionale:</strong> Acqualab S.r.l. dichiara di essere in possesso dei requisiti previsti dal D.Lgs. 81/2008 per l'accesso al cantiere e di impegnarsi a trasmettere, su richiesta, la documentazione necessaria (visura camerale, documento d'identità L.R., DURC, descrizione tipologia lavori, recapiti, posizione INPS e INAIL).<br><br>
+            <em>La mancata trasmissione tempestiva della documentazione di cantiere non costituisce inadempimento contrattuale nei confronti del Committente, ma è gestita direttamente tra l'Appaltatore e le figure della sicurezza del cantiere.</em><br><br>
+            <em>Eventuali vizi o difformità dovranno essere denunciati per scritto (e-mail, PEC o raccomandata) all'Appaltatore con descrizione del problema e documentazione fotografica, a pena di decadenza dalla garanzia.</em>
+          </div>
+        </div>
+      </div>
+
+      <!-- ART. 8 — RECESSO -->
+      <div class="card" id="art8">
+        <div class="card-header">
+          <h2>Art. 8 — Risoluzione e Recesso</h2>
+          <div class="sub">Testo standard di contratto</div>
+        </div>
+        <div class="field-row">
+          <div style="font-size:13px;line-height:1.8;color:var(--gray-700)">
+            Il Committente può recedere dal contratto in qualsiasi momento ai sensi dell'art. 1671 c.c.; in tal caso, lo stesso riconosce fin d'ora che:<br>
+            • saranno dovute tutte le somme relative alle spese sostenute, ai lavori già eseguiti e alle forniture già ordinate, anche se non ancora consegnate in cantiere, secondo i prezzi contrattuali;<br>
+            • sarà inoltre dovuto, a titolo di mancato guadagno, l'utile d'impresa sui lavori non eseguiti, convenzionalmente determinato nella misura minima del 15% (quindici per cento) del valore residuo del contratto non ancora eseguito.<br><br>
+            Resta in ogni caso salva la facoltà dell'Appaltatore di provare un danno maggiore.<br><br>
+            Costituisce causa di risoluzione di diritto (art. 1456 c.c.) il mancato pagamento di una rata del piano dei pagamenti per oltre 30 giorni dalla scadenza, previa diffida scritta. In caso di risoluzione per mancato pagamento, l'Appaltatore ha diritto:<br>
+            • al pagamento dei lavori eseguiti e dei materiali ordinati non annullabili;<br>
+            • oltre al risarcimento dell'eventuale maggior danno, incluso il mancato guadagno sulle lavorazioni non eseguite, convenzionalmente determinato nella misura minima del 15% (quindici per cento) del valore residuo del contratto non ancora eseguito.
+          </div>
+        </div>
+      </div>
+
+      <!-- ART. 9 — LICEITÀ -->
+      <div class="card" id="art9">
+        <div class="card-header">
+          <h2>Art. 9 — Dichiarazione di Liceità</h2>
+          <div class="sub">Da compilare per ogni contratto</div>
+        </div>
+        <div class="field-row">
+          <div style="font-size:13px;line-height:1.75;color:var(--gray-700)">
+            Il Committente dichiara di essere in possesso di tutti i titoli abilitativi necessari alla realizzazione dell'opera in conformità alle disposizioni vigenti, ovvero che l'esecuzione dei lavori è esentata da autorizzazioni o non soggetta a vincoli.
+          </div>
+        </div>
+        <div class="field-row grid2">
+          <div>
+            <div class="field-label">Titolo abilitativo n.</div>
+            <input class="field-input" id="art9-titolo-num" type="text" placeholder="numero...">
+            <div style="margin-top:6px;font-size:11px;color:var(--gray-400)">Lasciare vuoto se non applicabile</div>
+          </div>
+          <div>
+            <div class="field-label">Del</div>
+            <input class="field-input" id="art9-titolo-data" type="date">
+          </div>
+        </div>
+        <div class="field-row">
+          <div class="checkbox-row">
+            <input type="checkbox" id="chk-esenzione">
+            <label for="chk-esenzione">□ Il Committente dichiara l'esenzione da autorizzazioni</label>
+          </div>
+        </div>
+        <div class="field-row" style="background:rgba(183,124,10,0.06);border-left:3px solid var(--warn)">
+          <div style="font-size:12px;line-height:1.75;color:var(--gray-700);font-style:italic">
+            In assenza di tali requisiti non sarà possibile dare inizio alle forniture.<br><br>
+            Qualora, per fatto e colpa del Committente, i titoli abilitativi risultino mancanti, invalidi o revocati, ovvero l'opera risulti comunque non realizzabile, l'Appaltatore avrà facoltà di recedere dal contratto per giusta causa, con diritto al pagamento delle opere e di tutte le prestazioni, anche di natura intellettuale, già eseguite e al rimborso delle spese sostenute.
+          </div>
+        </div>
+      </div>
+
+      <!-- ART. 10 — GDPR -->
+      <div class="card" id="art10">
+        <div class="card-header">
+          <h2>Art. 10 — Trattamento dei Dati Personali (GDPR)</h2>
+          <div class="sub">Testo standard di contratto</div>
+        </div>
+        <div class="field-row">
+          <div style="font-size:13px;line-height:1.8;color:var(--gray-700)">
+            I dati personali del Committente vengono trattati da Acqualab S.r.l. in qualità di Titolare del trattamento, ai sensi del Reg. UE 2016/679 (GDPR), esclusivamente per le finalità connesse all'esecuzione del presente contratto, all'adempimento degli obblighi di legge e alla gestione amministrativo-contabile.<br><br>
+            I dati non saranno ceduti a terzi salvo obblighi di legge o necessità di esecuzione del contratto (es. subappaltatori). Il Committente può esercitare i propri diritti scrivendo a <a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="21484f474e6140425054400c4d40430f4855">[email&#160;protected]</a>.
+          </div>
+        </div>
+      </div>
+
+      <!-- ART. 11 — FORO -->
+      <div class="card" id="art11">
+        <div class="card-header">
+          <h2>Art. 11 — Foro Competente e Legge Applicabile</h2>
+          <div class="sub">Testo standard di contratto</div>
+        </div>
+        <div class="field-row">
+          <div style="font-size:13px;line-height:1.75;color:var(--gray-700)">
+            Il presente contratto è regolato dalla legge italiana. Per qualsiasi controversia le parti concordano la competenza esclusiva del Foro di Firenze. Le parti dichiarano di aver letto e compreso il presente contratto e di accettarne integralmente le condizioni, ivi incluse le clausole ai sensi degli artt. 1341 e 1342 c.c.: Art. 5 – Esclusioni; Art. 6 – Varianti; Art. 8 – Risoluzione e recesso; Art. 11 – Foro competente.
+          </div>
+        </div>
+      </div>
+
+      <!-- FIRME -->
+      <div class="card" id="firme">
+        <div class="card-header">
+          <h2>Sottoscrizione e Accettazione</h2>
+        </div>
+        <div class="field-row">
+          <div class="field-label">Luogo e data di firma</div>
+          <input class="field-input" id="firma-luogo-data" type="text" placeholder="es. Impruneta, __ / __ / ____">
+        </div>
+        <div class="firme-grid">
+          <div class="firma-box">
+            <div class="firma-title">Appaltatore</div>
+            <div class="firma-name">Acqualab S.r.l. — Marco Pagnini</div>
+            <div class="firma-role">Legale Rappresentante</div>
+            <div class="firma-line">Firma e timbro</div>
+          </div>
+          <div class="firma-box">
+            <div class="firma-title">Committente</div>
+            <div class="firma-name" id="firma-committente-nome">—</div>
+            <div class="firma-role">Firma</div>
+            <div class="firma-line">Firma</div>
+          </div>
+        </div>
+        <div style="padding:1rem 1.25rem;border-top:1px solid var(--gray-200);background:var(--gold-light)">
+          <div class="field-label" style="color:var(--gold)">Approvazione specifica clausole (artt. 1341–1342 c.c.)</div>
+          <div style="font-size:12px;color:var(--gray-700);margin-bottom:1rem">Art. 5 (Esclusioni) — Art. 6 (Varianti) — Art. 8 (Risoluzione e recesso) — Art. 11 (Foro competente)</div>
+          <div class="firme-grid" style="padding:0">
+            <div class="firma-box">
+              <div class="firma-title">Appaltatore</div>
+              <div class="firma-name">Acqualab S.r.l. — Marco Pagnini</div>
+              <div class="firma-role">L.R. — Firma e timbro</div>
+              <div class="firma-line">Firma per specifica approvazione</div>
+            </div>
+            <div class="firma-box">
+              <div class="firma-title">Committente</div>
+              <div class="firma-name" id="firma-committente-nome2">—</div>
+              <div class="firma-role">Firma per specifica approvazione</div>
+              <div class="firma-line">Firma per specifica approvazione</div>
+            </div>
+          </div>
+        </div>
+        <div class="field-row">
+          <div class="field-label">Allegati parte integrante del contratto</div>
+          <textarea class="field-textarea" id="allegati-lista" rows="4" placeholder="• All. A — ...&#10;• All. B — ...&#10;• All. C — ..."></textarea>
+        </div>
+      </div>
+
+    </div><!-- /panel-contratto -->
+
+    <!-- TAB: ALLEGATI -->
+    <div class="section-panel" id="panel-allegati">
+      <div class="card">
+        <div class="card-header">
+          <h2>Allegati</h2>
+          <div class="sub">PDF e immagini — ogni file verrà stampato su una pagina intera in coda al contratto</div>
+        </div>
+        <div style="padding:1.25rem">
+          <div class="allegati-drop-zone" id="allegati-drop-zone"
+               onclick="document.getElementById('allegati-file-input').click()"
+               ondragover="event.preventDefault();this.classList.add('dragover')"
+               ondragleave="this.classList.remove('dragover')"
+               ondrop="handleAllegatiDrop(event)">
+            <div class="allegati-drop-icon">📎</div>
+            <div class="allegati-drop-text">Trascina qui i file oppure <span style="color:var(--teal-500);text-decoration:underline;cursor:pointer">sfoglia</span></div>
+            <div class="allegati-drop-sub">PDF, JPG, PNG — ogni file verrà stampato su una pagina intera</div>
+            <input type="file" id="allegati-file-input" accept=".pdf,.jpg,.jpeg,.png" multiple style="display:none" onchange="handleAllegatiInput(this)">
+          </div>
+          <div id="allegati-list" style="margin-top:1rem;display:flex;flex-direction:column;gap:10px"></div>
+        </div>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
+  // ── CALCOLO PAGAMENTI ────────────────────────────────────────
+  function fmtEur(n) {
+    return n.toLocaleString('it-IT', {minimumFractionDigits:2, maximumFractionDigits:2});
+  }
+
+  function parseNum(s) {
+    // Accept both comma and dot as decimal separator
+    return parseFloat(s.replace(/\./g,'').replace(',','.')) || 0;
+  }
+
+  function calcolaPagamenti() {
+    const imponibile = parseNum(document.getElementById('importo-imponibile').value);
+    const ivaPct = parseNum(document.getElementById('importo-iva-pct').value) || 0;
+    const totale = imponibile * (1 + ivaPct / 100);
+
+    // Update totale field
+    document.getElementById('importo-totale').value = imponibile > 0 ? fmtEur(totale) : '';
+    // IVA amount label
+    const ivaLabel = document.getElementById('importo-iva-label');
+    if (ivaLabel) ivaLabel.textContent = imponibile > 0 && ivaPct > 0 ? 'IVA ' + ivaPct + '%: € ' + fmtEur(totale - imponibile) : '';
+    // Show IVA 10% note only when aliquota is 10
+    const notaIva = document.getElementById('nota-iva-10');
+    if (notaIva) notaIva.style.display = (ivaPct === 10) ? '' : 'none';
+
+    // Calculate each rata
+    let sumPct = 0;
+    let sumImp = 0;
+    const N = 5;
+    for (let i = 0; i < N; i++) {
+      const pct = parseNum(document.getElementById('pct-' + i).value);
+      sumPct += pct;
+      const imp = totale * pct / 100;
+      sumImp += imp;
+      document.getElementById('imp-' + i).textContent = imponibile > 0 ? fmtEur(imp) : '—';
+    }
+
+    // Update totals row
+    document.getElementById('pct-totale').textContent = fmtEur(sumPct) + '%';
+    document.getElementById('imp-totale').textContent = imponibile > 0 ? fmtEur(sumImp) : '—';
+
+    // Warning if pct != 100
+    const warn = document.getElementById('pct-warning');
+    const rounded = Math.round(sumPct * 100) / 100;
+    warn.style.display = (imponibile > 0 && rounded !== 100) ? '' : 'none';
+    document.getElementById('pct-totale').style.color = rounded !== 100 ? 'var(--danger)' : '';
+  }
+
+  // ── ESCLUSIONI ART.5 ─────────────────────────────────────────
+  const ESCLUSIONI = [
+    { id:'excl-buro',     icon:'📋', title:'Burocrazia e pratiche amministrative', detail:'Permessi comunali, relazioni geologiche, calcoli strutturali' },
+    { id:'excl-prog',     icon:'📐', title:'Progettazione impianti terzi', detail:'Progetti definitivi di impianti elettrici e idraulici' },
+    { id:'excl-scavi',    icon:'🚜', title:'Scavi, movimento terra e smaltimento rifiuti', detail:'Macerie, materiali di risulta, smaltimento in discarica' },
+    { id:'excl-edili',    icon:'🧱', title:'Opere edili e getti in CLS', detail:'Intonaci, murature, bordi e pavimentazioni perimetrali' },
+    { id:'excl-allacci',  icon:'⚡', title:'Allacciamenti elettrici e idraulici', detail:'Dal quadro generale al locale tecnico; carico acqua e fognatura' },
+    { id:'excl-acqua',    icon:'💧', title:'Acqua per il riempimento della piscina', detail:'A carico del Committente' },
+    { id:'excl-chimici',  icon:'🧪', title:'Prodotti chimici', detail:'Sale e prodotti per il primo trattamento e il mantenimento' },
+    { id:'excl-iva',      icon:'🧾', title:'IVA', detail:'Tutti gli importi si intendono al netto dell\'IVA' },
+  ];
+
+  let esclusioniAttive = new Set(ESCLUSIONI.map(e => e.id)); // tutte on per default
+
+  function buildEsclusioni() {
+    const list = document.getElementById('esclusioni-list');
+    list.innerHTML = ESCLUSIONI.map(e => {
+      const on = esclusioniAttive.has(e.id);
+      return `<div class="esclusione-item ${on ? '' : 'off'}" id="item-${e.id}">
+        <button class="escl-toggle ${on ? 'on' : ''}" id="etoggle-${e.id}" onclick="toggleEsclusione('${e.id}',event)"></button>
+        <span class="escl-icon">${e.icon}</span>
+        <div class="escl-text">
+          <div class="escl-title">${e.title}</div>
+          <div class="escl-detail">${e.detail}</div>
+        </div>
+      </div>`;
+    }).join('');
+  }
+
+  function toggleEsclusione(id, e) {
+    if (e) e.stopPropagation();
+    if (esclusioniAttive.has(id)) esclusioniAttive.delete(id);
+    else esclusioniAttive.add(id);
+    const on = esclusioniAttive.has(id);
+    document.getElementById('item-' + id).classList.toggle('off', !on);
+    document.getElementById('etoggle-' + id).classList.toggle('on', on);
+  }
+
+  // ── VOCI ART.3 ────────────────────────────────────────────────
+  const VOCI = [
+    {id:'voce-31', num:'3.1', label:'Circolazione'},
+    {id:'voce-32', num:'3.2', label:'Filtrazione'},
+    {id:'voce-33', num:'3.3', label:'Trattamento chimico'},
+    {id:'voce-34', num:'3.4', label:'Quadro elettrico'},
+    {id:'voce-35', num:'3.5', label:'Illuminazione'},
+    {id:'voce-36', num:'3.6', label:'Rivestimento'},
+    {id:'voce-37', num:'3.7', label:'Complementi'},
+  ];
+
+  function buildSidebarVoci() {
+    const nav = document.getElementById('sidebar-voci');
+    nav.innerHTML = VOCI.map(v => {
+      const card = document.getElementById(v.id);
+      const on = !card.classList.contains('disabled');
+      return `<button class="art3-nav-btn ${on ? 'active-voce' : 'inactive-voce'}" id="sidebar-${v.id}" onclick="scrollToVoce('${v.id}')">
+        <span class="voce-dot ${on ? 'on' : ''}" id="dot-${v.id}"></span>
+        <span>${v.num} — ${v.label}</span>
+      </button>`;
+    }).join('');
+    updateProgress();
+  }
+
+  function attivaVoce(id) {
+    const card = document.getElementById(id);
+    const btn = document.getElementById('toggle-' + id.replace('voce-',''));
+    const isOn = btn.classList.contains('on');
+    if (isOn) {
+      btn.classList.remove('on');
+      card.classList.add('disabled');
+    } else {
+      btn.classList.add('on');
+      card.classList.remove('disabled');
+    }
+    // update sidebar dot
+    const dot = document.getElementById('dot-' + id);
+    const sideBtn = document.getElementById('sidebar-' + id);
+    if (dot) dot.className = 'voce-dot ' + (!isOn ? 'on' : '');
+    if (sideBtn) sideBtn.className = 'art3-nav-btn ' + (!isOn ? 'active-voce' : 'inactive-voce');
+    updateProgress();
+  }
+
+  function toggleVoce(id, e) {
+    if (e.target.classList.contains('voce-toggle-btn')) return;
+    const card = document.getElementById(id);
+    card.classList.toggle('open');
+  }
+
+  function updateProgress() {
+    const on = VOCI.filter(v => !document.getElementById(v.id).classList.contains('disabled')).length;
+    document.getElementById('progress-text').textContent = on + ' / ' + VOCI.length + ' voci';
+    document.getElementById('progress-pct').textContent = Math.round(on / VOCI.length * 100) + '%';
+    document.getElementById('progress-bar').style.width = Math.round(on / VOCI.length * 100) + '%';
+  }
+
+  // ── TAB SWITCHING ─────────────────────────────────────────────
+  function switchTab(tab, e) {
+    document.querySelectorAll('.section-panel').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+    document.getElementById('panel-' + tab).classList.add('active');
+    if (e && e.target) e.target.classList.add('active');
+  }
+
+  // ── SCROLL TO SECTION ─────────────────────────────────────────
+  function scrollToSection(id) {
+    // Switch to contratto tab if needed
+    document.querySelectorAll('.section-panel').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+    document.getElementById('panel-contratto').classList.add('active');
+    document.querySelector('.nav-btn').classList.add('active');
+    // Scroll with offset for sticky header
+    setTimeout(() => {
+      const el = document.getElementById(id);
+      if (!el) return;
+      const headerH = document.querySelector('.site-header').offsetHeight + 16;
+      const top = el.getBoundingClientRect().top + window.scrollY - headerH;
+      window.scrollTo({top, behavior: 'smooth'});
+    }, 30);
+  }
+
+  function scrollToVoce(id) {
+    // Make sure we're on the contratto tab
+    document.querySelectorAll('.section-panel').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+    document.getElementById('panel-contratto').classList.add('active');
+    document.querySelector('.nav-btn').classList.add('active');
+    // Open the voce if not disabled
+    const card = document.getElementById(id);
+    if (card && !card.classList.contains('disabled')) card.classList.add('open');
+    // Scroll to it
+    setTimeout(() => { if (card) card.scrollIntoView({behavior: 'smooth', block: 'center'}); }, 50);
+  }
+
+  // ── SYNC COMMITTENTE NAME IN FIRME ────────────────────────────
+  document.getElementById('committente-nome').addEventListener('input', function() {
+    const v = this.value || '—';
+    document.getElementById('firma-committente-nome').textContent = v;
+    document.getElementById('firma-committente-nome2').textContent = v;
+  });
+
+  // ── TOAST ─────────────────────────────────────────────────────
+  function showToast(msg, type) {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.className = 'toast ' + (type || '');
+    t.classList.add('show');
+    clearTimeout(t._timer);
+    t._timer = setTimeout(() => t.classList.remove('show'), 2800);
+  }
+
+  // ── COLLECT STATE ─────────────────────────────────────────────
+  function raccogliStato() {
+    const allInputs = [];
+    document.querySelectorAll('input[type=text], input[type=date], input[type=checkbox], textarea').forEach(el => {
+      if (el.type === 'checkbox') allInputs.push(el.checked);
+      else allInputs.push(el.value);
+    });
+    const vociDisabled = VOCI.filter(v => document.getElementById(v.id).classList.contains('disabled')).map(v => v.id);
+    const vociOpen = VOCI.filter(v => document.getElementById(v.id).classList.contains('open')).map(v => v.id);
+    const esclusioniSalvate = Array.from(esclusioniAttive);
+    return { allInputs, vociDisabled, vociOpen, esclusioniSalvate, timestamp: new Date().toISOString() };
+  }
+
+  function applicaStato(stato) {
+    if (stato.allInputs) {
+      const els = document.querySelectorAll('input[type=text], input[type=date], input[type=checkbox], textarea');
+      stato.allInputs.forEach((val, i) => {
+        if (!els[i]) return;
+        if (els[i].type === 'checkbox') els[i].checked = val;
+        else els[i].value = val;
+      });
+    }
+    // Restore voci
+    VOCI.forEach(v => {
+      const card = document.getElementById(v.id);
+      const btn = document.getElementById('toggle-' + v.id.replace('voce-',''));
+      const isDisabled = stato.vociDisabled && stato.vociDisabled.includes(v.id);
+      card.classList.toggle('disabled', isDisabled);
+      card.classList.toggle('open', stato.vociOpen ? stato.vociOpen.includes(v.id) : true);
+      btn.classList.toggle('on', !isDisabled);
+    });
+    // Restore esclusioni
+    if (stato.esclusioniSalvate) {
+      esclusioniAttive = new Set(stato.esclusioniSalvate);
+      buildEsclusioni();
+    }
+    buildSidebarVoci();
+    // Sync committente name
+    const nome = document.getElementById('committente-nome').value || '—';
+    document.getElementById('firma-committente-nome').textContent = nome;
+    document.getElementById('firma-committente-nome2').textContent = nome;
+    // Ricalcola importi pagamenti
+    calcolaPagamenti();
+  }
+
+  // ── SALVA ─────────────────────────────────────────────────────
+  function salvaFile() {
+    const name = document.getElementById('save-name').value.trim();
+    if (!name) { showToast('⚠ Inserisci un nome per il contratto', 'error'); return; }
+    const payload = {
+      _app: 'acqualab-contratto',
+      _version: 1,
+      name,
+      stato: raccogliStato()
+    };
+    const blob = new Blob([JSON.stringify(payload, null, 2)], {type:'application/json'});
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = name.replace(/[^a-zA-Z0-9_]/g,'_') + '_contratto.json';
+    a.click();
+    URL.revokeObjectURL(url);
+    // Salva anche in localStorage
+    try {
+      const key = 'acqualab_contratti';
+      const saved = JSON.parse(localStorage.getItem(key) || '{}');
+      saved[name] = payload;
+      localStorage.setItem(key, JSON.stringify(saved));
+    } catch(e) {}
+    showToast('✓ Contratto "' + name + '" salvato', 'success');
+  }
+
+  function escHtml(s) { return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+  // ── ALLEGATI ──────────────────────────────────────────────────
+  let allegati = [];
+
+  function handleAllegatiInput(input) {
+    Array.from(input.files).forEach(f => aggiungiAllegato(f));
+    input.value = '';
+  }
+
+  function handleAllegatiDrop(e) {
+    e.preventDefault();
+    document.getElementById('allegati-drop-zone').classList.remove('dragover');
+    Array.from(e.dataTransfer.files).forEach(f => {
+      if (f.type.match(/image\/(jpeg|png)|application\/pdf/i) || f.name.match(/\.(pdf|jpg|jpeg|png)$/i)) aggiungiAllegato(f);
+    });
+  }
+
+  function aggiungiAllegato(file) {
+    const reader = new FileReader();
+    reader.onload = function(e) {
+      allegati.push({ id: Date.now() + Math.random(), name: file.name, type: file.type, size: file.size, dataUrl: e.target.result });
+      allegati.sort((a, b) => a.name.localeCompare(b.name, 'it', {numeric: true}));
+      renderAllegati();
+    };
+    reader.readAsDataURL(file);
+  }
+
+  function rimuoviAllegato(id) {
+    allegati = allegati.filter(a => a.id !== id);
+    renderAllegati();
+  }
+
+  function renderAllegati() {
+    const list = document.getElementById('allegati-list');
+    const count = document.getElementById('allegati-count');
+    count.style.display = allegati.length ? '' : 'none';
+    count.textContent = allegati.length;
+    if (!allegati.length) { list.innerHTML = ''; }
+    else {
+      list.innerHTML = allegati.map(a => {
+        const isPdf = a.type === 'application/pdf' || a.name.match(/\.pdf$/i);
+        const sizeStr = a.size > 1024*1024 ? (a.size/1024/1024).toFixed(1)+' MB' : Math.round(a.size/1024)+' KB';
+        const thumb = isPdf ? '<div class="allegato-thumb-pdf">PDF</div>' : '<img class="allegato-thumb" src="' + a.dataUrl + '" alt="">';
+        return '<div class="allegato-item">' + thumb +
+          '<div class="allegato-info"><div class="allegato-name">' + escHtml(a.name) + '</div><div class="allegato-meta">' + sizeStr + (isPdf ? ' · PDF' : ' · Immagine') + '</div></div>' +
+          '<button class="allegato-del" onclick="rimuoviAllegato(' + a.id + ')" title="Rimuovi">✕</button></div>';
+      }).join('');
+    }
+    // Auto-popola la lista allegati nella sezione Firme
+    const lista = document.getElementById('allegati-lista');
+    if (lista) {
+      const lettere = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+      // Calcola prefisso comune tra tutti i nomi file e lo rimuove
+      const nomi = allegati.map(a => a.name.replace(/\.[^.]+$/, ''));
+      let prefisso = nomi.length > 1 ? nomi[0] : '';
+      if (nomi.length > 1) {
+        for (let n of nomi) {
+          while (prefisso && !n.startsWith(prefisso)) {
+            prefisso = prefisso.slice(0, -1);
+          }
+        }
+        // Taglia anche separatori finali (spazi, trattini, underscore)
+        prefisso = prefisso.replace(/[-_\s]+$/, '');
+      } else {
+        prefisso = '';
+      }
+      lista.value = nomi.map((nome, i) => {
+        const pulito = prefisso ? nome.slice(prefisso.length).replace(/^[-_\s]+/, '') : nome;
+        return '\u2022 All. ' + (lettere[i] || (i+1)) + ' \u2014 ' + (pulito || nome);
+      }).join('\n');
+    }
+  }
+
+  async function aggiornaPrintZone() {
+    const zone = document.getElementById('allegati-print-zone');
+    zone.innerHTML = '';
+    for (const a of allegati) {
+      const isPdf = a.type === 'application/pdf' || a.name.match(/\.pdf$/i);
+      if (isPdf) {
+        try {
+          pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+          const arr = new Uint8Array(atob(a.dataUrl.split(',')[1]).split('').map(c => c.charCodeAt(0)));
+          const pdf = await pdfjsLib.getDocument({data: arr}).promise;
+          for (let p = 1; p <= pdf.numPages; p++) {
+            const page = await pdf.getPage(p);
+            const viewport = page.getViewport({scale: 2.0});
+            const canvas = document.createElement('canvas');
+            canvas.width = viewport.width; canvas.height = viewport.height;
+            canvas.style.maxWidth = '100%'; canvas.style.maxHeight = '100vh';
+            canvas.style.width = 'auto'; canvas.style.height = 'auto';
+            await page.render({canvasContext: canvas.getContext('2d'), viewport}).promise;
+            const div = document.createElement('div');
+            div.className = 'allegato-print-page';
+            div.appendChild(canvas);
+            zone.appendChild(div);
+          }
+        } catch(e) {
+          console.error('PDF render error', e);
+          const errDiv = document.createElement('div');
+          errDiv.className = 'allegato-print-page';
+          errDiv.style.cssText = 'display:flex;align-items:center;justify-content:center;font-size:12pt;color:#888;';
+          errDiv.textContent = '⚠ Errore rendering: ' + a.name;
+          zone.appendChild(errDiv);
+        }
+      } else {
+        const div = document.createElement('div');
+        div.className = 'allegato-print-page';
+        div.innerHTML = '<img src="' + a.dataUrl + '" alt="' + escHtml(a.name) + '">';
+        zone.appendChild(div);
+      }
+    }
+  }
+
+  // ── STAMPA ────────────────────────────────────────────────────
+  async function stampaProfessionale() {
+    const name = document.getElementById('save-name').value.trim();
+    const num = document.getElementById('contratto-num').value.trim();
+    document.getElementById('print-contratto-num').textContent = num || '';
+    document.getElementById('print-date').textContent = 'Stampato il ' + new Date().toLocaleDateString('it-IT', {day:'2-digit',month:'long',year:'numeric'});
+    // Expand all active voci for print
+    const vociEranOpen = new Set(VOCI.filter(v => document.getElementById(v.id).classList.contains('open')).map(v => v.id));
+    VOCI.forEach(v => { if (!document.getElementById(v.id).classList.contains('disabled')) document.getElementById(v.id).classList.add('open'); });
+    if (allegati.length > 0) {
+      showToast('⏳ Preparazione allegati...', '');
+      await aggiornaPrintZone();
+    }
+    // Convert textareas to divs so they expand to full content in print
+    const textareas = document.querySelectorAll('textarea');
+    const replacements = [];
+    textareas.forEach(ta => {
+      const div = document.createElement('div');
+      div.className = ta.className + ' textarea-print-div';
+      div.style.cssText = 'white-space:pre-wrap;height:auto;min-height:0;overflow:visible;';
+      div.textContent = ta.value;
+      ta.parentNode.insertBefore(div, ta);
+      ta.style.display = 'none';
+      replacements.push({ta, div});
+    });
+    window.print();
+    // Ripristina voci aperte
+    VOCI.forEach(v => {
+      const card = document.getElementById(v.id);
+      if (vociEranOpen.has(v.id)) card.classList.add('open');
+      else card.classList.remove('open');
+    });
+    // Restore textareas after print
+    replacements.forEach(({ta, div}) => {
+      ta.style.display = '';
+      div.remove();
+    });
+  }
+
+  // ── EXPORT JSON ───────────────────────────────────────────────
+  function importaJSON(input) {
+    const file = input.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = function(e) {
+      try {
+        const payload = JSON.parse(e.target.result);
+        if (payload._app !== 'acqualab-contratto') { showToast('⚠ File non valido', 'error'); return; }
+        if (payload.name) document.getElementById('save-name').value = payload.name;
+        if (payload.esclusioniAttive) {
+          esclusioniAttive = new Set(payload.esclusioniAttive);
+          buildEsclusioni();
+        }
+        applicaStato(payload.stato);
+        showToast('✓ Contratto "' + escHtml(payload.name) + '" importato', 'success');
+      } catch(err) {
+        showToast('⚠ Errore nel file JSON', 'error');
+      }
+    };
+    reader.readAsText(file);
+    input.value = '';
+  }
+
+
+  // ── INIT ─────────────
+  // ── INIT ─────────────────────────────────────────────────────
+  buildEsclusioni();
+  buildSidebarVoci();
+
+</script>
+</body>
+</html>
