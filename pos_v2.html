@@ -621,7 +621,19 @@ function raccogliStato() {
     var cells = tr.querySelectorAll('input.field-input');
     if (cells.length >= 3) lavs.push({ nome: cells[0].value, qual: cells[1].value, mans: cells[2].value });
   });
-  return { fields: fields, dpi: dpi, lavs: lavs, subappalto: chkSub ? chkSub.checked : false };
+  // Salva mansioni extra dinamiche
+  var mansExtra = [];
+  document.querySelectorAll('#mans-extra .field-row').forEach(function(row) {
+    var inp = row.querySelector('input.field-input'); var ta = row.querySelector('textarea');
+    mansExtra.push({ nome: inp ? inp.value : '', mans: ta ? ta.value : '' });
+  });
+  // Salva formazione extra dinamica
+  var formExtra = [];
+  document.querySelectorAll('#form-extra .field-row').forEach(function(row) {
+    var inp = row.querySelector('input.field-input'); var ta = row.querySelector('textarea');
+    formExtra.push({ nome: inp ? inp.value : '', form: ta ? ta.value : '' });
+  });
+  return { fields: fields, dpi: dpi, lavs: lavs, subappalto: chkSub ? chkSub.checked : false, mansExtra: mansExtra, formExtra: formExtra };
 }
 
 // ── APPLICA STATO ────────────────────────────────────────────
@@ -631,11 +643,49 @@ function applicaStato(s) {
   if (s.dpi) Object.entries(s.dpi).forEach(function(kv) { var el = document.getElementById('dpi-' + kv[0]); if (el) el.checked = kv[1]; });
   var chkSub = document.getElementById('chk-subappalto');
   if (chkSub && s.subappalto !== undefined) { chkSub.checked = s.subappalto; toggleSubappalto(); }
+  // Ripristina mansioni extra
+  if (s.mansExtra) {
+    document.getElementById('mans-extra').innerHTML = '';
+    s.mansExtra.forEach(function(m) {
+      addMansione();
+      var rows = document.querySelectorAll('#mans-extra .field-row');
+      var row = rows[rows.length - 1];
+      var inp = row.querySelector('input.field-input'); var ta = row.querySelector('textarea');
+      if (inp) inp.value = m.nome; if (ta) ta.value = m.mans;
+    });
+  }
+  // Ripristina formazione extra
+  if (s.formExtra) {
+    document.getElementById('form-extra').innerHTML = '';
+    s.formExtra.forEach(function(f) {
+      addFormazione();
+      var rows = document.querySelectorAll('#form-extra .field-row');
+      var row = rows[rows.length - 1];
+      var inp = row.querySelector('input.field-input'); var ta = row.querySelector('textarea');
+      if (inp) inp.value = f.nome; if (ta) ta.value = f.form;
+    });
+  }
   if (s.lavs) {
     var tbody = document.getElementById('lav-tbody'); tbody.innerHTML = '';
     s.lavs.forEach(function(l) {
       var tr = document.createElement('tr');
-      tr.innerHTML = '<td><input class="field-input" value="' + l.nome + '"></td><td><input class="field-input" value="' + l.qual + '"></td><td><input class="field-input" value="' + l.mans + '"></td><td><button class="del-row-btn" onclick="this.closest(&quot;tr&quot;).remove()">&#10005;</button></td>';
+      ['', l.nome, l.qual, l.mans, ''].forEach(function(v, ci) {
+        if (ci === 0 || ci === 4) return;
+        var td = document.createElement('td');
+        if (ci < 4) { var inp = document.createElement('input'); inp.className = 'field-input'; inp.value = v; td.appendChild(inp); }
+        else { var btn = document.createElement('button'); btn.className = 'del-row-btn'; btn.textContent = '✕'; btn.onclick = function(){ this.closest('tr').remove(); }; td.appendChild(btn); }
+        tr.appendChild(td);
+      });
+      // Ricostruisce correttamente
+      tr.innerHTML = '';
+      [l.nome, l.qual, l.mans].forEach(function(v) {
+        var td = document.createElement('td'); var inp = document.createElement('input');
+        inp.className = 'field-input'; inp.value = v; td.appendChild(inp); tr.appendChild(td);
+      });
+      var tdBtn = document.createElement('td'); var btn = document.createElement('button');
+      btn.className = 'del-row-btn'; btn.textContent = '✕';
+      btn.addEventListener('click', function(){ this.closest('tr').remove(); });
+      tdBtn.appendChild(btn); tr.appendChild(tdBtn);
       tbody.appendChild(tr);
     });
   }
@@ -673,8 +723,7 @@ function posTogglePanel() {
   var panel = document.getElementById('pos-allegati-panel');
   if (panel.style.display === 'none' || !panel.style.display) {
     panel.style.display = 'block';
-    // Se non ci sono ancora allegati, apri subito il file picker
-    if (!posAllegati.length) document.getElementById('pos-file-input').click();
+    // Non apriamo automaticamente il picker — l'utente usa il pulsante dedicato
   } else {
     panel.style.display = 'none';
   }
@@ -687,7 +736,7 @@ function posHandleInput(input) {
 function posHandleDrop(e) {
   e.preventDefault();
   Array.from(e.dataTransfer.files).forEach(function(f){
-    if (f.type.match(/pdf|jpeg|jpg|png/i) || f.name.match(/\.pdf$/i)) posAggiungi(f);
+    if (f.type.match(/image\/(jpeg|png)|application\/pdf/i) || f.name.match(/\.(pdf|jpg|jpeg|png)$/i)) posAggiungi(f);
   });
 }
 function posAggiungi(file) {
@@ -782,6 +831,12 @@ async function stampaPOS() {
   // Aggiorna print zone allegati
   if (posAllegati.length) { showToast('Preparazione allegati...'); await posAggiornaPrintZone(); }
 
+  // Nasconde sidebar e toolbar per la stampa
+  var sidebar = document.querySelector('.sidebar');
+  var toolbar = document.querySelector('.toolbar');
+  var sidebarPrevDisplay = '', toolbarPrevDisplay = '';
+  if (sidebar) { sidebarPrevDisplay = sidebar.style.display; sidebar.style.display = 'none'; }
+  if (toolbar) { toolbarPrevDisplay = toolbar.style.display; toolbar.style.display = 'none'; }
   // Mostra print-header
   var ph = document.querySelector('.print-header');
   if (ph) ph.style.display = 'flex';
