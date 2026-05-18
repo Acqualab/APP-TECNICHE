@@ -107,8 +107,17 @@ input[type=checkbox]{width:15px;height:15px;cursor:pointer;accent-color:var(--bl
         <input type="text" id="inp-offerta" placeholder="es. 2024/001" style="height:30px;width:110px;font-size:12px;padding:0 8px;border:0.5px solid var(--border2);border-radius:var(--radius);background:var(--bg);color:var(--text);font-family:var(--font)">
       </div>
     </div>
-    <div style="display:flex;align-items:center;gap:10px">
+    <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
       <span class="norm-badge">UNI 9182:2010</span>
+      <button class="print-btn" onclick="salvaProgetto()" style="background:var(--green)">
+        <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M2 2h9l3 3v9H2z"/><rect x="5" y="9" width="6" height="5"/><rect x="5" y="2" width="5" height="3"/></svg>
+        Salva progetto
+      </button>
+      <label class="print-btn" style="background:var(--blue);cursor:pointer">
+        <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M14 10v3a1 1 0 01-1 1H3a1 1 0 01-1-1v-3"/><path d="M8 2v8m-3-3l3 3 3-3"/></svg>
+        Carica progetto
+        <input type="file" id="inp-carica" accept=".json" style="display:none" onchange="caricaProgetto(this)">
+      </label>
       <button class="print-btn" onclick="window.print()">
         <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="8" width="10" height="6" rx="1"/><path d="M5 8V3h6v5"/><path d="M3 8h10a1 1 0 011 1v2H2V9a1 1 0 011-1z"/></svg>
         Stampa / PDF
@@ -558,6 +567,72 @@ function mc(label,val,unit,sub){
 // Ensure all elements including those in hidden tabs are available
 window.addEventListener('DOMContentLoaded', function(){ renderTable(); });
 if(document.readyState !== 'loading') renderTable();
+
+// ─── SALVA PROGETTO ──────────────────────────────────────────────────────────
+function salvaProgetto(){
+  const stato = {
+    version: '1.0',
+    savedAt: new Date().toISOString(),
+    cliente: document.getElementById('inp-cliente')?.value || '',
+    data:    document.getElementById('inp-data')?.value    || '',
+    offerta: document.getElementById('inp-offerta')?.value || '',
+    tipo:    document.getElementById('sel-tipo')?.value    || 'res',
+    cond:    document.getElementById('sel-cond')?.value    || 'ric',
+    dn:      document.getElementById('sel-dn')?.value      || '25',
+    utenti:  document.getElementById('inp-utenti')?.value  || '4',
+    consumo: document.getElementById('inp-consumo')?.value || '150',
+    trit:    document.getElementById('inp-trit')?.value    || '45',
+    apparecchi: APPARECCHI.map(a => ({nome: a.nome, n: a.n, on: a.on}))
+  };
+  const blob = new Blob([JSON.stringify(stato, null, 2)], {type:'application/json'});
+  const url  = URL.createObjectURL(blob);
+  const link = document.createElement('a');
+  const nome = (stato.cliente ? stato.cliente.replace(/\s+/g,'_') + '_' : '') +
+               (stato.offerta ? stato.offerta.replace(/\//g,'-') + '_' : '') +
+               'portata.json';
+  link.href = url; link.download = nome;
+  document.body.appendChild(link); link.click();
+  document.body.removeChild(link); URL.revokeObjectURL(url);
+}
+
+// ─── CARICA PROGETTO ─────────────────────────────────────────────────────────
+function caricaProgetto(input){
+  const file = input.files[0];
+  if(!file) return;
+  const reader = new FileReader();
+  reader.onload = function(e){
+    try {
+      const stato = JSON.parse(e.target.result);
+      // Ripristina i campi header
+      const set = (id, val) => { const el = document.getElementById(id); if(el) el.value = val || ''; };
+      set('inp-cliente', stato.cliente);
+      set('inp-data',    stato.data);
+      set('inp-offerta', stato.offerta);
+      set('sel-tipo',    stato.tipo);
+      set('sel-cond',    stato.cond);
+      set('sel-dn',      stato.dn);
+      set('inp-utenti',  stato.utenti);
+      set('inp-consumo', stato.consumo);
+      set('inp-trit',    stato.trit);
+      // Ripristina apparecchi
+      if(Array.isArray(stato.apparecchi)){
+        stato.apparecchi.forEach(s => {
+          const idx = APPARECCHI.findIndex(a => a.nome === s.nome);
+          if(idx >= 0){ APPARECCHI[idx].n = s.n || 0; APPARECCHI[idx].on = !!s.on; }
+        });
+      }
+      // Aggiorna UI
+      onTipoChange();
+      renderTable();
+      input.value = ''; // reset input per consentire ricaricamento dello stesso file
+      alert('✅ Progetto caricato correttamente.');
+    } catch(err) {
+      alert('❌ File non valido. Assicurati di caricare un file .json salvato da questa applicazione.');
+    }
+  };
+  reader.readAsText(file);
+}
+
 </script>
 </body>
 </html>
