@@ -564,9 +564,47 @@ function mc(label,val,unit,sub){
   </div>`;
 }
 
+// ─── AZZERA TUTTO ALL'APERTURA ───────────────────────────────────────────────
+function resetTutto(){
+  // Campi header
+  const set = (id, val) => { const el = document.getElementById(id); if(el) el.value = val; };
+  set('inp-cliente', '');
+  set('inp-data',    '');
+  set('inp-offerta', '');
+  // Scheda Parametri
+  set('sel-tipo',    'res');
+  set('inp-appart',  '4');
+  set('inp-utenti',  '4');
+  set('inp-consumo', '150');
+  set('sel-dn',      '25');
+  set('inp-trit',    '45');
+  // Scheda Apparecchi – ripristina valori di default
+  const DEFAULT = [
+    {n:1, on:true},  // Lavabo
+    {n:1, on:true},  // Lavello cucina
+    {n:1, on:true},  // WC a cassetta
+    {n:0, on:false}, // WC a flussometro
+    {n:1, on:true},  // Vasca da bagno
+    {n:1, on:true},  // Doccia
+    {n:1, on:true},  // Bidet
+    {n:1, on:true},  // Lavatrice
+    {n:1, on:true},  // Lavastoviglie
+    {n:0, on:false}, // Lavatoio / lavandino
+    {n:1, on:true},  // Rubinetto esterno DN 15
+    {n:0, on:false}, // Idrante antincendio DN 45
+    {n:0, on:false}, // Abbeveratoio / stalla
+    {n:0, on:false}, // Fontanella
+  ];
+  DEFAULT.forEach((d, i) => { if(APPARECCHI[i]){ APPARECCHI[i].n = d.n; APPARECCHI[i].on = d.on; } });
+  // Mostra prima scheda e aggiorna UI
+  showTab('tab-parametri');
+  onTipoChange();
+  renderTable();
+}
+
 // Ensure all elements including those in hidden tabs are available
-window.addEventListener('DOMContentLoaded', function(){ renderTable(); });
-if(document.readyState !== 'loading') renderTable();
+window.addEventListener('DOMContentLoaded', function(){ resetTutto(); });
+if(document.readyState !== 'loading') resetTutto();
 
 // ─── SALVA PROGETTO ──────────────────────────────────────────────────────────
 function salvaProgetto(){
