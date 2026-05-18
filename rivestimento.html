@@ -557,8 +557,7 @@ function calcola(){
   var mlEff=nBarre*lunghBarra;
   var sfrido=n2(mlEff-perimetroTot);
   var nChiodiProfilo=Math.ceil(perimetroTot/passoChiodi);
-  // Chiodi platea: griglia su area platee (1 chiodo ogni passo² m²)
-  var nChiodiPlatea=Math.ceil(areaPlateeNette/(passoChiodi*passoChiodi));
+  var nChiodiPlatea=Math.ceil(perimetroTot/passoChiodi);
   var nChiodi=nChiodiProfilo+nChiodiPlatea;
   var nSilicone=Math.ceil(perimetroTot/passoSilicone);
   var litriTreatment=Math.ceil(areaPlateeNette/rendTreatment);
