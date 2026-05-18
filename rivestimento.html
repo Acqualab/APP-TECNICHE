@@ -1,0 +1,780 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Acqualab — Rivestimento Piscina v1</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{--c1:#2c3e50;--c2:#f7f4ef;--c3:#e8e2d6;--gn:#27ae60;--gn2:#eafaf1;--gndk:#1a5c35;--rd:#e74c3c;--rd2:#fdf2f0;--bl:#2980b9;--bl2:#eaf2fa;--or:#e67e22;--tx:#3c2f22;--bdr:#d5cfc6;--r:10px}
+body{font-family:'Avenir Next','Segoe UI',system-ui,sans-serif;font-size:15px;color:var(--tx);background:var(--c2);min-height:100vh}
+h2{font-size:.92rem;color:var(--c1);border-bottom:2px solid var(--c3);padding-bottom:5px;margin-bottom:10px;font-weight:700}
+.app{display:grid;grid-template-columns:265px 1fr;min-height:100vh}
+.sidebar{background:var(--c1);color:#fff;display:flex;flex-direction:column}
+.sidebar-header{padding:18px 16px 14px;border-bottom:1px solid rgba(255,255,255,.1)}
+.sidebar-logo{font-size:1.1rem;font-weight:800;letter-spacing:1.5px;margin-bottom:2px}
+.sidebar-sub{font-size:.6rem;opacity:.55;line-height:1.4}
+.sidebar-body{flex:1;overflow-y:auto;padding:14px 12px}
+.sidebar-footer{padding:12px;border-top:1px solid rgba(255,255,255,.1);display:flex;flex-direction:column;gap:5px}
+.proj-btn{width:100%;padding:9px 12px;background:var(--gn);color:#fff;border:none;border-radius:8px;font-size:.78rem;font-weight:700;cursor:pointer;font-family:inherit;margin-bottom:10px}
+.proj-btn:hover{background:#1e8449}
+.proj-section-label{font-size:.58rem;font-weight:700;letter-spacing:.08em;opacity:.45;text-transform:uppercase;margin:6px 0 5px 2px}
+.project-list{display:flex;flex-direction:column;gap:3px}
+.project-item{padding:8px 10px;border-radius:7px;cursor:pointer;font-size:.74rem;border:1px solid transparent;transition:all .15s;color:rgba(255,255,255,.75)}
+.project-item:hover{background:rgba(255,255,255,.1);color:#fff}
+.project-item.active{background:rgba(255,255,255,.15);border-color:rgba(255,255,255,.2);color:#fff}
+.proj-name{font-weight:700}.proj-date{font-size:.62rem;opacity:.55;margin-top:1px}
+.proj-del{font-size:.6rem;color:#e87c7c;cursor:pointer;opacity:.7;margin-top:3px;display:inline-block}
+.proj-del:hover{opacity:1}
+.sio-btn{display:block;width:100%;padding:7px 10px;background:transparent;color:rgba(255,255,255,.65);border:1px solid rgba(255,255,255,.18);border-radius:6px;font-size:.68rem;font-weight:600;cursor:pointer;font-family:inherit;text-align:center}
+.sio-btn:hover{background:rgba(255,255,255,.1);color:#fff}
+.main{display:flex;flex-direction:column;min-height:100vh}
+.main-header{background:#fff;border-bottom:1px solid var(--c3);padding:12px 22px;display:flex;align-items:center;justify-content:space-between;gap:12px}
+.main-title{font-size:.98rem;font-weight:700;color:var(--c1)}
+.main-sub{font-size:.68rem;color:#999;margin-top:1px}
+.header-actions{display:flex;gap:7px;flex-shrink:0}
+.btn{display:inline-flex;align-items:center;gap:5px;padding:7px 13px;border-radius:7px;border:1.5px solid var(--bdr);background:#fff;cursor:pointer;font-size:.74rem;font-weight:700;color:var(--tx);transition:all .15s;font-family:inherit}
+.btn:hover{background:var(--c2)}.btn:active{transform:scale(.98)}
+.btn-gn{background:var(--gn);color:#fff;border-color:var(--gn)}.btn-gn:hover{background:#1e8449}
+.btn-c1{background:var(--c1);color:#fff;border-color:var(--c1)}.btn-c1:hover{background:#1a252f}
+.btn-bl{background:var(--bl);color:#fff;border-color:var(--bl)}.btn-bl:hover{background:#1a6595}
+.btn-rd{color:var(--rd);border-color:#f1a9a0;background:#fff}.btn-rd:hover{background:var(--rd2)}
+.btn-sm{padding:5px 10px;font-size:.7rem}
+.btn-full{width:100%;justify-content:center;margin-top:6px}
+.tabs{display:flex;border-bottom:2px solid var(--c3);padding:0 22px;background:#fff}
+.tab{padding:10px 16px;font-size:.75rem;font-weight:700;cursor:pointer;border-bottom:3px solid transparent;color:#aaa;transition:all .15s;font-family:inherit;background:none;border-top:none;border-left:none;border-right:none;margin-bottom:-2px}
+.tab.active{color:var(--c1);border-bottom-color:var(--gn)}.tab:hover{color:var(--c1)}
+.main-body{flex:1;padding:18px 22px}
+.panel{display:none}.panel.active{display:block}
+.card{background:#fff;border:1px solid var(--c3);border-radius:var(--r);padding:16px;margin-bottom:12px;box-shadow:0 1px 4px rgba(44,62,80,.05)}
+.grid-2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.grid-3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+.field{display:flex;flex-direction:column;gap:4px}
+.field label{font-size:.68rem;font-weight:700;color:#5a4a3c}
+.field input,.field select,.field textarea{padding:7px 9px;border:1.5px solid var(--c3);border-radius:6px;font-size:.84rem;font-family:inherit;color:var(--tx);background:var(--c2);transition:border-color .15s}
+.field input:focus,.field select:focus,.field textarea:focus{outline:none;border-color:var(--gn);box-shadow:0 0 0 3px rgba(39,174,96,.1)}
+.field textarea{resize:vertical;min-height:50px}
+.field .hint{font-size:.6rem;color:#bbb;margin-top:2px}
+.toggle-row{display:flex;align-items:center;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--c3)}
+.toggle-row:last-child{border-bottom:none}
+.toggle-label{font-size:.8rem;font-weight:700;color:var(--tx)}
+.toggle-sub{font-size:.66rem;color:#aaa;margin-top:1px}
+.switch{width:38px;height:21px;background:#ccc;border-radius:11px;cursor:pointer;position:relative;transition:background .2s;flex-shrink:0}
+.switch.on{background:var(--gn)}
+.switch::after{content:'';position:absolute;top:3px;left:3px;width:15px;height:15px;background:#fff;border-radius:50%;transition:left .2s}
+.switch.on::after{left:20px}
+.section-zone{border:1px solid var(--c3);border-radius:8px;padding:14px;margin-bottom:10px;background:var(--c2)}
+.zone-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+.zone-title{font-size:.82rem;font-weight:700;color:var(--c1)}
+.zone-badge{font-size:.6rem;padding:2px 7px;border-radius:5px;background:var(--bl2);color:#1a5276;font-weight:700;margin-left:7px}
+.metric{background:var(--c2);border-radius:8px;padding:12px;text-align:center}
+.metric-val{font-size:1.25rem;font-weight:800;color:var(--c1);font-family:'Courier New',monospace}
+.metric-lbl{font-size:.66rem;color:#999;margin-top:3px}
+.result-table{width:100%;border-collapse:collapse;font-size:.75rem}
+.result-table th{text-align:left;padding:6px 8px;background:var(--c3);color:var(--c1);font-weight:700;font-size:.68rem}
+.result-table td{padding:6px 8px;border-bottom:1px solid var(--c3);vertical-align:top}
+.result-table tr:last-child td{border-bottom:none}
+.result-table .num{text-align:right;font-family:'Courier New',monospace;font-weight:700}
+.result-table .total-row td{font-weight:700;background:var(--gn2);color:var(--gndk)}
+.alert{padding:8px 12px;border-radius:7px;font-size:.73rem;margin-bottom:10px;border-left:3px solid}
+.alert-info{background:var(--bl2);color:#1a5276;border-color:var(--bl)}
+.alert-warn{background:#fdebd0;color:#7d4e0e;border-color:var(--or)}
+.alert-gn{background:var(--gn2);color:var(--gndk);border-color:var(--gn)}
+.alert-rd{background:var(--rd2);color:#7d1a1a;border-color:var(--rd)}
+.tag{display:inline-block;padding:1px 6px;border-radius:4px;font-size:.6rem;font-weight:700}
+.tag-antisd{background:#fdebd0;color:#7d4e0e}
+.tag-warn{background:#fdedeb;color:#922b21}
+.drop-zone{border:2px dashed var(--c3);border-radius:8px;padding:20px 12px;text-align:center;cursor:pointer;background:var(--c2);transition:border-color .2s;margin-bottom:10px}
+.drop-zone:hover{border-color:var(--gn)}
+.nb{background:var(--c2);border-left:4px solid var(--c1);padding:10px 12px;margin:8px 0;font-size:.73rem;border-radius:0 var(--r) var(--r) 0;line-height:1.6;color:var(--tx)}
+.empty-state{text-align:center;padding:40px 16px;color:#bbb;font-size:.78rem}
+.rot-box{margin-bottom:10px;padding:10px;background:var(--c2);border-radius:8px;border:1px solid var(--c3)}
+.rot-hd{display:flex;justify-content:space-between;margin-bottom:6px}
+.rot-title{font-weight:700;font-size:.82rem;color:var(--c1)}
+.rot-sub{font-size:.72rem;color:#888}
+@media(max-width:720px){.app{grid-template-columns:1fr}.sidebar{display:none}.grid-3{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media print{
+  .print-header{display:flex!important}
+  
+  *{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  .sidebar,.tabs,.header-actions,.nav-btns{display:none!important}
+  .app{display:block}
+  .main{display:block}
+  .main-header{display:none}
+  .main-body{padding:0}
+  .panel{display:none!important}
+  .panel#panel-report{display:block!important}
+  #panel-report .nav-btns{display:none!important}
+  .card{box-shadow:none;border:1px solid #ccc;break-inside:avoid;margin-bottom:10px;page-break-inside:avoid}
+  .metric{background:#f0ede6!important;border:1px solid #ccc}
+  .result-table th{background:#e8e2d6!important}
+  .result-table .total-row td{background:#eafaf1!important;color:#1a5c35!important}
+  .rot-box{background:#f7f4ef!important;border:1px solid #ccc}
+  .alert-gn{background:#eafaf1!important;color:#1a5c35!important}
+  .alert-info{background:#eaf2fa!important;color:#1a5276!important}
+  .nb{background:#f5f0e8!important}
+  @page{
+    size:A4;
+    margin:1.5cm 1.8cm 2cm 1.8cm;
+    @top-center{
+      content:'ACQUALAB srl — Rivestimento Piscina';
+      font-family:'Avenir Next','Segoe UI',sans-serif;
+      font-size:8pt;
+      color:#888;
+    }
+    @bottom-center{
+      content:counter(page) ' / ' counter(pages);
+      font-family:'Avenir Next','Segoe UI',sans-serif;
+      font-size:8pt;
+      color:#888;
+    }
+  }
+}
+</style>
+</head>
+<body>
+<div class="app">
+<div class="sidebar">
+  <div class="sidebar-header">
+    <div class="sidebar-logo">ACQUALAB</div>
+    <div class="sidebar-sub">Master Pool Building<br>Rivestimento membrana PVC v1</div>
+  </div>
+  <div class="sidebar-body">
+    <button class="proj-btn" onclick="nuovoProgetto()">+ Nuovo progetto</button>
+    <div class="proj-section-label">Progetti salvati</div>
+    <div class="project-list" id="projectList"><div class="empty-state">Nessun progetto</div></div>
+  </div>
+  <div class="sidebar-footer">
+    <button class="sio-btn" onclick="esportaJSON()">Esporta JSON</button>
+    <label class="sio-btn" style="cursor:pointer">Importa JSON<input type="file" accept=".json" style="display:none" onchange="importaJSON(event)"></label>
+  </div>
+</div>
+
+<div class="main">
+  <div class="main-header">
+    <div>
+      <div class="main-title" id="mainTitle">Nuovo progetto</div>
+      <div class="main-sub" id="mainSub">Inserisci i dati della piscina</div>
+    </div>
+    <div class="header-actions">
+      <button class="btn btn-sm" onclick="salvaProgetto()">Salva</button>
+      <button class="btn btn-sm btn-c1" onclick="showTab('report')">Report</button>
+      <button class="btn btn-sm btn-bl" onclick="window.print()">Stampa</button>
+    </div>
+  </div>
+  <div class="tabs">
+    <button class="tab active" onclick="showTab('dati')">Dati generali</button>
+    <button class="tab" onclick="showTab('vasca')">Vasca e disegno</button>
+    <button class="tab" onclick="showTab('membrana')">Membrana</button>
+    <button class="tab" onclick="showTab('zone')">Zone speciali</button>
+    <button class="tab" onclick="showTab('report')">Report</button>
+  </div>
+  <div class="main-body">
+
+    <div class="panel active" id="panel-dati">
+      <div class="card"><h2>Dati progetto</h2>
+        <div class="grid-2">
+          <div class="field"><label>Cliente</label><input type="text" id="cliente"></div>
+          <div class="field"><label>Nome progetto</label><input type="text" id="nomeProgetto" placeholder="es. Villa Rossi"></div>
+          <div class="field"><label>Indirizzo</label><input type="text" id="indirizzo"></div>
+          <div class="field"><label>Data</label><input type="date" id="dataProgetto"></div>
+          <div class="field" style="grid-column:span 2"><label>Note</label><textarea id="note" rows="2"></textarea></div>
+        </div>
+      </div>
+      <div class="nav-btns" style="display:flex;justify-content:flex-end;margin-top:4px">
+        <button class="btn btn-gn" onclick="showTab('vasca')">Vasca e disegno →</button>
+      </div>
+    </div>
+
+    <div class="panel" id="panel-vasca">
+      <div class="card"><h2>Disegno quotato</h2>
+        <div class="alert alert-info">Carica la pianta o la sezione quotata: Claude estrae le quote automaticamente.</div>
+        <div style="margin-bottom:10px">
+          <label style="font-size:.68rem;font-weight:700;color:#5a4a3c;display:block;margin-bottom:4px">API Key Anthropic</label>
+          <div style="display:flex;gap:8px;align-items:center">
+            <input type="password" id="apiKey" placeholder="sk-ant-..." style="flex:1;padding:7px 9px;border:1.5px solid var(--c3);border-radius:6px;font-size:.84rem;font-family:monospace;background:var(--c2);color:var(--tx)" oninput="localStorage.setItem('acqualab_apikey',this.value)">
+            <button class="btn btn-sm" onclick="toggleApiKey()" id="btnShowKey">Mostra</button>
+          </div>
+          <div style="font-size:.62rem;color:#aaa;margin-top:3px">La chiave non viene inviata altrove. <a href="https://console.anthropic.com/settings/keys" target="_blank" style="color:var(--bl)">Ottieni la tua chiave →</a></div>
+        </div>
+        <div class="drop-zone" id="dropZone" onclick="document.getElementById('fileDisegno').click()" ondragover="event.preventDefault();this.style.borderColor='var(--gn)'" ondragleave="this.style.borderColor=''" ondrop="handleDrop(event)">
+          <div id="dropContent">
+            <div style="font-size:1.8rem;opacity:.2;margin-bottom:6px">+</div>
+            <div style="font-size:.76rem;color:#aaa">Clicca o trascina il disegno qui</div>
+            <div style="font-size:.64rem;color:#ccc;margin-top:3px">JPG, PNG — max 10 MB</div>
+          </div>
+        </div>
+        <input type="file" id="fileDisegno" accept="image/*" style="display:none" onchange="caricaDisegno(event)">
+        <div id="aiSection" style="display:none">
+          <button class="btn btn-gn btn-full" id="btnAnalizza" onclick="analizzaDisegno()">Analizza disegno con AI</button>
+          <div id="aiStatus" style="font-size:.7rem;color:#888;margin-top:6px;min-height:16px"></div>
+        </div>
+      </div>
+      <div class="card"><h2>Dimensioni vasca principale</h2>
+        <div class="grid-3">
+          <div class="field"><label>Lunghezza (m)</label><input type="number" id="vL" value="9" step="0.05" oninput="aggiornaPreview()"></div>
+          <div class="field"><label>Larghezza (m)</label><input type="number" id="vW" value="5" step="0.05" oninput="aggiornaPreview()"></div>
+          <div class="field"><label>Profondità (m)</label><input type="number" id="vH" value="1.6" step="0.05" oninput="aggiornaPreview()"></div>
+        </div>
+        <div style="background:var(--c2);border-radius:7px;padding:10px;margin-top:10px;display:grid;grid-template-columns:repeat(3,1fr);gap:8px;text-align:center">
+          <div><div style="font-size:.65rem;color:#aaa">Fondo</div><div style="font-weight:700;font-size:.88rem;color:var(--c1)" id="prevFondo">—</div></div>
+          <div><div style="font-size:.65rem;color:#aaa">Perimetro</div><div style="font-weight:700;font-size:.88rem;color:var(--c1)" id="prevPerim">—</div></div>
+          <div><div style="font-size:.65rem;color:#aaa">Pareti</div><div style="font-weight:700;font-size:.88rem;color:var(--c1)" id="prevPareti">—</div></div>
+        </div>
+        <div id="noteDisegnoBox" style="display:none;margin-top:8px">
+          <div class="nb"><b>Note AI:</b><br><span id="noteDisegnoText"></span></div>
+        </div>
+      </div>
+      <div class="nav-btns" style="display:flex;justify-content:space-between;margin-top:4px">
+        <button class="btn" onclick="showTab('dati')">← Dati generali</button>
+        <button class="btn btn-gn" onclick="showTab('membrana')">Membrana →</button>
+      </div>
+    </div>
+
+    <div class="panel" id="panel-membrana">
+      <div class="card"><h2>Tipo di membrana</h2>
+        <div class="grid-2">
+          <div class="field"><label>Membrana</label>
+            <select id="tipoMembrana" onchange="aggiornaMembrana()">
+              <option value="3d" selected>Membrana 3D</option>
+              <option value="standard">Standard liscia</option>
+            </select>
+          </div><div></div>
+        </div>
+        <div id="membranaNote" class="alert alert-gn" style="margin-top:10px">Membrana 3D: antisdrucciolo non richiesto.</div>
+      </div>
+      <div class="card"><h2>Parametri rotolo</h2>
+        <div class="grid-3">
+          <div class="field"><label>Altezza rotolo (m)</label><input type="number" id="roloH" value="1.65" step="0.05"><div class="hint">Standard: 1,65 m</div></div>
+          <div class="field"><label>Lunghezza rotolo (m)</label><input type="number" id="roloL" value="25" step="1"><div class="hint">Standard: 25 m</div></div>
+          <div class="field"><label>Sormonto saldatura (cm)</label><input type="number" id="sorm" value="5" step="1"></div>
+        </div>
+      </div>
+      <div class="card"><h2>Tecnica di posa</h2>
+        <div class="toggle-row">
+          <div><div class="toggle-label">Posa forme libere</div><div class="toggle-sub">Ferzo parete si ripiega sul fondo, ferzo platea sormonta; saldatura nell'angolo</div></div>
+          <div class="switch on" id="switchForme" onclick="this.classList.toggle('on')"></div>
+        </div>
+      </div>
+      <div class="card"><h2>Profilo di ancoraggio</h2>
+        <div class="alert alert-info">Installato sul perimetro sotto il bordo. Chiodi ogni 50 cm, silicone ogni 5 m.</div>
+        <div class="grid-3">
+          <div class="field"><label>Lunghezza barre</label>
+            <select id="lunghBarra"><option value="3">Barre da 3 m</option><option value="2">Barre da 2 m</option></select>
+          </div>
+          <div class="field"><label>Passo chiodi (cm)</label><input type="number" id="passoChiodi" value="50" step="5"><div class="hint">1 ogni 50 cm</div></div>
+          <div class="field"><label>Silicone (m/tubo)</label><input type="number" id="passoSilicone" value="5" step="1"><div class="hint">1 tubo ogni 5 m</div></div>
+        </div>
+      </div>
+      <div class="card"><h2>PVC liquido per saldature</h2>
+        <div class="alert alert-info"> — latte da 1 kg. Quantità da inserire manualmente in base alla complessità delle saldature.</div>
+        <div class="grid-2">
+          <div class="field"><label>Latte da 1 kg da ordinare</label><input type="number" id="pvcLiquido" value="1" step="1" min="1"><div class="hint">Inserisci la quantità stimata</div></div>
+          <div></div>
+        </div>
+      </div>
+      <div class="card"><h2>Disinfezione platea</h2>
+        <div class="alert alert-info">Renolit Alkorchem Pool Shell Treatment — 1 lt ogni 50 m².</div>
+        <div class="grid-2">
+          <div class="field"><label>Rendimento (m²/lt)</label><input type="number" id="rendTreatment" value="50" step="5"></div>
+          <div></div>
+        </div>
+      </div>
+      <div class="nav-btns" style="display:flex;justify-content:space-between;margin-top:4px">
+        <button class="btn" onclick="showTab('vasca')">← Vasca e disegno</button>
+        <button class="btn btn-gn" onclick="showTab('zone')">Zone speciali →</button>
+      </div>
+    </div>
+
+    <div class="panel" id="panel-zone">
+      <div class="alert alert-info">La vasca principale è calcolata automaticamente. Aggiungi qui zone speciali.</div>
+      <div id="zoneContainer"></div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:6px">
+        <button class="btn" onclick="aggiungiZona('spiaggetta')">+ Spiaggetta</button>
+        <button class="btn" onclick="aggiungiZona('scala')">+ Scala immersa</button>
+        <button class="btn" onclick="aggiungiZona('tramoggia')">+ Tramoggia</button>
+        <button class="btn" onclick="aggiungiZona('nicchia')">+ Nicchia / seduta</button>
+      </div>
+      <div class="nav-btns" style="display:flex;justify-content:space-between;margin-top:12px">
+        <button class="btn" onclick="showTab('membrana')">← Membrana</button>
+        <button class="btn btn-gn" onclick="showTab('report')">Genera report →</button>
+      </div>
+    </div>
+
+    <div class="panel" id="panel-report">
+      <div class="nav-btns" style="display:flex;margin-bottom:12px">
+        <button class="btn" onclick="showTab('zone')">← Zone speciali</button>
+      </div>
+      <div id="reportContent"><div class="empty-state">Clicca "Report" nella barra in alto per generare il calcolo.</div></div>
+    </div>
+
+  </div>
+</div>
+</div>
+<script>
+var progetti=JSON.parse(localStorage.getItem('acqualab_riv')||'[]');
+var pid=null,zone=[],zoneCounter=0,disegnoB64='',disegnoMime='';
+
+function showTab(t){
+  var tabs=['dati','vasca','membrana','zone','report'];
+  document.querySelectorAll('.tab').forEach(function(el,i){el.classList.toggle('active',tabs[i]===t);});
+  document.querySelectorAll('.panel').forEach(function(p){p.classList.remove('active');});
+  document.getElementById('panel-'+t).classList.add('active');
+  if(t==='report') generaReport();
+}
+function n2(v){return parseFloat(v).toFixed(2);}
+function g(id){return parseFloat(document.getElementById(id).value)||0;}
+function sv(id){return document.getElementById(id).value||'';}
+function sw(id){return document.getElementById(id).classList.contains('on');}
+
+function aggiornaPreview(){
+  var L=g('vL'),W=g('vW'),H=g('vH');
+  document.getElementById('prevFondo').textContent=n2(L*W)+' m\u00b2';
+  document.getElementById('prevPerim').textContent=n2((L+W)*2)+' m';
+  document.getElementById('prevPareti').textContent=n2((L+W)*2*H)+' m\u00b2';
+}
+function aggiornaMembrana(){
+  var is3d=document.getElementById('tipoMembrana').value==='3d';
+  var box=document.getElementById('membranaNote');
+  box.className='alert '+(is3d?'alert-gn':'alert-warn');
+  box.textContent=is3d?'Membrana 3D: antisdrucciolo non richiesto.':'Standard: antisdrucciolo obbligatorio entro 1,00 m dal pelo libero.';
+}
+function toggleApiKey(){
+  var inp=document.getElementById('apiKey');
+  var btn=document.getElementById('btnShowKey');
+  if(inp.type==='password'){inp.type='text';btn.textContent='Nascondi';}
+  else{inp.type='password';btn.textContent='Mostra';}
+}
+function handleDrop(e){
+  e.preventDefault();
+  document.getElementById('dropZone').style.borderColor='';
+  var file=e.dataTransfer.files[0];
+  if(file) leggiFile(file);
+}
+function caricaDisegno(e){var file=e.target.files[0];if(file)leggiFile(file);e.target.value='';}
+function leggiFile(file){
+  if(file.size>10*1024*1024){alert('File troppo grande (max 10 MB).');return;}
+  if(!file.type.match(/image\/(jpeg|png|webp)/i)&&!file.name.match(/\.(jpg|jpeg|png|webp)$/i)){alert('Formato non supportato. Usa JPG o PNG.');return;}
+  var reader=new FileReader();
+  reader.onload=function(ev){
+    disegnoB64=ev.target.result;disegnoMime=file.type||'image/jpeg';
+    document.getElementById('dropContent').innerHTML='<img src="'+disegnoB64+'" style="max-width:100%;max-height:190px;border-radius:6px;margin-bottom:6px"><br><span style="font-size:.72rem;color:var(--gn);font-weight:700">Disegno caricato</span> <button class="btn btn-sm btn-rd" onclick="event.stopPropagation();rimuoviDisegno()">Rimuovi</button>';
+    document.getElementById('aiSection').style.display='block';
+  };
+  reader.readAsDataURL(file);
+}
+function rimuoviDisegno(){
+  disegnoB64='';disegnoMime='';
+  document.getElementById('dropContent').innerHTML='<div style="font-size:1.8rem;opacity:.2;margin-bottom:6px">+</div><div style="font-size:.76rem;color:#aaa">Clicca o trascina il disegno qui</div><div style="font-size:.64rem;color:#ccc;margin-top:3px">JPG, PNG \u2014 max 10 MB</div>';
+  document.getElementById('aiSection').style.display='none';
+  document.getElementById('aiStatus').textContent='';
+  document.getElementById('noteDisegnoBox').style.display='none';
+}
+async function analizzaDisegno(){
+  var btn=document.getElementById('btnAnalizza');
+  var status=document.getElementById('aiStatus');
+  if(!disegnoB64)return;
+  var apiKey=(document.getElementById('apiKey').value||'').trim();
+  if(!apiKey){status.style.color='var(--rd)';status.textContent='Inserisci la tua API key Anthropic.';return;}
+  btn.disabled=true;btn.textContent='Analisi in corso...';
+  status.style.color='#888';status.textContent='Invio a Claude AI...';
+  var b64=disegnoB64.split(',')[1];
+  var mime=disegnoMime.startsWith('image')?disegnoMime:'image/jpeg';
+  var prompt='Sei un tecnico specializzato in piscine. Analizza questo disegno quotato ed estrai le dimensioni.\nRispondi SOLO con JSON valido:\n{"vasca":{"lunghezza":null,"larghezza":null,"profondita":null},"zone":[{"tipo":"spiaggetta|scala|tramoggia|nicchia","valori":{}}],"note":""}\nCampi: scala(larghezza,nAlzate,altAlzata,nPedate,profPedata), spiaggetta(lunghezza,larghezza,profondita), tramoggia(lunghezza,larghezza,profMin,profMax,poggiapiedi), nicchia(lunghezza,larghezza,altezza,profondita). Usa null se non leggibile.';
+  try{
+    var resp=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json','x-api-key':apiKey,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:1000,messages:[{role:'user',content:[{type:'image',source:{type:'base64',media_type:mime,data:b64}},{type:'text',text:prompt}]}]})});
+    var data=await resp.json();
+    if(data.error)throw new Error(data.error.message);
+    var testo=(data.content||[]).map(function(c){return c.text||'';}).join('');
+    var parsed=JSON.parse(testo.replace(/```json|```/g,'').trim());
+    var estratti=[];
+    if(parsed.vasca){
+      if(parsed.vasca.lunghezza!=null){document.getElementById('vL').value=parsed.vasca.lunghezza;estratti.push('L='+parsed.vasca.lunghezza);}
+      if(parsed.vasca.larghezza!=null){document.getElementById('vW').value=parsed.vasca.larghezza;estratti.push('W='+parsed.vasca.larghezza);}
+      if(parsed.vasca.profondita!=null){document.getElementById('vH').value=parsed.vasca.profondita;estratti.push('H='+parsed.vasca.profondita);}
+    }
+    if(parsed.zone&&parsed.zone.length){parsed.zone.filter(function(z){return z.tipo&&z.valori;}).forEach(function(z){zone.push({id:zoneCounter++,tipo:z.tipo,valori:Object.assign({},z.valori)});});renderZone();estratti.push(parsed.zone.length+' zone');}
+    if(parsed.note){document.getElementById('noteDisegnoText').textContent=parsed.note;document.getElementById('noteDisegnoBox').style.display='block';}
+    aggiornaPreview();
+    // Salva API key per riuso
+    var _k=document.getElementById('apiKey').value.trim();
+    if(_k) localStorage.setItem('acqualab_apikey',_k);
+    status.style.color='var(--gn)';status.textContent='Estratto: '+(estratti.join(', ')||'nessuna quota')+'. Verifica i campi.';
+    btn.disabled=false;btn.textContent='Ri-analizza disegno';
+  }catch(err){
+    status.style.color='var(--rd)';status.textContent='Errore: '+err.message;
+    btn.disabled=false;btn.textContent='Riprova analisi';
+  }
+}
+
+var ZONE_CFG={
+  spiaggetta:{label:'Spiaggetta',badge:'Piano orizzontale',fields:[{id:'lunghezza',label:'Lunghezza (m)',val:3.4},{id:'larghezza',label:'Larghezza (m)',val:1},{id:'profondita',label:'Prof. dal pelo libero (m)',val:0.32}]},
+  scala:{label:'Scala immersa',badge:'Scale',fields:[{id:'larghezza',label:'Larghezza (m)',val:1.6},{id:'nAlzate',label:'N. alzate',val:5},{id:'altAlzata',label:'Altezza alzata (m)',val:0.32},{id:'nPedate',label:'N. pedate',val:4},{id:'profPedata',label:'Prof. pedata (m)',val:0.25}]},
+  tramoggia:{label:'Tramoggia',badge:'Fondo inclinato',fields:[{id:'lunghezza',label:'Lunghezza (m)',val:4},{id:'larghezza',label:'Larghezza (m)',val:3},{id:'profMin',label:'Prof. minima (m)',val:1.2},{id:'profMax',label:'Prof. massima (m)',val:2},{id:'poggiapiedi',label:'Poggia piedi (m)',val:0.3}]},
+  nicchia:{label:'Nicchia / seduta',badge:'Elemento speciale',fields:[{id:'lunghezza',label:'Lunghezza (m)',val:1.5},{id:'larghezza',label:'Larghezza (m)',val:0.5},{id:'altezza',label:'Altezza (m)',val:0.4},{id:'profondita',label:'Prof. dal pelo libero (m)',val:0.6}]}
+};
+function aggiungiZona(tipo){var cfg=ZONE_CFG[tipo];var v={};cfg.fields.forEach(function(f){v[f.id]=f.val;});zone.push({id:zoneCounter++,tipo:tipo,valori:v});renderZone();}
+function rimuoviZona(id){zone=zone.filter(function(z){return z.id!==id;});renderZone();}
+function aggiornaZona(id,campo,val){var z=zone.find(function(z){return z.id===id;});if(z){var n=parseFloat(val);if(!isNaN(n))z.valori[campo]=n;}}
+function renderZone(){
+  var cont=document.getElementById('zoneContainer');
+  if(!zone.length){cont.innerHTML='<div class="alert alert-info" style="margin-bottom:10px">Nessuna zona speciale aggiunta.</div>';return;}
+  cont.innerHTML=zone.map(function(z){
+    var cfg=ZONE_CFG[z.tipo];
+    var cols=cfg.fields.length<=3?cfg.fields.length:3;
+    var fields=cfg.fields.map(function(f){return '<div class="field"><label>'+f.label+'</label><input type="number" step="0.01" value="'+(z.valori[f.id]!=null?z.valori[f.id]:f.val)+'" oninput="aggiornaZona('+z.id+',\''+f.id+'\',this.value)"></div>';}).join('');
+    return '<div class="section-zone"><div class="zone-header"><div><span class="zone-title">'+cfg.label+'</span><span class="zone-badge">'+cfg.badge+'</span></div><button class="btn btn-sm btn-rd" onclick="rimuoviZona('+z.id+')">Rimuovi</button></div><div style="display:grid;grid-template-columns:repeat('+cols+',minmax(0,1fr));gap:10px">'+fields+'</div></div>';
+  }).join('');
+}
+
+function calcola(){
+  var L=g('vL'),W=g('vW'),H=g('vH');
+  var roloH=g('roloH')||1.65,roloL=g('roloL')||25,sorm_m=(g('sorm')||5)/100;
+  var is3d=document.getElementById('tipoMembrana').value==='3d';
+  var lunghBarra=parseFloat(document.getElementById('lunghBarra').value)||3;
+  var passoChiodi=(g('passoChiodi')||50)/100;
+  var passoSilicone=g('passoSilicone')||5;
+  var rendTreatment=g('rendTreatment')||50;
+  var largUtile=+(roloH-sorm_m).toFixed(4);
+  var righe=[],totAntisd=0,areaPlateeNette=0,totSup=0;
+  var perimetroTot=(L+W)*2;
+  var mlPlatee=[],mlPareti=[],mlParetiBasse=[];
+
+  function addParete(zona,lunghezza,altezza,note){
+    var altF=+(altezza+sorm_m).toFixed(4);
+    var nFasce=altF>roloH?2:1;
+    var mlF=+(lunghezza+sorm_m).toFixed(4);
+    totSup+=altF*mlF*nFasce;
+    var lista=altF>0.5?mlPareti:mlParetiBasse;
+    if(nFasce===2){lista.push({zona:zona,ml:mlF});lista.push({zona:zona+' f2',ml:mlF});}
+    else lista.push({zona:zona,ml:mlF});
+    righe.push({tipo:'parete',zona:zona,lunghezza:n2(lunghezza),altezza:n2(altezza),altFerzo:n2(altF),mlFerzo:n2(mlF),nFasce:nFasce,note:note,antisd:false});
+  }
+
+  function addPlatea(zona,dim1,dim2,antisd,note){
+    var latoLungo=Math.max(dim1,dim2),latoCorto=Math.min(dim1,dim2);
+    var areaNetta=latoLungo*latoCorto;
+    areaPlateeNette+=areaNetta;
+    if(antisd&&!is3d)totAntisd+=areaNetta;
+    // Ferzi platea: ml NETTI senza sormonto laterale
+    // Se latoCorto <= roloH: 1 ferzo lungo latoLungo (ml netto)
+    // Se latoCorto > roloH: ceil(latoLungo/largUtile) ferzi da latoCorto ml netti
+    var nFerzi,mlF;
+    if(latoCorto<=roloH+0.001){
+      nFerzi=Math.ceil(latoLungo/roloL); if(nFerzi<1)nFerzi=1;
+      mlF=latoLungo; // netto, senza sormonto
+      totSup+=nFerzi*latoCorto*roloH; // ogni ferzo copre latoCorto m di larghezza
+    } else {
+      nFerzi=Math.ceil(latoLungo/largUtile);
+      mlF=latoCorto; // netto
+      totSup+=nFerzi*mlF*roloH;
+    }
+    for(var i=0;i<nFerzi;i++) mlPlatee.push({zona:zona+(nFerzi>1?' f'+(i+1):''),ml:mlF});
+    righe.push({tipo:'platea',zona:zona,areaNetta:n2(areaNetta),latoLungo:n2(latoLungo),latoCorto:n2(latoCorto),nFerzi:nFerzi,mlFerzo:n2(mlF),mlTot:n2(nFerzi*mlF),nFasce:nFerzi,note:note,antisd:antisd&&!is3d});
+  }
+
+  // Ferzo spiaggetta+pedate: 1 ferzo da lato corto vasca (W) copre tutto
+  // Parete spiaggetta: 2 pezzi — inferiore (H-profSpiagg) e superiore (profSpiagg)
+  var spiaggettaZone=null, scalaZone=null;
+  zone.forEach(function(z){if(z.tipo==='spiaggetta')spiaggettaZone=z;if(z.tipo==='scala')scalaZone=z;});
+
+  addParete('Parete lato lungo A',L,H,'');
+  addParete('Parete lato lungo B',L,H,'');
+  // Parete corto libera (opposta alla spiaggetta)
+  addParete('Parete lato corto (libero)',W,H,'');
+  addPlatea('Fondo vasca principale',L,W,false,'');
+
+  // Ferzo spiaggetta+pedate: 1 ferzo da W (lato corto vasca) netto
+  if(spiaggettaZone){
+    var lu=spiaggettaZone.valori.lunghezza,la=spiaggettaZone.valori.larghezza,pr=spiaggettaZone.valori.profondita;
+    // La spiaggetta è coperta dall'ultimo ferzo della platea (già conteggiato nel fondo vasca)
+    // Non aggiungere ferzo separato — solo contabilizzare l'area
+    areaPlateeNette+=lu*la;
+    if(pr<=1.0&&!is3d)totAntisd+=lu*la;
+    righe.push({tipo:'platea',zona:'Spiaggetta',areaNetta:n2(lu*la),latoLungo:n2(lu),latoCorto:n2(la),nFerzi:0,mlFerzo:'incluso',mlTot:'incluso',nFasce:0,note:'prof. '+n2(pr)+' m — coperta ultimo ferzo platea',antisd:pr<=1.0&&!is3d});
+    // perimetroTot NON aumenta: il profilo di ancoraggio e' solo sul bordo vasca principale
+    // Parete spiaggetta: 2 pezzi
+    var hInf=+(H-pr).toFixed(4); // parete inferiore (sotto spiaggetta)
+    var hSup=pr;                  // parete superiore (alzata spiaggetta)
+    // Ferzo spiaggetta+scala: copre tutta la larghezza vasca (spiaggetta 3.4 + scala 1.6 = W=5m)
+    mlParetiBasse.push({zona:'Parete spiaggetta+scala (ferzo unico)',ml:+(W+sorm_m).toFixed(4)});
+    righe.push({tipo:'parete',zona:'Parete spiaggetta+scala',lunghezza:n2(W),altezza:n2(H),altFerzo:n2(H),mlFerzo:n2(W+sorm_m),nFasce:1,note:'ferzo unico: spiagg. '+n2(lu)+'m + scala '+n2(W-lu)+'m',antisd:false});
+  }
+  // Pedate scala: già incluse nel ferzo spiaggetta+pedate
+  if(scalaZone){
+    var larg=scalaZone.valori.larghezza,nA=scalaZone.valori.nAlzate,aA=scalaZone.valori.altAlzata,nP=scalaZone.valori.nPedate,pP=scalaZone.valori.profPedata;
+    // Alzate scala: incluse nel ferzo spiaggetta+scala (stesso taglio)
+    for(var i=0;i<nA;i++) righe.push({tipo:'parete',zona:'Alzata scala '+(i+1),lunghezza:n2(larg),altezza:n2(aA),altFerzo:n2(aA+sorm_m),mlFerzo:n2(larg+sorm_m),nFasce:1,note:'inclusa nel ferzo spiagg+scala',antisd:false});
+    // Pedate: incluse nei ferzi del fondo vasca (stesso ferzo della spiaggetta)
+    var areaPedate=larg*pP*nP;
+    areaPlateeNette+=areaPedate;
+    righe.push({tipo:'platea',zona:'Pedate scala ('+nP+')',areaNetta:n2(areaPedate),latoLungo:n2(larg),latoCorto:n2(pP),nFerzi:0,mlFerzo:'incluso nel fondo',mlTot:'incluso nel fondo',nFasce:0,note:'tagliate dagli stessi ferzi del fondo vasca',antisd:false});
+  }
+
+  zone.forEach(function(z){
+    if(z.tipo==='tramoggia'){
+      var lu=z.valori.lunghezza,la=z.valori.larghezza,pMin=z.valori.profMin,pMax=z.valori.profMax,pp=z.valori.poggiapiedi;
+      var hm=(pMin+pMax)/2;
+      addParete('Tramoggia \u2013 parete lungo A',lu,hm,'altezza media');
+      addParete('Tramoggia \u2013 parete lungo B',lu,hm,'altezza media');
+      addParete('Tramoggia \u2013 parete corto A',la,hm,'altezza media');
+      addParete('Tramoggia \u2013 parete corto B',la,hm,'altezza media');
+      var diag=Math.sqrt(lu*lu+(pMax-pMin)*(pMax-pMin));
+      addPlatea('Tramoggia \u2013 fondo inclinato',diag,la,false,'superficie sviluppata');
+      if(pp>0) addPlatea('Tramoggia \u2013 poggia piedi',(lu*2+la*2),pp,false,'largh. '+n2(pp)+' m');
+    }
+    if(z.tipo==='nicchia'){
+      var lu=z.valori.lunghezza,la=z.valori.larghezza,al=z.valori.altezza,pr=z.valori.profondita;
+      addParete('Nicchia \u2013 parete fondo',lu,al,'');
+      addParete('Nicchia \u2013 parete lat. sx',la,al,'');
+      addParete('Nicchia \u2013 parete lat. dx',la,al,'');
+      addPlatea('Nicchia \u2013 piano seduta',lu,la,pr<=1.0,'prof. '+n2(pr)+' m');
+      perimetroTot+=lu*2+la*2;
+    }
+  });
+
+  var tuttiML=mlPlatee.concat(
+    mlPareti.filter(function(t){return t.zona.indexOf('corto')>=0||t.zona.indexOf('Corto')>=0;}),
+    mlPareti.filter(function(t){return t.zona.indexOf('lungo')>=0||t.zona.indexOf('Lungo')>=0;}),
+    mlParetiBasse
+  );
+  var dettaglioRotoli=[],mlRim=0,rCorrente=[];
+  tuttiML.forEach(function(t){
+    if(mlRim<t.ml-0.001){
+      if(rCorrente.length>0) dettaglioRotoli.push({n:dettaglioRotoli.length+1,tagli:rCorrente.slice(),usati:+(roloL-mlRim).toFixed(3)});
+      mlRim=roloL;rCorrente=[];
+    }
+    mlRim=+(mlRim-t.ml).toFixed(6);
+    rCorrente.push({zona:t.zona,ml:t.ml});
+  });
+  if(rCorrente.length>0) dettaglioRotoli.push({n:dettaglioRotoli.length+1,tagli:rCorrente.slice(),usati:+(roloL-mlRim).toFixed(3)});
+  var totRotoli=dettaglioRotoli.length;
+
+  var mlTotPlatee=mlPlatee.reduce(function(s,t){return s+t.ml;},0);
+  var mlTotPareti=mlPareti.concat(mlParetiBasse).reduce(function(s,t){return s+t.ml;},0);
+
+  var nBarre=Math.ceil(perimetroTot/lunghBarra);
+  var mlEff=nBarre*lunghBarra;
+  var sfrido=n2(mlEff-perimetroTot);
+  var nChiodiProfilo=Math.ceil(perimetroTot/passoChiodi);
+  // Chiodi platea: griglia su area platee (1 chiodo ogni passo² m²)
+  var nChiodiPlatea=Math.ceil(areaPlateeNette/(passoChiodi*passoChiodi));
+  var nChiodi=nChiodiProfilo+nChiodiPlatea;
+  var nSilicone=Math.ceil(perimetroTot/passoSilicone);
+  var litriTreatment=Math.ceil(areaPlateeNette/rendTreatment);
+
+  return{righe:righe,totRotoli:totRotoli,dettaglioRotoli:dettaglioRotoli,
+    mlTotPlatee:n2(mlTotPlatee),mlTotPareti:n2(mlTotPareti),
+    totSup:n2(totSup),totAntisd:n2(totAntisd),is3d:is3d,
+    roloH:roloH,roloL:roloL,supRotolo:n2(roloH*roloL),
+    perimetroTot:n2(perimetroTot),lunghBarra:lunghBarra,
+    nBarre:nBarre,mlEffettivo:n2(mlEff),sfrido:sfrido,
+    nChiodi:nChiodi,nChiodiProfilo:nChiodiProfilo,nChiodiPlatea:nChiodiPlatea,nSilicone:nSilicone,litriTreatment:litriTreatment,
+    areaPlatee:n2(areaPlateeNette)};
+}
+
+function generaReport(){
+  var el=document.getElementById('reportContent');
+  try{
+    var res=calcola();
+    var righe=res.righe,totRotoli=res.totRotoli,dettaglioRotoli=res.dettaglioRotoli;
+    var mlTotPlatee=res.mlTotPlatee,mlTotPareti=res.mlTotPareti;
+    var totSup=res.totSup,totAntisd=res.totAntisd,is3d=res.is3d;
+    var roloH=res.roloH,roloL=res.roloL,supRotolo=res.supRotolo;
+    var perimetroTot=res.perimetroTot,lunghBarra=res.lunghBarra;
+    var nBarre=res.nBarre,mlEffettivo=res.mlEffettivo,sfrido=res.sfrido;
+    var nChiodi=res.nChiodi,nSilicone=res.nSilicone,litriTreatment=res.litriTreatment;
+    var areaPlatee=res.areaPlatee;
+    var pareti=righe.filter(function(r){return r.tipo==='parete';});
+    var platee=righe.filter(function(r){return r.tipo!=='parete';});
+    var dat=raccogliDati();
+
+    var h='';
+    h+='<div class="print-header" style="display:none;margin-bottom:20px;padding-bottom:12px;border-bottom:2px solid #2c3e50">';
+    h+='<div style="display:flex;justify-content:space-between;align-items:flex-end">';
+    h+='<div><div style="font-size:1.3rem;font-weight:800;letter-spacing:1px;color:#2c3e50">ACQUALAB</div>';
+    h+='<div style="font-size:.7rem;color:#888">Master Pool Building — Rivestimento membrana PVC</div></div>';
+    h+='<div style="text-align:right;font-size:.75rem;color:#555">';
+    h+='<div><b>Progetto:</b> '+(dat.nome||'—')+'</div>';
+    h+='<div><b>Cliente:</b> '+(dat.cliente||'—')+'</div>';
+    h+='<div><b>Data:</b> '+(dat.data||'—')+'</div></div></div></div>';
+    h+='<div style="display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;margin-bottom:14px">';
+    h+='<div class="metric"><div class="metric-val">'+totRotoli+'</div><div class="metric-lbl">Rotoli</div></div>';
+    h+='<div class="metric"><div class="metric-val">'+nBarre+'</div><div class="metric-lbl">Barre profilo</div></div>';
+    h+='<div class="metric"><div class="metric-val">'+nChiodi+'</div><div class="metric-lbl">Chiodi</div></div>';
+    h+='<div class="metric"><div class="metric-val">'+litriTreatment+'</div><div class="metric-lbl">Lt Treatment</div></div></div>';
+
+    h+='<div class="card"><h2>Dati progetto</h2><div class="nb">';
+    h+='<b>Progetto:</b> '+(dat.nome||'\u2014')+' &nbsp;&middot;&nbsp; <b>Cliente:</b> '+(dat.cliente||'\u2014')+' &nbsp;&middot;&nbsp; <b>Data:</b> '+(dat.data||'\u2014')+'<br>';
+    h+='<b>Vasca:</b> '+dat.vL+' \u00d7 '+dat.vW+' \u00d7 '+dat.vH+' m &nbsp;&middot;&nbsp; <b>Membrana:</b> '+(is3d?'3D':'Standard')+' &nbsp;&middot;&nbsp; <b>Rotolo:</b> '+roloH+'\u00d7'+roloL+' m &nbsp;&middot;&nbsp; <b>Sormonto:</b> '+dat.sorm+' cm';
+    if(dat.note) h+='<br><b>Note:</b> '+dat.note;
+    h+='</div></div>';
+
+    h+='<div class="card"><h2>1. Ferzi pareti</h2><div style="overflow-x:auto"><table class="result-table">';
+    h+='<thead><tr><th>Zona</th><th class="num">L(m)</th><th class="num">H par.</th><th class="num">H ferzo</th><th class="num">ML ferzo</th><th class="num">Fasce</th></tr></thead><tbody>';
+    pareti.forEach(function(r){
+      h+='<tr><td>'+r.zona+(r.note?'<br><span style="font-size:.65rem;color:#aaa">'+r.note+'</span>':'')+'</td>';
+      h+='<td class="num">'+r.lunghezza+'</td><td class="num">'+r.altezza+'</td>';
+      h+='<td class="num">'+r.altFerzo+'</td><td class="num">'+r.mlFerzo+'</td>';
+      h+='<td class="num">'+(r.nFasce>1?'2':'1')+'</td></tr>';
+    });
+    h+='</tbody><tfoot><tr style="background:var(--c2)"><td colspan="4">ML totali pareti</td><td class="num" colspan="2" style="font-weight:700">'+mlTotPareti+' m</td></tr></tfoot></table></div></div>';
+
+    h+='<div class="card"><h2>2. Ferzi platee</h2><div style="overflow-x:auto"><table class="result-table">';
+    h+='<thead><tr><th>Zona</th><th class="num">Area</th><th class="num">N.ferzi</th><th class="num">ML/ferzo</th><th class="num">ML tot</th></tr></thead><tbody>';
+    platee.forEach(function(r){
+      var incluso=r.nFerzi===0;
+      h+='<tr><td>'+r.zona+(r.antisd?'<br><span class="tag tag-antisd">ANTISD.</span>':'')+(r.note?'<br><span style="font-size:.65rem;color:#aaa">'+r.note+'</span>':'')+'</td>';
+      h+='<td class="num">'+r.areaNetta+' m\u00b2</td>';
+      h+='<td class="num">'+(incluso?'&mdash;':r.nFerzi)+'</td>';
+      h+='<td class="num">'+(incluso?'incluso':r.mlFerzo+' m')+'</td>';
+      h+='<td class="num">'+(incluso?'incluso':r.mlTot+' m')+'</td></tr>';
+    });
+    h+='</tbody><tfoot><tr style="background:var(--c2)"><td colspan="3">ML totali platee</td><td class="num" colspan="2" style="font-weight:700">'+mlTotPlatee+' m</td></tr></tfoot></table></div>';
+    if(is3d) h+='<div class="alert alert-gn" style="margin-top:8px">Membrana 3D: antisdrucciolo non richiesto.</div>';
+    if(!is3d&&parseFloat(totAntisd)>0) h+='<div class="alert alert-warn" style="margin-top:8px">Antisdrucciolo richiesto: <b>'+totAntisd+' m\u00b2</b></div>';
+    h+='</div>';
+
+    h+='<div class="card"><h2>3. Consumo rotoli</h2>';
+    dettaglioRotoli.forEach(function(r){
+      var avanzo=(roloL-r.usati).toFixed(2);
+      h+='<div class="rot-box"><div class="rot-hd"><span class="rot-title">Rotolo #'+r.n+'</span><span class="rot-sub">usati '+r.usati.toFixed(2)+' m &nbsp;&middot;&nbsp; avanzo <b>'+avanzo+' m</b></span></div>';
+      h+='<table class="result-table" style="font-size:.72rem"><tbody>';
+      r.tagli.forEach(function(t){h+='<tr><td>'+t.zona+'</td><td class="num">'+parseFloat(t.ml).toFixed(2)+' m</td></tr>';});
+      h+='</tbody></table></div>';
+    });
+    h+='</div>';
+
+    h+='<div class="card"><h2>4. Profilo di ancoraggio</h2><table class="result-table"><tbody>';
+    h+='<tr><td>Perimetro totale</td><td class="num">'+perimetroTot+' m</td></tr>';
+    h+='<tr><td>ML effettivi (sfrido '+sfrido+' m)</td><td class="num">'+mlEffettivo+' m</td></tr>';
+    h+='<tr class="total-row"><td><b>BARRE DA ORDINARE</b></td><td class="num">'+nBarre+' barre da '+lunghBarra+' m</td></tr>';
+    h+='<tr><td>Chiodi — profilo ancoraggio</td><td class="num">'+res.nChiodiProfilo+' pz</td></tr>';
+    h+='<tr><td>Chiodi — ferzi platea</td><td class="num">'+res.nChiodiPlatea+' pz</td></tr>';
+    h+='<tr><td><b>Chiodi totali</b> (ogni '+dat.passoChiodi+' cm)</td><td class="num"><b>'+nChiodi+' pz</b></td></tr>';
+    h+='<tr><td>Silicone</td><td class="num">'+nSilicone+' tubi (ogni '+dat.passoSilicone+' m)</td></tr>';
+    h+='<tr class="total-row"><td><b>PVC LIQUIDO DA ORDINARE</b></td><td class="num">'+dat.pvcLiquido+' latte da 1 kg</td></tr>';
+    h+='</tbody></table></div>';
+
+    h+='<div class="card"><h2>5. Pool Shell Treatment</h2><table class="result-table"><tbody>';
+    h+='<tr><td>Superficie platee</td><td class="num">'+areaPlatee+' m\u00b2</td></tr>';
+    h+='<tr><td>Rendimento</td><td class="num">'+dat.rendTreatment+' m\u00b2/lt</td></tr>';
+    h+='<tr class="total-row"><td><b>LITRI DA ORDINARE</b></td><td class="num">'+litriTreatment+' lt</td></tr>';
+    h+='</tbody></table></div>';
+
+    h+='<div class="card" style="border-left:3px solid var(--gn)"><h2>6. Riepilogo ordine materiali</h2><table class="result-table">';
+    h+='<thead><tr><th>Materiale</th><th class="num">Q.t\u00e0</th><th>Note</th></tr></thead><tbody>';
+    h+='<tr><td>Membrana PVC '+(is3d?'3D':'standard')+'</td><td class="num">'+totRotoli+' rotoli</td><td>'+roloH+'\u00d7'+roloL+' m &mdash; '+totRotoli+' &times; '+supRotolo+' = '+(totRotoli*(roloH*roloL)).toFixed(2)+' m&sup2;</td></tr>';
+    h+='<tr><td>Profilo di ancoraggio</td><td class="num">'+nBarre+' barre</td><td>da '+lunghBarra+' m</td></tr>';
+    h+='<tr><td>Chiodi a espansione</td><td class="num">'+nChiodi+' pz</td><td>ogni '+dat.passoChiodi+' cm</td></tr>';
+    h+='<tr><td>Silicone</td><td class="num">'+nSilicone+' tubi</td><td>ogni '+dat.passoSilicone+' m</td></tr>';
+    h+='<tr><td>Pool Shell Treatment</td><td class="num">'+litriTreatment+' lt</td><td>'+areaPlatee+' m\u00b2 platea</td></tr>';
+    h+='<tr><td>PVC liquido</td><td class="num">'+dat.pvcLiquido+' latte 1 kg</td><td></td></tr>';
+    h+='</tbody></table></div>';
+
+    h+='<div class="nb" style="margin-top:8px"><b>Acqualab srl</b> \u2014 Viale Aldo Moro 2, 50023 Impruneta (FI) \u2014 P.I. 02281140976<br>Master Pool Building \u2014 App Rivestimento v1</div>';
+
+    el.innerHTML=h;
+  }catch(err){
+    el.innerHTML='<div class="alert alert-rd" style="margin:1rem"><b>Errore:</b> '+err.message+'<br><pre style="font-size:.6rem;margin-top:6px;white-space:pre-wrap">'+err.stack+'</pre></div>';
+  }
+}
+
+function raccogliDati(){
+  return{nome:sv('nomeProgetto'),cliente:sv('cliente'),indirizzo:sv('indirizzo'),data:sv('dataProgetto'),note:sv('note'),
+    vL:g('vL'),vW:g('vW'),vH:g('vH'),membrana:document.getElementById('tipoMembrana').value,
+    roloH:g('roloH'),roloL:g('roloL'),sorm:g('sorm'),
+    formeLibere:sw('switchForme'),
+    lunghBarra:parseFloat(document.getElementById('lunghBarra').value)||3,
+    passoChiodi:g('passoChiodi')||50,passoSilicone:g('passoSilicone')||5,rendTreatment:g('rendTreatment')||50,
+    pvcLiquido:g('pvcLiquido')||1,
+    zone:JSON.parse(JSON.stringify(zone))};
+}
+function applicaDati(dat){
+  document.getElementById('nomeProgetto').value=dat.nome||'';
+  document.getElementById('cliente').value=dat.cliente||'';
+  document.getElementById('indirizzo').value=dat.indirizzo||'';
+  document.getElementById('dataProgetto').value=dat.data||'';
+  document.getElementById('note').value=dat.note||'';
+  document.getElementById('vL').value=dat.vL||9;
+  document.getElementById('vW').value=dat.vW||5;
+  document.getElementById('vH').value=dat.vH||1.6;
+  document.getElementById('tipoMembrana').value=dat.membrana||'3d';
+  document.getElementById('roloH').value=dat.roloH||1.65;
+  document.getElementById('roloL').value=dat.roloL||25;
+  document.getElementById('sorm').value=dat.sorm||5;
+  document.getElementById('lunghBarra').value=dat.lunghBarra||3;
+  document.getElementById('passoChiodi').value=dat.passoChiodi||50;
+  document.getElementById('passoSilicone').value=dat.passoSilicone||5;
+  document.getElementById('rendTreatment').value=dat.rendTreatment||50;
+  document.getElementById('pvcLiquido').value=dat.pvcLiquido||1;
+  document.getElementById('switchForme').classList.toggle('on',dat.formeLibere!==false);
+  zone=dat.zone?JSON.parse(JSON.stringify(dat.zone)):[];
+  zoneCounter=zone.length?Math.max.apply(null,zone.map(function(z){return z.id||0;}))+1:0;
+  aggiornaMembrana();aggiornaPreview();renderZone();
+}
+function salvaProgetto(){
+  var dat=raccogliDati();
+  var id=pid||Date.now().toString();pid=id;
+  var prog=Object.assign({},dat,{id:id,salvato:new Date().toISOString()});
+  var idx=progetti.findIndex(function(p){return p.id===id;});
+  if(idx>=0)progetti[idx]=prog;else progetti.unshift(prog);
+  localStorage.setItem('acqualab_riv',JSON.stringify(progetti));
+  document.getElementById('mainTitle').textContent=dat.nome||'Senza nome';
+  document.getElementById('mainSub').textContent=dat.cliente||'';
+  renderProjectList();
+}
+function caricaProgetto(id){
+  var prog=progetti.find(function(p){return p.id===id;});if(!prog)return;
+  pid=id;applicaDati(prog);
+  document.getElementById('mainTitle').textContent=prog.nome||'Senza nome';
+  document.getElementById('mainSub').textContent=prog.cliente||'';
+  renderProjectList();showTab('dati');
+}
+function eliminaProgetto(id,e){
+  e.stopPropagation();if(!confirm('Eliminare il progetto?'))return;
+  progetti=progetti.filter(function(p){return p.id!==id;});
+  localStorage.setItem('acqualab_riv',JSON.stringify(progetti));
+  if(pid===id){pid=null;nuovoProgetto();}
+  renderProjectList();
+}
+function nuovoProgetto(){
+  pid=null;
+  applicaDati({nome:'',cliente:'',indirizzo:'',data:new Date().toISOString().split('T')[0],note:'',vL:9,vW:5,vH:1.6,membrana:'3d',roloH:1.65,roloL:25,sorm:5,formeLibere:true,lunghBarra:3,passoChiodi:50,passoSilicone:5,rendTreatment:50,zone:[]});
+  disegnoB64='';disegnoMime='';
+  document.getElementById('mainTitle').textContent='Nuovo progetto';
+  document.getElementById('mainSub').textContent='Inserisci i dati della piscina';
+  renderProjectList();showTab('dati');
+}
+function renderProjectList(){
+  var cont=document.getElementById('projectList');
+  if(!progetti.length){cont.innerHTML='<div class="empty-state">Nessun progetto</div>';return;}
+  cont.innerHTML=progetti.map(function(p){
+    return '<div class="project-item'+(p.id===pid?' active':'')+'" onclick="caricaProgetto(\''+p.id+'\')"><div class="proj-name">'+(p.nome||'Senza nome')+'</div><div class="proj-date">'+(p.cliente||'')+' '+(p.data?'&middot; '+p.data:'')+'</div><span class="proj-del" onclick="eliminaProgetto(\''+p.id+'\',event)">Elimina</span></div>';
+  }).join('');
+}
+function esportaJSON(){
+  var blob=new Blob([JSON.stringify(progetti,null,2)],{type:'application/json'});
+  var a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='acqualab_rivestimento.json';a.click();
+}
+function importaJSON(e){
+  var file=e.target.files[0];if(!file)return;
+  var reader=new FileReader();
+  reader.onload=function(ev){
+    try{
+      var dati=JSON.parse(ev.target.result);
+      if(!Array.isArray(dati)||!dati.every(function(p){return p&&typeof p==='object'&&p.nome!==undefined;})){alert('File non valido o struttura non riconosciuta.');return;}
+      if(progetti.length>0&&!confirm('Vuoi sostituire i '+progetti.length+' progetti esistenti con i '+dati.length+' importati?'))return;
+      progetti=dati;localStorage.setItem('acqualab_riv',JSON.stringify(progetti));renderProjectList();alert('Importati '+dati.length+' progetti.');
+    }catch(ex){alert('Errore lettura file: '+ex.message);}
+  };
+  reader.readAsText(file);e.target.value='';
+}
+
+document.getElementById('dataProgetto').value=new Date().toISOString().split('T')[0];
+var _k=localStorage.getItem('acqualab_apikey');
+if(_k){var _el=document.getElementById('apiKey');if(_el)_el.value=_k;}
+renderProjectList();aggiornaPreview();renderZone();
+</script>
+</body>
+</html>
