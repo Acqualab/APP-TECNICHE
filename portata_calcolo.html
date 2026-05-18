@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="it">
 <head>
 <meta charset="UTF-8">
@@ -573,29 +573,13 @@ function resetTutto(){
   set('inp-offerta', '');
   // Scheda Parametri
   set('sel-tipo',    'res');
-  set('inp-appart',  '4');
-  set('inp-utenti',  '4');
-  set('inp-consumo', '150');
+  set('inp-appart',  '');
+  set('inp-utenti',  '');
+  set('inp-consumo', '');
   set('sel-dn',      '25');
-  set('inp-trit',    '45');
-  // Scheda Apparecchi – ripristina valori di default
-  const DEFAULT = [
-    {n:1, on:true},  // Lavabo
-    {n:1, on:true},  // Lavello cucina
-    {n:1, on:true},  // WC a cassetta
-    {n:0, on:false}, // WC a flussometro
-    {n:1, on:true},  // Vasca da bagno
-    {n:1, on:true},  // Doccia
-    {n:1, on:true},  // Bidet
-    {n:1, on:true},  // Lavatrice
-    {n:1, on:true},  // Lavastoviglie
-    {n:0, on:false}, // Lavatoio / lavandino
-    {n:1, on:true},  // Rubinetto esterno DN 15
-    {n:0, on:false}, // Idrante antincendio DN 45
-    {n:0, on:false}, // Abbeveratoio / stalla
-    {n:0, on:false}, // Fontanella
-  ];
-  DEFAULT.forEach((d, i) => { if(APPARECCHI[i]){ APPARECCHI[i].n = d.n; APPARECCHI[i].on = d.on; } });
+  set('inp-trit',    '');
+  // Scheda Apparecchi – azzera tutti gli apparecchi
+  APPARECCHI.forEach(a => { a.n = 0; a.on = false; });
   // Mostra prima scheda e aggiorna UI
   showTab('tab-parametri');
   onTipoChange();
