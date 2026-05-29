@@ -288,7 +288,7 @@ const SUPA_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJ
 
 
 function isLicensed(){
-  try{return (sessionStorage.getItem('mop_license')||'').length>0;}catch(e){return false;}
+  try{return (sessionStorage.getItem('mop_lic_v2')||'').length>0;}catch(e){return false;}
 }
 function showPremiumBanner(){
   document.getElementById('premium-banner').style.display='flex';
@@ -307,7 +307,7 @@ async function verifyLicense(){
     var data=await res.json();
     if(data&&data.length>0){
       document.getElementById('pw-gate').style.display='none';
-      try{sessionStorage.setItem('mop_license',key);}catch(e){}
+      try{sessionStorage.setItem('mop_lic_v2',key);}catch(e){}
       // Show disclaimer after license verified
       var ov=document.getElementById('disclaimer-overlay');
       if(ov){ov.style.display='flex';}
@@ -326,7 +326,7 @@ async function verifyLicense(){
 (function(){
   var ok=false;
   var saved='';
-  try{saved=sessionStorage.getItem('mop_license')||'';ok=saved.length>0;}catch(e){}
+  try{saved=sessionStorage.getItem('mop_lic_v2')||'';ok=saved.length>0;}catch(e){}
   if(ok){var g=document.getElementById('pw-gate');if(g)g.style.display='none';}
   document.addEventListener('DOMContentLoaded',function(){
     var inp=document.getElementById('pw-input');
