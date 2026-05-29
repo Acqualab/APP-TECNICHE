@@ -288,7 +288,12 @@ const SUPA_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJ
 
 
 function isLicensed(){
-  try{return (sessionStorage.getItem('mop_lic_v2')||'').length>0;}catch(e){return false;}
+  try{
+    var k=sessionStorage.getItem('mop_lic_v2');
+    console.log('isLicensed check - key:', k);
+    if(!k||k.length===0)return false;
+    return true;
+  }catch(e){return false;}
 }
 function showPremiumBanner(){
   document.getElementById('premium-banner').style.display='flex';
@@ -989,6 +994,7 @@ function rc(name,icon,val,unit,cls=''){
 }
 function ok(msg){return`<div class="success-card">✅ ${msg}</div>`;}
 function calcPool(){
+  console.log("calcPool called, isLicensed=", isLicensed());
   const i=getLang();
   const v=+document.getElementById('v_piscina').value||0;
   const ph=+document.getElementById('ph_ril').value||0;
