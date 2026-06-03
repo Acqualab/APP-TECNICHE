@@ -1,4 +1,20 @@
-<!DOCTYPE html>
+<!DOCT
+<div class="tab-panel" id="tab-products">
+  <div style="padding: 20px 0;">
+    <div style="background: rgba(30,95,138,0.08); border: 1.5px solid rgba(30,95,138,0.15); border-radius: 12px; padding: 20px; margin-bottom: 16px; text-align: center;">
+      <div style="font-size: 32px; margin-bottom: 10px;">🛒</div>
+      <div style="font-family: var(--serif); font-size: 18px; color: var(--accent); font-weight: 600; margin-bottom: 8px;" id="prod-title">Prodotti Consigliati</div>
+      <div style="font-family: var(--sans); font-size: 13px; color: var(--muted); line-height: 1.6;" id="prod-desc">Una selezione di prodotti scelti per la cura della tua piscina. Presto disponibili con link diretti ai migliori prezzi.</div>
+    </div>
+    <div style="background: rgba(255,200,0,0.10); border: 1.5px solid rgba(255,180,0,0.25); border-radius: 12px; padding: 16px; text-align: center;">
+      <div style="font-size: 20px; margin-bottom: 6px;">🔔</div>
+      <div style="font-family: var(--sans); font-size: 13px; color: var(--muted); line-height: 1.6;" id="prod-coming">Sezione in arrivo — I prodotti consigliati saranno disponibili presto.</div>
+    </div>
+    <div style="margin-top: 20px; padding: 14px; background: rgba(30,95,138,0.05); border-radius: 10px; text-align: center;">
+      <div style="font-family: var(--sans); font-size: 12px; color: var(--muted);" id="prod-noad">🚫 Nessuna pubblicità — Solo prodotti selezionati con cura.</div>
+    </div>
+  </div>
+</div>YPE html>
 <html lang="it">
 <head>
 <meta charset="UTF-8"/>
@@ -268,7 +284,7 @@ hr.divider{border:none;border-top:1px solid var(--border);margin:20px 0;}
 }
 </style>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=DM+Mono:ital,wght@0,400;0,500;1,400&display=swap"></head>
-<body translate="no" class="notranslate"><div id="pw-gate" style="position:fixed;inset:0;z-index:99999;background:#1e5f8a;display:none;align-items:center;justify-content:center;padding:20px;">
+<body translate="no" class="notranslate"><div id="test-banner" style="background:red;color:white;text-align:center;padding:10px;font-size:18px;font-weight:bold;position:fixed;top:0;left:0;right:0;z-index:999999;">⚠️ VERSIONE FREEMIUM - NON LICENZIATO</div><div id="pw-gate" style="position:fixed;inset:0;z-index:99999;background:#1e5f8a;display:none;align-items:center;justify-content:center;padding:20px;">
   <div style="background:#faf8f4;border-radius:12px;padding:36px 32px;max-width:400px;width:100%;text-align:center;box-shadow:0 8px 40px rgba(0,0,0,0.3);">
     <div style="font-family:Playfair Display,Georgia,serif;color:#1e5f8a;font-size:28px;margin-bottom:4px;">Pool</div>
     <div style="font-family:Inter,sans-serif;font-size:11px;letter-spacing:2.5px;color:#3a8abf;text-transform:uppercase;margin-bottom:8px;">my own</div>
@@ -287,6 +303,67 @@ const SUPA_URL='https://ftmaajejjhzqndppjqcu.supabase.co';
 const SUPA_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZ0bWFhamVqamh6cW5kcHBqcWN1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODAwNTQ3NzUsImV4cCI6MjA5NTYzMDc3NX0.lb-IIgoae4wkqAIVOsAZ2ihDohk_Vj1tMTm-xNHlqMQ';
 
 
+
+function showLegal(type){
+  var overlay=document.getElementById('legal-overlay');
+  var title=document.getElementById('legal-title');
+  var body=document.getElementById('legal-body');
+  if(type==='terms'){
+    title.textContent='Termini e Condizioni di Utilizzo';
+    body.innerHTML=`
+      <p><strong>Versione 1.0 — 28 maggio 2026</strong></p>
+      <h3>1. Accettazione dei termini</h3>
+      <p>L'accesso e l'utilizzo dell'applicazione My Own Pool (disponibile su myownpool.app) implica l'accettazione integrale dei presenti Termini e Condizioni di Utilizzo.</p>
+      <h3>2. Descrizione del servizio</h3>
+      <p>My Own Pool è un'applicazione web per il calcolo dei dosaggi di prodotti chimici per piscine. Il servizio fornisce indicazioni puramente orientative e non sostituisce la consulenza di un professionista qualificato.</p>
+      <h3>3. Limitazione di responsabilità</h3>
+      <p>I calcoli forniti sono puramente indicativi. Il titolare declina qualsiasi responsabilità per danni derivanti dall'uso dei dosaggi calcolati, da dati errati inseriti dall'utente, o da mancato funzionamento del servizio.</p>
+      <h3>4. Accesso al servizio e licenza d'uso</h3>
+      <p>Previo pagamento, il titolare concede una licenza personale, non esclusiva, non trasferibile. È vietato condividere le credenziali, riprodurre o distribuire l'applicazione, effettuare reverse engineering.</p>
+      <h3>5. Prezzi e pagamenti</h3>
+      <p>I prezzi sono indicati su myownpool.app e possono essere modificati. I pagamenti sono gestiti da Gumroad Inc. / Stripe Inc.</p>
+      <h3>6. Diritto di recesso</h3>
+      <p>L'utente ha diritto di recedere entro 14 giorni dall'acquisto con rimborso integrale, salvo che abbia già acceduto e utilizzato il servizio digitale.</p>
+      <h3>7. Proprietà intellettuale</h3>
+      <p>Tutti i contenuti di My Own Pool sono di proprietà esclusiva del titolare. È vietata qualsiasi riproduzione senza autorizzazione scritta.</p>
+      <h3>8. Modifiche al servizio</h3>
+      <p>Il titolare si riserva il diritto di modificare o interrompere il servizio. Modifiche sostanziali ai Termini verranno comunicate con almeno 15 giorni di anticipo.</p>
+      <h3>9. Legge applicabile</h3>
+      <p>I presenti Termini sono regolati dalla legge italiana. Foro competente: Tribunale del luogo di residenza del titolare.</p>
+      <h3>10. Contatti</h3>
+      <p>info@myownpool.app — privacy@myownpool.app</p>
+      <p style="margin-top:16px;font-size:11px;">© 2026 My Own Pool — myownpool.app</p>
+    `;
+  } else {
+    title.textContent='Privacy Policy';
+    body.innerHTML=`
+      <p><strong>Informativa sul Trattamento dei Dati Personali — GDPR — Versione 1.0 — 28 maggio 2026</strong></p>
+      <h3>1. Titolare del trattamento</h3>
+      <p>La persona fisica che gestisce My Own Pool (myownpool.app). Contatto: privacy@myownpool.app</p>
+      <h3>2. Dati raccolti</h3>
+      <p>Dati forniti dall'utente: email, nome e cognome (facoltativi), dati di pagamento (gestiti da terzi).</p>
+      <p>Dati automatici: IP, browser, sistema operativo, data/ora di accesso, pagine visitate.</p>
+      <p>My Own Pool <strong>non raccoglie</strong> i parametri chimici inseriti né i risultati dei calcoli.</p>
+      <h3>3. Finalità del trattamento</h3>
+      <p>Erogazione del servizio, gestione pagamenti, adempimenti legali, comunicazioni di servizio, sicurezza del sistema.</p>
+      <h3>4. Conservazione dei dati</h3>
+      <p>Dati account: durata contratto + 10 anni. Dati di log: max 12 mesi. Dati marketing: fino alla revoca del consenso.</p>
+      <h3>5. Condivisione con terzi</h3>
+      <p>I dati non vengono venduti. Condivisi solo con Gumroad/Stripe (pagamenti), Netlify (hosting), autorità competenti.</p>
+      <h3>6. Diritti dell'interessato</h3>
+      <p>Accesso, rettifica, cancellazione, limitazione, portabilità, opposizione, revoca del consenso. Richieste a: privacy@myownpool.app</p>
+      <h3>7. Cookie</h3>
+      <p>Solo cookie tecnici necessari (sessione, lingua). Nessun cookie di profilazione o pubblicitario.</p>
+      <h3>8. Sicurezza</h3>
+      <p>Connessioni HTTPS/TLS, accesso protetto da autenticazione, aggiornamento regolare dei sistemi.</p>
+      <h3>9. Modifiche</h3>
+      <p>Modifiche sostanziali comunicate via email. Versione aggiornata sempre disponibile su myownpool.app/privacy.</p>
+      <p style="margin-top:16px;font-size:11px;">© 2026 My Own Pool — myownpool.app</p>
+    `;
+  }
+  overlay.style.display='flex';
+}
+
 function isLicensed(){
   try{
     var k=sessionStorage.getItem('mop_lic_v2');
@@ -295,6 +372,7 @@ function isLicensed(){
     return true;
   }catch(e){return false;}
 }
+function hidePremiumTestBanner(){var b=document.getElementById('test-banner');if(b)b.style.display='none';}
 function showPremiumBanner(){
   document.getElementById('premium-banner').style.display='flex';
 }
@@ -313,6 +391,7 @@ async function verifyLicense(){
     if(data&&data.length>0){
       document.getElementById('pw-gate').style.display='none';
       try{sessionStorage.setItem('mop_lic_v2',key);}catch(e){}
+      hidePremiumTestBanner();
       // Show disclaimer after license verified
       var ov=document.getElementById('disclaimer-overlay');
       if(ov){ov.style.display='flex';}
@@ -332,7 +411,7 @@ async function verifyLicense(){
   var ok=false;
   var saved='';
   try{saved=sessionStorage.getItem('mop_lic_v2')||'';ok=saved.length>0;}catch(e){}
-  if(ok){var g=document.getElementById('pw-gate');if(g)g.style.display='none';}
+  if(ok){var g=document.getElementById('pw-gate');if(g)g.style.display='none';hidePremiumTestBanner();}
   document.addEventListener('DOMContentLoaded',function(){
     var inp=document.getElementById('pw-input');
     if(inp)inp.addEventListener('keydown',function(e){if(e.key==='Enter')verifyLicense();});
@@ -343,6 +422,18 @@ async function verifyLicense(){
 <div class="app-wrapper">
 
 <!-- DISCLAIMER OVERLAY -->
+
+
+<!-- LEGAL OVERLAY -->
+<div id="legal-overlay" style="display:none;position:fixed;inset:0;z-index:99998;background:rgba(10,30,50,0.82);align-items:center;justify-content:center;padding:20px;">
+  <div id="legal-box" style="background:#faf8f4;border-radius:14px;max-width:520px;width:100%;max-height:80vh;display:flex;flex-direction:column;box-shadow:0 8px 40px rgba(0,0,0,0.35);">
+    <div style="padding:20px 24px 14px;border-bottom:1px solid #e0d8cc;display:flex;align-items:center;justify-content:space-between;">
+      <div id="legal-title" style="font-family:var(--serif);font-size:18px;color:var(--accent);font-weight:600;"></div>
+      <button onclick="document.getElementById('legal-overlay').style.display='none';" style="background:none;border:none;cursor:pointer;font-size:22px;color:#8aaabb;line-height:1;">✕</button>
+    </div>
+    <div id="legal-body" style="padding:20px 24px;overflow-y:auto;flex:1;font-family:var(--sans);font-size:12px;color:var(--muted);line-height:1.7;"></div>
+  </div>
+</div>
 
 <!-- PREMIUM BANNER -->
 <div id="premium-banner" style="display:none;position:fixed;inset:0;z-index:88888;background:rgba(10,30,50,0.82);align-items:center;justify-content:center;padding:20px;">
@@ -399,7 +490,10 @@ async function verifyLicense(){
         <div class="d-section-body" id="disc-s3-body">My Own Pool è un software proprietario. È vietata la riproduzione, la distribuzione o la modifica del software senza autorizzazione scritta. Tutti i diritti sono riservati.</div>
       </div>
     </div>
-    <div class="d-copyright" id="disc-copyright">© 2025 My Own Pool — Tutti i diritti riservati</div>
+    <div class="d-copyright" id="disc-copyright">© 2026 My Own Pool &nbsp;·&nbsp; 
+<a href="#" onclick="showLegal('terms');return false;" style="color:var(--muted);font-size:11px;text-decoration:none;">Termini di Servizio</a>
+&nbsp;·&nbsp;
+<a href="#" onclick="showLegal('privacy');return false;" style="color:var(--muted);font-size:11px;text-decoration:none;">Privacy Policy</a> — Tutti i diritti riservati</div>
     <div class="disclaimer-checkbox-row" id="disc-check-row">
       <input type="checkbox" id="disc-checkbox"/>
       <label for="disc-checkbox" id="disc-check-label">Ho letto e accetto i termini di utilizzo</label>
@@ -422,10 +516,10 @@ async function verifyLicense(){
   <text x="80" y="44" text-anchor="middle" font-family="Playfair Display, Georgia, serif" font-size="30" font-weight="400" fill="#1e5f8a" letter-spacing="1">Pool</text>
   <line x1="40" y1="48" x2="120" y2="48" stroke="#a8cfe8" stroke-width="0.8"/>
 </svg>
-      <div id="app-subtitle" style="font-size:22px;color:var(--soft);letter-spacing:2px;text-transform:uppercase;font-family:var(--sans);font-weight:400;font-style:italic;">Pool Dosage Calculator</div>
+      <div id="app-subtitle" style="font-size:22px;color:var(--soft);letter-spacing:2px;text-transform:uppercase;font-family:var(--sans);font-weight:400;font-style:italic;">Calcolo Dosaggi Piscina</div>
     </div>
     <div style="margin-top:10px;display:flex;justify-content:center;">
-      <span style="font-size:10px;color:var(--muted);font-family:var(--mono);background:rgba(30,95,138,0.10);border:1px solid rgba(30,95,138,0.25);border-radius:20px;padding:3px 10px;letter-spacing:1px;">My Own Pool V.1.00</span>
+      <span id="version-badge" style="font-size:10px;color:var(--muted);font-family:var(--mono);background:rgba(30,95,138,0.10);border:1px solid rgba(30,95,138,0.25);border-radius:20px;padding:3px 10px;letter-spacing:1px;">My Own Pool V.1.03</span>
     </div>
   </header>
 
@@ -433,6 +527,7 @@ async function verifyLicense(){
     <button class="tab-btn active" id="tb-pool" onclick="switchTab('tab-pool',this)"><span id="tb-pool-label">🏊 My Own Pool</span></button>
     <button class="tab-btn" id="tb-limits" onclick="switchTab('tab-limits',this)"><span id="tb-limits-label">⚙️ Limiti</span></button>
     <button class="tab-btn" id="tb-guide" onclick="switchTab('tab-guide',this)"><span id="tb-guide-label">📖 Guida</span></button>
+    <button class="tab-btn" id="tb-products" onclick="switchTab('tab-products',this)"><span id="tb-products-label">🛒 Prodotti</span></button>
   </div>
 
   <!-- TAB POOL -->
@@ -1406,7 +1501,7 @@ window.addEventListener('DOMContentLoaded',function(){
   loadLimits();
   try{const saved=localStorage.getItem('pa_lang');if(saved&&T[saved])currentLang=saved;}catch(e){}
   setLang(currentLang);
-  // Show disclaimer on first load
+  // Show disclaimer on load
   try{
     var ov=document.getElementById('disclaimer-overlay');
     if(ov){ov.style.display='flex';}
@@ -1454,7 +1549,10 @@ const DISC = {
     s2body:`My Own Pool, i suoi sviluppatori e distributori declinano qualsiasi responsabilità per danni diretti, indiretti, accidentali o consequenziali a persone, animali, cose o impianti derivanti dall'uso dei calcoli forniti. L'utente utilizza l'applicazione sotto la propria esclusiva responsabilità. I dosaggi dipendono dalla correttezza dei dati inseriti. L'uso di qualsiasi prodotto chimico deve avvenire nel rispetto delle schede di sicurezza del produttore e della normativa vigente. Questa applicazione non è un dispositivo di sicurezza certificato.`,
     s3title:'©️ Proprietà Intellettuale',
     s3body:`My Own Pool è un software proprietario. È vietata la riproduzione, la distribuzione o la modifica del software senza autorizzazione scritta. Tutti i diritti sono riservati.`,
-    copyright:'© 2025 My Own Pool — Tutti i diritti riservati',
+    copyright:'© 2026 My Own Pool &nbsp;·&nbsp; 
+<a href="#" onclick="showLegal('terms');return false;" style="color:var(--muted);font-size:11px;text-decoration:none;">Termini di Servizio</a>
+&nbsp;·&nbsp;
+<a href="#" onclick="showLegal('privacy');return false;" style="color:var(--muted);font-size:11px;text-decoration:none;">Privacy Policy</a> — Tutti i diritti riservati',
     checkLabel:'Ho letto e accetto i termini di utilizzo',
     btnLabel:'✓ Accetta e Continua',
   },
@@ -1466,7 +1564,10 @@ const DISC = {
     s2body:`My Own Pool, its developers and distributors expressly disclaim any liability for direct, indirect, incidental or consequential damages to persons, animals, property or equipment arising from the use of the calculations provided. The user uses the application entirely at their own risk. Calculated dosages depend on the accuracy of data entered. Any chemical product must always be used in accordance with the manufacturer's safety data sheet and applicable regulations. This application is not a certified safety device.`,
     s3title:'©️ Intellectual Property',
     s3body:`My Own Pool is proprietary software. Reproduction, distribution, or modification of the software without written authorization is prohibited. All rights reserved.`,
-    copyright:'© 2025 My Own Pool — All rights reserved',
+    copyright:'© 2026 My Own Pool &nbsp;·&nbsp; 
+<a href="#" onclick="showLegal('terms');return false;" style="color:var(--muted);font-size:11px;text-decoration:none;">Termini di Servizio</a>
+&nbsp;·&nbsp;
+<a href="#" onclick="showLegal('privacy');return false;" style="color:var(--muted);font-size:11px;text-decoration:none;">Privacy Policy</a> — All rights reserved',
     checkLabel:'I have read and accept the terms of use',
     btnLabel:'✓ Accept and Continue',
   },
@@ -1478,7 +1579,10 @@ const DISC = {
     s2body:`My Own Pool, ses développeurs et distributeurs déclinent toute responsabilité pour les dommages directs, indirects, accidentels ou consécutifs causés à des personnes, animaux, biens ou installations résultant de l'utilisation des calculs fournis. L'utilisateur utilise l'application sous sa propre responsabilité. Les dosages dépendent de l'exactitude des données saisies. Tout produit chimique doit être utilisé conformément aux fiches de sécurité du fabricant et à la réglementation en vigueur. Cette application n'est pas un dispositif de sécurité certifié.`,
     s3title:'©️ Propriété Intellectuelle',
     s3body:`My Own Pool est un logiciel propriétaire. La reproduction, la distribution ou la modification du logiciel sans autorisation écrite est interdite. Tous droits réservés.`,
-    copyright:'© 2025 My Own Pool — Tous droits réservés',
+    copyright:'© 2026 My Own Pool &nbsp;·&nbsp; 
+<a href="#" onclick="showLegal('terms');return false;" style="color:var(--muted);font-size:11px;text-decoration:none;">Termini di Servizio</a>
+&nbsp;·&nbsp;
+<a href="#" onclick="showLegal('privacy');return false;" style="color:var(--muted);font-size:11px;text-decoration:none;">Privacy Policy</a> — Tous droits réservés',
     checkLabel:"J'ai lu et j'accepte les conditions d'utilisation",
     btnLabel:'✓ Accepter et Continuer',
   },
@@ -1490,7 +1594,10 @@ const DISC = {
     s2body:`My Own Pool, seine Entwickler und Vertreiber lehnen jede Haftung für direkte, indirekte, zufällige oder Folgeschäden an Personen, Tieren, Sachen oder Anlagen ab, die aus der Nutzung der bereitgestellten Berechnungen entstehen. Der Benutzer verwendet die Anwendung auf eigenes Risiko. Berechnete Dosierungen hängen von der Richtigkeit der eingegebenen Daten ab. Jedes Chemikalienprodukt muss gemäß dem Sicherheitsdatenblatt des Herstellers und den geltenden Vorschriften verwendet werden. Diese Anwendung ist kein zertifiziertes Sicherheitsgerät.`,
     s3title:'©️ Geistiges Eigentum',
     s3body:`My Own Pool ist eine proprietäre Software. Vervielfältigung, Verbreitung oder Änderung der Software ohne schriftliche Genehmigung ist untersagt. Alle Rechte vorbehalten.`,
-    copyright:'© 2025 My Own Pool — Alle Rechte vorbehalten',
+    copyright:'© 2026 My Own Pool &nbsp;·&nbsp; 
+<a href="#" onclick="showLegal('terms');return false;" style="color:var(--muted);font-size:11px;text-decoration:none;">Termini di Servizio</a>
+&nbsp;·&nbsp;
+<a href="#" onclick="showLegal('privacy');return false;" style="color:var(--muted);font-size:11px;text-decoration:none;">Privacy Policy</a> — Alle Rechte vorbehalten',
     checkLabel:'Ich habe die Nutzungsbedingungen gelesen und akzeptiere sie',
     btnLabel:'✓ Akzeptieren und Fortfahren',
   },
@@ -1502,7 +1609,10 @@ const DISC = {
     s2body:`My Own Pool, sus desarrolladores y distribuidores declinan cualquier responsabilidad por daños directos, indirectos, accidentales o consecuentes a personas, animales, bienes o instalaciones derivados del uso de los cálculos proporcionados. El usuario utiliza la aplicación bajo su exclusiva responsabilidad. Las dosis calculadas dependen de la exactitud de los datos introducidos. Cualquier producto químico debe utilizarse de acuerdo con las fichas de seguridad del fabricante y la normativa vigente. Esta aplicación no es un dispositivo de seguridad certificado.`,
     s3title:'©️ Propiedad Intelectual',
     s3body:`My Own Pool es un software propietario. Se prohíbe la reproducción, distribución o modificación del software sin autorización escrita. Todos los derechos reservados.`,
-    copyright:'© 2025 My Own Pool — Todos los derechos reservados',
+    copyright:'© 2026 My Own Pool &nbsp;·&nbsp; 
+<a href="#" onclick="showLegal('terms');return false;" style="color:var(--muted);font-size:11px;text-decoration:none;">Termini di Servizio</a>
+&nbsp;·&nbsp;
+<a href="#" onclick="showLegal('privacy');return false;" style="color:var(--muted);font-size:11px;text-decoration:none;">Privacy Policy</a> — Todos los derechos reservados',
     checkLabel:'He leído y acepto los términos de uso',
     btnLabel:'✓ Aceptar y Continuar',
   },
@@ -1514,7 +1624,10 @@ const DISC = {
     s2body:`My Own Pool, os seus desenvolvedores e distribuidores declaram-se isentos de qualquer responsabilidade por danos diretos, indiretos, acidentais ou consequenciais causados a pessoas, animais, bens ou instalações resultantes da utilização dos cálculos fornecidos. O utilizador utiliza a aplicação sob sua exclusiva responsabilidade. As dosagens calculadas dependem da exatidão dos dados introduzidos. Qualquer produto químico deve ser utilizado em conformidade com as fichas de segurança do fabricante e a regulamentação vigente. Esta aplicação não é um dispositivo de segurança certificado.`,
     s3title:'©️ Propriedade Intelectual',
     s3body:`My Own Pool é um software proprietário. É proibida a reprodução, distribuição ou modificação do software sem autorização por escrito. Todos os direitos reservados.`,
-    copyright:'© 2025 My Own Pool — Todos os direitos reservados',
+    copyright:'© 2026 My Own Pool &nbsp;·&nbsp; 
+<a href="#" onclick="showLegal('terms');return false;" style="color:var(--muted);font-size:11px;text-decoration:none;">Termini di Servizio</a>
+&nbsp;·&nbsp;
+<a href="#" onclick="showLegal('privacy');return false;" style="color:var(--muted);font-size:11px;text-decoration:none;">Privacy Policy</a> — Todos os direitos reservados',
     checkLabel:'Li e aceito os termos de uso',
     btnLabel:'✓ Aceitar e Continuar',
   },
@@ -1526,7 +1639,10 @@ const DISC = {
     s2body:`My Own Pool, zijn ontwikkelaars en distributeurs wijzen elke aansprakelijkheid af voor directe, indirecte, incidentele of gevolgschade aan personen, dieren, eigendommen of installaties als gevolg van het gebruik van de verstrekte berekeningen. De gebruiker gebruikt de applicatie op eigen risico. Berekende doseringen zijn afhankelijk van de nauwkeurigheid van de ingevoerde gegevens. Elk chemisch product moet worden gebruikt in overeenstemming met het veiligheidsinformatieblad van de fabrikant en de geldende regelgeving. Deze applicatie is geen gecertificeerd veiligheidsapparaat.`,
     s3title:'©️ Intellectueel Eigendom',
     s3body:`My Own Pool is propriëtaire software. Reproductie, verspreiding of wijziging van de software zonder schriftelijke toestemming is verboden. Alle rechten voorbehouden.`,
-    copyright:'© 2025 My Own Pool — Alle rechten voorbehouden',
+    copyright:'© 2026 My Own Pool &nbsp;·&nbsp; 
+<a href="#" onclick="showLegal('terms');return false;" style="color:var(--muted);font-size:11px;text-decoration:none;">Termini di Servizio</a>
+&nbsp;·&nbsp;
+<a href="#" onclick="showLegal('privacy');return false;" style="color:var(--muted);font-size:11px;text-decoration:none;">Privacy Policy</a> — Alle rechten voorbehouden',
     checkLabel:'Ik heb de gebruiksvoorwaarden gelezen en ga akkoord',
     btnLabel:'✓ Accepteren en Doorgaan',
   },
@@ -1538,7 +1654,10 @@ const DISC = {
     s2body:`تخلي My Own Pool ومطوروها وموزعوها أي مسؤولية عن الأضرار المباشرة أو غير المباشرة أو العرضية أو التبعية التي تلحق بالأشخاص أو الحيوانات أو الممتلكات أو المنشآت الناجمة عن استخدام الحسابات المقدمة. يستخدم المستخدم التطبيق على مسؤوليته الخاصة. تعتمد الجرعات على دقة البيانات المدخلة. يجب استخدام أي منتج كيميائي وفقاً لبطاقة بيانات السلامة والتشريعات المعمول بها. هذا التطبيق ليس جهاز أمان معتمداً.`,
     s3title:'©️ الملكية الفكرية',
     s3body:`My Own Pool برنامج مملوك. يُحظر نسخ البرنامج أو توزيعه أو تعديله دون إذن كتابي. جميع الحقوق محفوظة.`,
-    copyright:'© 2025 My Own Pool — جميع الحقوق محفوظة',
+    copyright:'© 2026 My Own Pool &nbsp;·&nbsp; 
+<a href="#" onclick="showLegal('terms');return false;" style="color:var(--muted);font-size:11px;text-decoration:none;">Termini di Servizio</a>
+&nbsp;·&nbsp;
+<a href="#" onclick="showLegal('privacy');return false;" style="color:var(--muted);font-size:11px;text-decoration:none;">Privacy Policy</a> — جميع الحقوق محفوظة',
     checkLabel:'لقد قرأت وأوافق على شروط الاستخدام',
     btnLabel:'✓ قبول والمتابعة',
   },
@@ -1563,5 +1682,15 @@ function updateDisclaimer(code){
   document.getElementById('disclaimer-accept-btn').style.opacity='0.45';
 }
 </script>
+
+<!-- APP FOOTER -->
+<div style="text-align:center;padding:20px 16px 30px;margin-top:10px;border-top:1px solid rgba(30,95,138,0.1);">
+  <span style="font-family:var(--sans);font-size:11px;color:var(--muted);">© 2026 My Own Pool &nbsp;·&nbsp;
+  <a href="#" onclick="showLegal('terms');return false;" style="color:var(--muted);text-decoration:none;">Termini di Servizio</a>
+  &nbsp;·&nbsp;
+  <a href="#" onclick="showLegal('privacy');return false;" style="color:var(--muted);text-decoration:none;">Privacy Policy</a>
+  </span>
+</div>
+
 </body>
 </html>
